@@ -1,6 +1,6 @@
-export interface EmailSendResponse {
+export interface TemplateEmailResponse {
 
-    id: number,
+    id: string,
     name: string,
     body: string
 
