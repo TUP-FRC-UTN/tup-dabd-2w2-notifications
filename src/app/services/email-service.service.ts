@@ -1,4 +1,4 @@
-import {inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment as env } from '../../environments/environment.development';
 import { Base64Service } from './base64-service.service';
