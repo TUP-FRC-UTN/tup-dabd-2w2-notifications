@@ -1,0 +1,24 @@
+/* Estilos para la tabla */
+.table {
+    width: 100%;
+    border-collapse: collapse; /* Eliminar espacio entre bordes */
+}
+
+.table th, .table td {
+    padding: 10px;
+    border: 2px solid #FFA500; /* Borde naranja */
+    text-align: left;
+    background-color: #FFF8DC; /* Fondo claro para las celdas */
+}
+
+.table th {
+    background-color: #FFA500; /* Fondo naranja para los encabezados */
+    color: rgb(10, 10, 10); /* Texto blanco para los títulos de las columnas */
+}
+
+.custom-form {
+    background-color: #FFEFD5; /* Fondo del formulario */
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #FFA500; /* Borde del contenedor */
+}

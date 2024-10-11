@@ -26,7 +26,7 @@ export class TemplateEmailComponent {
 
 
 
-  public async sendEmail(templateName: string, templateBody: string): Promise<void> {
+  public async sendEmailTemplate(templateName: string, templateBody: string): Promise<void> {
 
 
 
@@ -142,11 +142,13 @@ export class TemplateEmailComponent {
   // }
 
 
+  
+
+
+
 
 
 }
-
-
 
 
 

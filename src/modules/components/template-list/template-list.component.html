@@ -1,0 +1,26 @@
+<div class="custom-form">
+    <h1>Listado de Templates</h1><br>
+    <!-- Campo para el Asunto -->
+    <div class="d-flex align-items-center mb-3">
+        <label for="search" class="text-orange me-2">Buscar</label>
+        <input type="text" class="form-control custom-input" id="search" name="search" placeholder="Buscar">
+    </div>
+
+    <table class="table custom-input">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Template Body</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for(x of templates; track $index){
+            <tr>
+                <td>{{ x.name }}</td>
+                <td>{{ x.base64body }}</td>
+            </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
