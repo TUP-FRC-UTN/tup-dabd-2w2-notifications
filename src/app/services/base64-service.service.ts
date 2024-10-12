@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class Base64Service {
+
   encodeToBase64(text: string): string {
     return btoa(encodeURIComponent(text));
   }
