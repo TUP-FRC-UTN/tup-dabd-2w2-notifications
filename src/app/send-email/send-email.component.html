@@ -2,26 +2,32 @@
     <div class="card-body">
         <form #form="ngForm" (ngSubmit)="enviar(form)">
             <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Para el correo:</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" style="max-width: 400px;"/>
+                <label class="form-label">Para el correo:</label>
+                <input type="email" class="form-control" id="email" name="email" style="max-width: 400px;"
+                [(ngModel)]="emailToSend"/>
             </div>
             <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Asunto:</label>
-                <input type="text" class="form-control" id="exampleInputPassword1" style="max-width: 400px;"/>
+                <label class="form-label">Asunto:</label>
+                <input type="text" class="form-control" id="asunto" name="asunto" style="max-width: 400px;"
+                [(ngModel)]="subject"/>
             </div>
             <h6>Variables</h6>
             <div class="mb-3">
                 <div class="row">
                     <div class="col-6">
-                        <label for="exampleInputPassword1" class="form-label">Nombre:</label>
-                        <input type="text" class="form-control" id="exampleInputPassword1" style="max-width: 200px;"/>
-                        <label for="exampleInputPassword1" class="form-label">Valor:</label>
-                        <input type="text" class="form-control" id="exampleInputPassword1" style="max-width: 200px;"/>
+                        <label class="form-label">Nombre:</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" style="max-width: 200px;"
+                        [(ngModel)]="name"/>
+                        <label class="form-label">Valor:</label>
+                        <input type="text" class="form-control" id="valor" name="valor" style="max-width: 200px;"
+                        [(ngModel)]="value"/>
                     </div>
                     <div class="col-6">
-                        <button class="btn btn-secondary">+</button>
+                        <button class="btn btn-secondary" (click)="addVariables()">+</button>
                         <br>
-                        <p>hola</p>
+                        <div *ngFor="let item of variables | keyvalue">
+                            <p>{{"Nombre: " + item.key + " / Valor: " + item.value }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -47,7 +53,7 @@
                 <div class="col-1"></div>
                 <div class="col-1"><button type="submit" class="btn btn-primary">Enviar</button></div>
             </div>
-            </form>
+        </form>
     </div>
 </div>
 
