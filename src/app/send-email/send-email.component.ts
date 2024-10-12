@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Form, FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-send-email',
@@ -9,5 +9,12 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './send-email.component.css'
 })
 export class SendEmailComponent {
-  variables : Map<String, String> = new Map<String, String>
+  //variables : Map<String, String> = new Map<String, String>
+  emailToSend : string | undefined
+  subject : string | undefined
+  variables : Map<string, string> | undefined
+
+  enviar(form : Form){
+
+  }
 }
