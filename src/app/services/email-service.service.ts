@@ -47,10 +47,20 @@ export class EmailServiceService {
       console.error('Error to get templates, try again please:', error);
       return error;
 
-    }
-
-
+    }  
   }
+  /*public async sendEmail(emailToSend: string, subject: string, variables: Map<string, string>) {
+    const body = {
+        "recipient": emailToSend,      // Recipient's email address
+        "subject": subject,        // Email subject
+        "variables": variables,
+        "template_id": 0            // ID of the template to use
+    }
+    const url = `${env.apiUrl}/emails/send`
+    try{
+      const response = await this.http.post<any>(url)
+    }
+  }*/
 }
 
 
