@@ -2,6 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment as env } from '../../environments/environment.development';
 import { Base64Service } from './base64-service.service';
+import { Observable } from 'rxjs';
+import { EmailTemplate } from '../models/emailTemplates';
 @Injectable({
   providedIn: 'root'
 })
@@ -49,20 +51,12 @@ export class EmailServiceService {
 
     }  
   }
-  /*public async sendEmail(emailToSend: string, subject: string, variables: Map<string, string>) {
-    const body = {
-        "recipient": emailToSend,      // Recipient's email address
-        "subject": subject,        // Email subject
-        "variables": variables,
-        "template_id": 0            // ID of the template to use
-    }
+  getEmailTemplatesNew(): Observable<EmailTemplate[]> {
+    return this.http.get<EmailTemplate[]>(`${env.apiUrl}/email-templates`)
+  }
+
+  /*sendEmail(json: any) {
     const url = `${env.apiUrl}/emails/send`
-    try{
-      const response = await this.http.post<any>(url)
-    }
+    this.http.post<any>(url)
   }*/
 }
-
-
-
-
