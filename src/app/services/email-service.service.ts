@@ -4,6 +4,7 @@ import { environment as env } from '../../environments/environment.development';
 import { Base64Service } from './base64-service.service';
 import { Observable } from 'rxjs';
 import { EmailTemplate } from '../models/emailTemplates';
+import { EmailData } from '../models/emailData';
 @Injectable({
   providedIn: 'root'
 })
@@ -55,8 +56,8 @@ export class EmailServiceService {
     return this.http.get<EmailTemplate[]>(`${env.apiUrl}/email-templates`)
   }
 
-  /*sendEmail(json: any) {
+  sendEmail(data: EmailData) {
     const url = `${env.apiUrl}/emails/send`
-    this.http.post<any>(url)
-  }*/
+    return this.http.post<EmailData>(url, data)
+  }
 }

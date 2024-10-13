@@ -32,12 +32,12 @@ export class SendEmailComponent implements OnInit{
 
   enviar(form : Form) {
     
-    const json = {
+    /*const json = {
       "recipient": this.emailToSend,
       "subject": this.subject,
       "variables": this.variables,
       "template_id": this.templateID
-    }
+    }*/
     const data : EmailData = {
       recipient: this.emailToSend,
       subject: this.subject,
@@ -46,7 +46,10 @@ export class SendEmailComponent implements OnInit{
     }
     
     console.log(data)
-    //this.service.sendEmail(json)
+    this.service.sendEmail(data).subscribe({
+      next: (data) => alert("Enviado con exito"),
+      error: (errr) => alert("Hubo un error al enviar el correo" +  errr)
+    })
   }
   addVariables() {
     if (this.name != null && this.name !== "" && this.value != null && this.value !== "") {
