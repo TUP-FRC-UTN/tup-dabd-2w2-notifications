@@ -16,13 +16,15 @@ import { Variable } from '../models/variables';
 export class SendEmailComponent implements OnInit{
 
   service : EmailServiceService = inject(EmailServiceService);
+
   emailToSend : string = ""
   subject : string = ""
   name : string = ""
   value : string = ""
+  templateID : number = 0
+
   variables : Variable[] = []
   templates : EmailTemplate[] = []
-  templateID : number = 0
 
   ngOnInit(): void {
     this.service.getEmailTemplatesNew().subscribe((data) => {
@@ -31,13 +33,7 @@ export class SendEmailComponent implements OnInit{
   }
 
   enviar(form : Form) {
-    
-    /*const json = {
-      "recipient": this.emailToSend,
-      "subject": this.subject,
-      "variables": this.variables,
-      "template_id": this.templateID
-    }*/
+
     const data : EmailData = {
       recipient: this.emailToSend,
       subject: this.subject,
@@ -48,7 +44,13 @@ export class SendEmailComponent implements OnInit{
     console.log(data)
     this.service.sendEmail(data).subscribe({
       next: (data) => alert("Enviado con exito"),
-      error: (errr) => alert("Hubo un error al enviar el correo" +  errr)
+      error: (errr) => alert("Hubo un error al enviar el correo" +  errr),
+      complete: () => {
+        this.emailToSend = ""
+        this.subject = ""
+        this.name = ""
+        this.value = ""
+      }
     })
   }
   addVariables() {
