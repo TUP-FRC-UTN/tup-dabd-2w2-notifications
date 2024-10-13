@@ -44,7 +44,7 @@ export class TemplateEditionComponent implements OnInit {
 
     if (form.valid) {
 
-      return await this.editEmailTemplate(form.value.templateBodyName, form.value.templateBodyModel);
+      return await this.editEmailTemplate(form.value.templateBodyName != undefined ? form.value.templateBodyName : this.templateName, form.value.templateBodyModel);
 
     }
 

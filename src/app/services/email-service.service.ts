@@ -55,7 +55,7 @@ export class EmailServiceService {
 
   public async editEmailTemplate(templateName: string, templateBody: string, id: string): Promise<any> {
 
-    const url = `${env.apiUrl}/email-templates` + id;
+    const url = `${env.apiUrl}/email-templates/` + id;
 
     try {
 
