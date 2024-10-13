@@ -18,7 +18,8 @@ export class SendEmailComponent {
   name : string = ""
   value : string = ""
   variables : Map<string, string> = new Map<string, string>()
-  templateID : number | undefined
+  //templateID : number | undefined
+  templateID : number = 0
 
   enviar(form : Form) {
     //this.service.sendEmail(this.emailToSend, this.subject, this.variables)
