@@ -17,7 +17,4 @@ export const routes: Routes = [
     {
         path: 'send-email', component: SendEmailComponent
     }
-
-
-
 ];
