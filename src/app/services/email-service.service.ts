@@ -2,6 +2,9 @@ import { inject, Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment as env } from '../../environments/environment.development';
 import { Base64Service } from './base64-service.service';
+import { Observable } from 'rxjs';
+import { EmailTemplate } from '../models/emailTemplates';
+import { EmailData } from '../models/emailData';
 @Injectable({
   providedIn: 'root'
 })
@@ -48,9 +51,15 @@ export class EmailServiceService {
       console.error('Un error ha ocurrido al obtener los templates, re intente nuevamente.', error);
       return error;
 
-    }
+    }  
+  }
+  getEmailTemplatesNew(): Observable<EmailTemplate[]> {
+    return this.http.get<EmailTemplate[]>(`${env.apiUrl}/email-templates`)
+  }
 
-
+  sendEmail(data: EmailData) {
+    const url = `${env.apiUrl}/emails/send`
+    return this.http.post<EmailData>(url, data)
   }
 
   public async editEmailTemplate(templateName: string, templateBody: string, id: string): Promise<any> {
@@ -72,7 +81,3 @@ export class EmailServiceService {
   }
 
 }
-
-
-
-

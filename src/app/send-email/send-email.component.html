@@ -1,0 +1,72 @@
+<div class="card">
+    <div class="card-body">
+        <form #form="ngForm" (ngSubmit)="enviar(form)">
+            <div class="mb-3">
+                <label class="form-label">Enviar a:</label>
+                <input type="email" class="form-control" id="email" name="email" style="max-width: 400px;"
+                [(ngModel)]="emailToSend"/>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Asunto:</label>
+                <input type="text" class="form-control" id="asunto" name="asunto" style="max-width: 400px;"
+                [(ngModel)]="subject"/>
+            </div>
+            <h6>Variables</h6>
+            <div class="mb-3">
+                <div class="row">
+                    <div class="col-6">
+                        <label class="form-label">Nombre:</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" style="max-width: 200px;"
+                        [(ngModel)]="name"/>
+                        <label class="form-label">Valor:</label>
+                        <input type="text" class="form-control" id="valor" name="valor" style="max-width: 200px;"
+                        [(ngModel)]="value"/>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-secondary mb-3" (click)="addVariables()">+</button>
+                        <br>
+                        <h6>Tus Variables:</h6>
+                        @for (item of variables; track $index) {
+                            <p>Nombre: {{item.key}} Valor: {{item.value}}</p>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h6>Plantillas</h6>
+                <!--
+                <select class="form-select" style="max-width: 200px;" name="plantillas" id="plantillas"
+                [(ngModel)]="templateID">
+                    <option [value]="1">One</option>
+                    <option [value]="2">Two</option>
+                    <option [value]="3">Three</option>
+                </select>
+                -->
+                
+                <select class="form-select" style="max-width: 200px;" name="plantillas" id="plantillas"
+                [(ngModel)]="templateID">
+                @for (item of templates; track $index) {
+                    <option [value]=item.id> {{item.name}} </option>
+                }
+                </select>
+                
+            </div>
+            <!-- Si encuentran otra forma de hacerlo, haganlo-->
+            <div class="row"> 
+                <div class="col-1"></div>
+                <div class="col-1"></div>
+                <div class="col-1"></div>
+                <div class="col-1"></div>
+                <div class="col-1"></div>
+                <div class="col-1"></div>
+                <div class="col-1"></div>
+                <div class="col-1"></div>
+                <div class="col-1"></div>
+                <div class="col-1"></div>
+                <div class="col-1"></div>
+                <div class="col-1"><button type="submit" class="btn btn-primary">Enviar</button></div>
+            </div>
+        </form>
+    </div>
+</div>
+
