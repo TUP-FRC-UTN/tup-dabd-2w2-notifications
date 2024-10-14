@@ -1,0 +1,49 @@
+/* Estilo para el contenedor principal */
+.d-flex {
+    display: flex;
+    height: 100vh; /* Toda la altura de la ventana */
+    overflow: hidden; /* Evitar scroll en todo el contenedor */
+}
+
+/* Sidebar fijo */
+.sidebar {
+    width: 200px; /* Ancho del sidebar */
+    background-color: #FFEFD5; /* Color de fondo del sidebar */
+    padding: 20px; /* Espaciado interno */
+    border-right: 2px solid #FFA500; /* Borde derecho */
+    position: fixed; /* Fijar el sidebar */
+    top: 0; /* Alinearlo al tope */
+    bottom: 0; /* Alinearlo a la parte inferior */
+    left: 0; /* Alinearlo al lado izquierdo */
+    overflow-y: auto; /* Hacer scroll si el contenido del sidebar es mayor */
+}
+
+/* Listado del sidebar */
+.sidebar-list {
+    list-style-type: none; /* Eliminar viñetas */
+    padding: 0;
+}
+
+.sidebar-list li {
+    margin: 10px 0; /* Separación entre elementos */
+}
+
+.sidebar-list a {
+    text-decoration: none; /* Sin subrayado */
+    color: #000;
+}
+
+.sidebar-list a:hover {
+    color: #FFA500;
+}
+
+/* Estilo para el contenido principal */
+.main-content {
+    margin-left: 220px; /* Desplazar el contenido hacia la derecha */
+    width: calc(100% - 220px); /* Ajustar el ancho del contenido */
+    overflow-y: auto; /* Hacer scroll solo en el contenido principal */
+}
+
+.content {
+    padding: 20px; /* Espaciado interno */
+}

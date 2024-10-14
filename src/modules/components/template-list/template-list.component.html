@@ -1,0 +1,58 @@
+<div class="custom-form">
+    <h1>Listado de Templates</h1><br>
+
+
+    <div class="d-flex align-items-center mb-3">
+        <label for="search" class="text-orange me-2 fw-bold">Buscar</label>
+        <input type="text" class="form-control custom-input me-3" id="search" name="search">
+
+        <label for="status" class="text-orange me-2 fw-bold">Estado</label>
+        <input type="text" class="form-control custom-input me-3" id="status" name="status">
+
+        <button type="button" class="btn btn-danger me-2">PDF</button>
+
+        <button type="button" class="btn btn-success me-2">Excel</button>
+    </div>
+
+
+    <table class="table custom-input">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Template</th>
+                <th>Previsualizar / Editar </th>
+            </tr>
+        </thead>
+        <tbody>
+            @for(x of templates; track $index){
+            <tr>
+                <td>{{ x.name }}</td>
+                <td class="template-body-cell">{{ x.body }}</td>
+                <td class="template-body-cell" style="text-align: center;">
+                    <button type="button" class="btn btn-secondary me-2"
+                        (click)="previewContent($index)">Previsualizar</button>
+
+                    <button type="button" class="btn btn-secondary me-2"
+                        (click)="editEmailTemplate($index)">Editar</button>
+                </td>
+
+            </tr>
+
+            }
+
+        </tbody>
+
+    </table>
+
+
+    <!-- Modal -->
+    <div class="modal" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
+            <iframe #iframePreview style="width: 100%; border: none;"></iframe>
+            <button type="button" class="btn btn-primary" (click)="closeModalToRenderHTML()">Aceptar</button>
+        </div>
+    </div>
+
+
+</div>
