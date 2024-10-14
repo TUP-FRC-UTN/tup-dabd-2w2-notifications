@@ -1,7 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Form, FormsModule } from '@angular/forms';
-import { EmailServiceService } from '../../../app/services/email-service.service';
+import { EmailServiceService } from     '../../../app/services/email-service.service';
+import { EmailTemplate } from '../../../app/models/emailTemplates';
+import { EmailData } from '../../../app/models/emailData';
+import { Variable } from '../../../app/models/variables';
 
 @Component({
   selector: 'app-send-email',
@@ -10,32 +13,65 @@ import { EmailServiceService } from '../../../app/services/email-service.service
   templateUrl: './send-email.component.html',
   styleUrl: './send-email.component.css'
 })
-export class SendEmailComponent {
-  //variables : Map<String, String> = new Map<String, String>
+export class SendEmailComponent implements OnInit{
+
   service : EmailServiceService = inject(EmailServiceService);
+
   emailToSend : string = ""
   subject : string = ""
   name : string = ""
   value : string = ""
-  variables : Map<string, string> = new Map<string, string>()
-  templateID : number | undefined
+  templateID : number = 0
+
+  variables : Variable[] = []
+  templates : EmailTemplate[] = []
+
+  ngOnInit(): void {
+    this.service.getEmailTemplatesNew().subscribe((data) => {
+      this.templates = data
+    })
+  }
 
   enviar(form : Form) {
-    //this.service.sendEmail(this.emailToSend, this.subject, this.variables)
-    const json = {
-      "recipient": this.emailToSend,      // Recipient's email address
-      "subject": this.subject,        // Email subject
-      "variables": this.variables,
-      "template_id": this.templateID            // ID of the template to use
+
+    const data : EmailData = {
+      recipient: this.emailToSend,
+      subject: this.subject,
+      variables: this.variables,
+      template_id: this.templateID
     }
-    alert(JSON.stringify(json))
-    console.log(json)
+    
+    console.log(data)
+    this.service.sendEmail(data).subscribe({
+      next: (data) => {
+        alert("Enviado con exito")
+        this.clean()
+      },
+      error: (errr) => {
+        alert("Hubo un error al enviar el correo, pruebe más tarde")
+      }
+    })
+    //this.clean()
   }
   addVariables() {
     if (this.name != null && this.name !== "" && this.value != null && this.value !== "") {
-      this.variables.set(this.name, this.value);
+
+      const newVariable : Variable = {
+        key : this.name,
+        value : this.value
+      }
+
+      this.variables.push(newVariable)
       this.name = "";
       this.value = "";
     }    
+  }
+  clean() {
+    this.emailToSend = ""
+    this.subject = ""
+    this.name = ""
+    this.value = ""
+    this.templateID = 0
+    this.variables = []
   }
 }
