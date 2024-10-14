@@ -43,15 +43,15 @@ export class SendEmailComponent implements OnInit{
     
     console.log(data)
     this.service.sendEmail(data).subscribe({
-      next: (data) => alert("Enviado con exito"),
-      error: (errr) => alert("Hubo un error al enviar el correo" +  errr),
-      complete: () => {
-        this.emailToSend = ""
-        this.subject = ""
-        this.name = ""
-        this.value = ""
+      next: (data) => {
+        alert("Enviado con exito")
+        this.clean()
+      },
+      error: (errr) => {
+        alert("Hubo un error al enviar el correo, pruebe más tarde")
       }
     })
+    //this.clean()
   }
   addVariables() {
     if (this.name != null && this.name !== "" && this.value != null && this.value !== "") {
@@ -65,5 +65,13 @@ export class SendEmailComponent implements OnInit{
       this.name = "";
       this.value = "";
     }    
+  }
+  clean() {
+    this.emailToSend = ""
+    this.subject = ""
+    this.name = ""
+    this.value = ""
+    this.templateID = 0
+    this.variables = []
   }
 }
