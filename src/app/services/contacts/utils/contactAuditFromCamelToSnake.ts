@@ -1,6 +1,6 @@
-import _ from 'lodash';
+import {_, mapKeys, camelCase} from 'lodash';
 
-import { AuditHistory, Changes } from '../../../models/contacts/contactAudit';
+import { AuditHistory, Changes, ContactAudit } from '../../../models/contacts/contactAudit';
 
 export const transformAuditHistoryData = (data: any[]): AuditHistory[] => {
   return data.map(item => {
@@ -17,3 +17,19 @@ export const transformAuditHistoryData = (data: any[]): AuditHistory[] => {
     } as AuditHistory;
   });
 };
+
+
+export function transformToContactAuditData(auditHistories: AuditHistory[]): ContactAudit[] {
+  return auditHistories
+    .filter(audit => audit.entity === 'ContactEntity') // Filtrar solo por la entidad ContactEntity
+    .map(audit => {
+      const contactAudit = {
+        entityId: audit.entity_id,
+        revisionDate: audit.revision_date,
+        changedBy: audit.changed_by,
+        contactValue: audit.changes.contact_value,
+        contactType: audit.changes.contact_type
+      };
+      return mapKeys(contactAudit, (value: any, key : any) => camelCase(key)); // Convertir a camelCase
+    });
+}

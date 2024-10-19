@@ -13,3 +13,13 @@ export interface AuditHistory {
     contact_value: string;          // Valor del contacto (email, número de teléfono, enlace)
     contact_type: ContactType;      // Tipo de contacto (EMAIL, PHONE, SOCIAL_MEDIA_LINK)
   }
+
+
+  export interface ContactAudit {
+    entityId: number;         // ID del contacto auditado
+    revisionDate: string;     // Fecha y hora de la revisión (en formato ISO)
+    changedBy: number;        // ID del usuario que hizo el cambio
+    contactValue: string;     // Valor del contacto (email, número de teléfono, enlace)
+    contactType: ContactType; // Tipo de contacto (EMAIL, PHONE, SOCIAL_MEDIA_LINK)
+  }
+  

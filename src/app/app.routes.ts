@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { TemplateEmailComponent } from '../modules/components/template-email/template-email.component';
 import { TemplateListComponent } from '../modules/components/template-list/template-list.component';
 import { SendEmailComponent } from '../modules/components/send-email/send-email.component';
+import { ContactAuditHistoryComponent } from '../modules/components/contact-audit-history/contact-audit-history.component';
 
 
 export const routes: Routes = [
@@ -16,5 +17,9 @@ export const routes: Routes = [
     },
     {
         path: 'send-email', component: SendEmailComponent
-    }
+    },
+    {
+        path: 'contact-audit', component: ContactAuditHistoryComponent
+    },
+
 ];
