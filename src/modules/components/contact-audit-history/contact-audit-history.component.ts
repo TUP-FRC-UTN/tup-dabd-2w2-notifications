@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 
 import {TableColumn, TableComponent} from 'ngx-dabd-grupo01';
 import { ContactType } from '../../../app/models/contacts/contactType';
@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './contact-audit-history.component.html',
   styleUrl: './contact-audit-history.component.css'
 })
-export class ContactAuditHistoryComponent {
+export class ContactAuditHistoryComponent implements OnInit {
 
 
   items: ContactAudit[] = [];
@@ -40,10 +40,9 @@ export class ContactAuditHistoryComponent {
       { headerName: "Fecha del cambio", accessorKey: "revisionDate" },
       { headerName: "Cambiado por", accessorKey: "changedBy" },
       { headerName: "Tipo de contacto", accessorKey: "contactTpe" },
-      { headerName: "Valor", accessorKey: "value" },
-
-
-    ]
+      { headerName: "Valor", accessorKey: "value" }
+    ];
+    this.loadData();
   }
 
   ngOnDestroy(): void {

@@ -14,7 +14,7 @@ export class ContactAuditService {
   private readonly http = inject(HttpClient); // Angular's new inject function
 
   // URL de la API que devuelve el historial de auditoría
-  private apiUrl = 'https://my-json-server.typicode.com/114050-RODI-CARO-Nicolas/contact-audit-mock/'
+  private apiUrl = 'https://my-json-server.typicode.com/114050-RODI-CARO-Nicolas/contact-audit-mock/audit_history'
 
   /**
    * Método para obtener todo el historial de auditoría
