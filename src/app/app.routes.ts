@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-
 import { TemplateEmailComponent } from '../modules/components/template-email/template-email.component';
 import { TemplateListComponent } from '../modules/components/template-list/template-list.component';
 import { TemplateEditionComponent } from '../modules/components/template-edition/template-edition.component';
+import { SendEmailComponent } from '../modules/components/send-email/send-email.component';
 
 export const routes: Routes = [
   {
@@ -16,5 +16,9 @@ export const routes: Routes = [
   {
     path: 'template/change/:id',
     component: TemplateEditionComponent,
+  },
+  {
+    path: 'send-email',
+    component: SendEmailComponent,
   },
 ];
