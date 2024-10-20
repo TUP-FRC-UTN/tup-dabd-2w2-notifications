@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { Base64Service } from './base64-service.service';
 import { TemplateSendModel } from '../models/templateSendModel';
 import { TemplateModelResponse } from '../models/templateModelResponse';
+import { EmailData } from '../models/emailData';
 @Injectable({
   providedIn: 'root',
 })
@@ -43,4 +44,11 @@ export class EmailServiceService {
     });
     
   }
+
+
+  sendEmail(data: EmailData) {
+    const url = `${env.apiUrl}/emails/send`
+    return this.http.post<EmailData>(url, data)
+  }
+
 }
