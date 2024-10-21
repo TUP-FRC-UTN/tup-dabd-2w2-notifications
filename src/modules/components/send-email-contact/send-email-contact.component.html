@@ -1,9 +1,10 @@
 <div class="card">
     <div class="card-body">
-        <form (ngSubmit)="submit()">
-            <label >hola</label>
-            <input type="">
-            <button></button>
+        <form #form="ngForm" (submit)="submit()">
+            <label class="form-label"> Elegir Contactos: </label>
+            <select name="Contactos" id="contactos">
+                
+            </select>
         </form>
     </div>
 </div>
