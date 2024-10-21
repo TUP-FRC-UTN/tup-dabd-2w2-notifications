@@ -1,11 +1,13 @@
 import { inject, Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment as env } from '../../environments/environment.development';
+import { environment as env, environment } from '../../environments/environment.development';
 import { Observable } from 'rxjs';
 import { Base64Service } from './base64-service.service';
 import { TemplateSendModel } from '../models/templateSendModel';
 import { TemplateModelResponse } from '../models/templateModelResponse';
 import { EmailData } from '../models/emailData';
+import { EmailTemplate } from '../models/emailTemplates';
+import { EmailDataContact } from '../models/emailDataContact';
 @Injectable({
   providedIn: 'root',
 })
@@ -32,6 +34,9 @@ export class EmailServiceService {
 
     return this.http.get<TemplateModelResponse[]>(url);
   }
+  getEmailTemplatesNew(): Observable<EmailTemplate[]> {
+    return this.http.get<EmailTemplate[]>(`${env.apiUrl}/email-templates`)
+  }
 
   editEmailTemplate(template:TemplateModelResponse) : Observable<TemplateModelResponse> {
 
@@ -49,6 +54,10 @@ export class EmailServiceService {
   sendEmail(data: EmailData) {
     const url = `${env.apiUrl}/emails/send`
     return this.http.post<EmailData>(url, data)
+  }
+  sendEmailWithContacts(data : EmailDataContact) {
+    const url = `${environment}/emails/send-to-contacts`
+    return this.http.post<EmailDataContact>(url, data)
   }
 
 }
