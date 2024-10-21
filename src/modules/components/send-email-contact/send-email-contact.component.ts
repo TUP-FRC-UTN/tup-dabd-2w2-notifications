@@ -20,12 +20,13 @@ export class SendEmailContactComponent implements OnInit{
   subjectToSend : string = ""
   variables : Variable[] = []
   template_id : number | undefined
-  contact_id : number | undefined
+  contacts_id : number[] = []
 
   serviceEmail = new EmailServiceService()
   serviceContacts = new ContactsService()
 
   allContacts : Contacts[] = []
+  selectedContactId : number = 0
   /*emailDataWithContact = new FormGroup({
     subject : new FormControl(''),
     variables : new FormControl(''),
@@ -35,10 +36,28 @@ export class SendEmailContactComponent implements OnInit{
 
 
   ngOnInit(): void {
-    
+    this.serviceContacts.getAllContacts().subscribe((data) => {
+      data.forEach(contact => {
+        if (contact.contact_type === "EMAIL") {
+          this.allContacts.push(contact)
+        }
+      })
+    })
   }
 
   submit() {
     throw new Error('Method not implemented.');
+  }
+  addContact() {
+    if (this.selectedContactId != 0) {
+      this.contacts_id.push(this.selectedContactId)
+    }
+  }
+  showContactById(id : number): string {
+    let contactName : string = ""
+    this.serviceContacts.getContactById(id).subscribe((data) => {
+      contactName = data.contact_value
+    })
+    return contactName
   }
 }

@@ -1,10 +1,25 @@
 <div class="card">
     <div class="card-body">
         <form #form="ngForm" (submit)="submit()">
-            <label class="form-label"> Elegir Contactos: </label>
-            <select name="Contactos" id="contactos">
-                
-            </select>
+            <div class="row">
+                <div class="col-6">
+                    <label class="form-label">Elegir Contactos:</label>
+                    <div class="d-flex align-items-center">
+                        <select class="form-select me-2" style="max-width: 250px;" name="Contactos" id="contactos" [(ngModel)]="selectedContactId">
+                            @for (c of allContacts; track $index) {
+                                <option [value]="c.id"> {{c.contact_value}} </option>
+                            }
+                        </select>
+                        <button type="button" class="btn btn-secondary"(click)="addContact()"> + </button>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h6>Contactos Seleccionados:</h6>
+                    @for (selectedContactId of contacts_id; track $index) {
+                        <p> {{showContactById(selectedContactId)}} </p>
+                    }
+                </div>
+            </div>
         </form>
     </div>
 </div>
