@@ -61,12 +61,9 @@ export class SendEmailContactComponent implements OnInit{
       this.contacts_id.push(this.selectedContactId)
     }
   }
-  showContactById(id : number): string {
-    let contactName : string = ""
-    this.serviceContacts.getContactById(id).subscribe((data) => {
-      contactName = data.contact_value
-    })
-    return contactName
+  showContactById(id: number): string {
+    const contact = this.allContacts.find(contact => contact.id == id);
+    return contact ? contact.contact_value : '';
   }
   addVariables() {
     if (this.variableName != null && this.variableName !== "" && this.variableValue != null && this.variableValue !== "") {
@@ -97,6 +94,7 @@ export class SendEmailContactComponent implements OnInit{
         this.clean()
       },
       error: (errr) => {
+        console.log(errr);
         alert("Hubo un error al enviar el correo, pruebe más tarde")
       }
     })

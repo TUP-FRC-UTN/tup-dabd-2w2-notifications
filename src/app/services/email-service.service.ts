@@ -16,12 +16,12 @@ export class EmailServiceService {
   private readonly http = inject(HttpClient);
 
   base64Service: Base64Service = new Base64Service();
-  urlBase : string = "localhost:8081"
+  urlBase : string = "http://localhost:8081"
 
   sendEmailTemplate(
     template: TemplateSendModel
   ): Observable<TemplateModelResponse> {
-    const url = `${env.apiUrl}/email-templates`;
+    const url = `${this.urlBase}/email-templates`;
 
     return this.http.post<TemplateModelResponse>(url, {
       name: template.name,
@@ -31,14 +31,14 @@ export class EmailServiceService {
 
   getEmailTemplates() {
     
-    const url = `${env.apiUrl}/email-templates`;
+    const url = `${this.urlBase}/email-templates`;
 
     return this.http.get<TemplateModelResponse[]>(url);
   }
 
   editEmailTemplate(template:TemplateModelResponse) : Observable<TemplateModelResponse> {
 
-    const url = `${env.apiUrl}/email-templates/` + template.id;
+    const url = `${this.urlBase}/email-templates/` + template.id;
 
     return this.http.put<TemplateModelResponse>(url, {
       name: template.name,

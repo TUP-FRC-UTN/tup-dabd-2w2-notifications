@@ -8,8 +8,8 @@ import { Contacts } from '../models/contacts';
 })
 export class ContactsService {
 
-  private readonly http : HttpClient = inject(HttpClient)
-  urlBase : string = "localhost:8085/contacts"
+  /*private readonly*/ http : HttpClient = inject(HttpClient)
+  urlBase : string = "http://localhost:8585/contacts"
   
   getAllContacts() {
     //const url = `${environment + "/contacts"}`
@@ -17,6 +17,7 @@ export class ContactsService {
   }
   getContactById(id : number) {
     //const url = `${environment + "/contacts/" + id}`
+    console.log(this.urlBase + "/" + id)
     return this.http.get<Contacts>(this.urlBase + "/" + id)
   }
 }
