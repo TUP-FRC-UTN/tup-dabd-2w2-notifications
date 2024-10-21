@@ -49,9 +49,9 @@
             <!---->
             <h6>Plantillas</h6>
                 <select class="form-select" style="max-width: 200px;" name="plantillas" id="plantillas"
-                [(ngModel)]="selectedTemplateId">
+                [(ngModel)]="template_id">
                 @for (item of allTemplates; track $index) {
-                    <option [value]=item.id> {{item.name}} </option>
+                    <option [value]="item.id"> {{item.name}} </option>
                 }
                 </select>
                 

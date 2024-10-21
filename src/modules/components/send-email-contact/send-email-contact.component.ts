@@ -33,7 +33,7 @@ export class SendEmailContactComponent implements OnInit{
   allContacts : Contacts[] = []
   allTemplates : EmailTemplate[] = []
   selectedContactId : number = 0
-  selectedTemplateId : number = 0
+  //selectedTemplateId : number = 0
   variableName : string = ""
   variableValue : string = ""
   /*emailDataWithContact = new FormGroup({
