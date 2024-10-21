@@ -9,13 +9,14 @@ import { Contacts } from '../models/contacts';
 export class ContactsService {
 
   private readonly http : HttpClient = inject(HttpClient)
+  urlBase : string = "localhost:8085/contacts"
   
   getAllContacts() {
-    const url = `${environment + "/contacts"}`
-    return this.http.get<Contacts[]>(url)
+    //const url = `${environment + "/contacts"}`
+    return this.http.get<Contacts[]>(this.urlBase)
   }
   getContactById(id : number) {
-    const url = `${environment + "/contacts/" + id}`
-    return this.http.get<Contacts>(url)
+    //const url = `${environment + "/contacts/" + id}`
+    return this.http.get<Contacts>(this.urlBase + "/" + id)
   }
 }
