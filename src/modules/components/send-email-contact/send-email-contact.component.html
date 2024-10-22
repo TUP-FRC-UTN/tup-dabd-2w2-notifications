@@ -1,26 +1,40 @@
 <div class="card">
     <div class="card-body">
-        <form #form="ngForm" (ngSubmit)="enviar(form)">
-            <div class="mb-3">
-                <label class="form-label">Enviar a:</label>
-                <input #email="ngModel" type="email" class="form-control" id="email" name="email" style="max-width: 400px;"
-                [(ngModel)]="emailToSend"
-                required
-                [ngClass]="{'is-invalid' : email.invalid && (email.dirty || email.touched), 'is-valid' : email.valid}"/>
-                @if (email.invalid && (email.dirty || email.touched)) {
-                    @if (email.getError('required')) {
-                        <div class="text-danger"> Campo Obligatorio </div>
+        <form #form="ngForm" (submit)="submit()">
+            <!---->
+            <div class="row">
+                <div class="col-6">
+                    <label class="form-label">Elegir Contactos:</label>
+                    <div class="d-flex align-items-center">
+                        <select #contactos="ngModel" class="form-select me-2" style="max-width: 350px;" name="Contactos" id="contactos" [(ngModel)]="selectedContactId"
+                        required
+                        [ngClass]="{'is-invalid': contactos.invalid && (contactos.dirty || contactos.touched), 'is-valid': contactos.valid && (contactos.dirty || contactos.touched)}">
+                            @for (c of allContacts; track $index) {
+                                <option [value]="c.id"> {{c.contact_value}} </option>
+                            }
+                            @if (contactos.invalid && (contactos.dirty || contactos.touched)) {
+                                @if (contactos.getError('required')) {
+                                    <div class="text-danger"> Campo Obligatorio </div>
+                                }
+                            }
+                        </select>
+                        <button type="button" class="btn btn-secondary"(click)="addContact()"> + </button>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h6>Contactos Seleccionados:</h6>
+                    @for (selectedContactId of contacts_id; track $index) {
+                        <p> {{showContactById(selectedContactId)}} </p>
                     }
-                    @if (email.getError('email')) {
-                        <div class="text-danger"> Correo Inválido </div>
+                    @if (contacts_id.length == 0) {
+                        <div class="text-danger"> Debe seleccionar al menos un contacto </div>
                     }
-                }
+                </div>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Asunto:</label>
-                <input #asunto="ngModel" type="text" class="form-control" id="asunto" name="asunto" style="max-width: 400px;"
-                [(ngModel)]="subject"
-                required minlength="3"
+            <!---->
+            <label class="form-label mt-3">Asunto:</label>
+            <input #asunto="ngModel" name="subject" type="text" class="form-control mb-3" style="max-width: 350px;" [(ngModel)]="subjectToSend"
+            required minlength="3"
                 [ngClass]="{'is-invalid' : asunto.invalid && (asunto.dirty || asunto.touched), 'is-valid' : asunto.valid}"/>
                 @if (asunto.invalid && (asunto.dirty || asunto.touched)) {
                     @if (asunto.getError('minlength')) {
@@ -29,34 +43,17 @@
                         <div class="text-danger"> Campo Obligatorio </div>
                     }
                 }
-            </div>
             <!--
-            
-            <h6>Variables</h6>
+            <h6 class="mt-3">Variables</h6>
             <div class="mb-3">
                 <div class="row">
                     <div class="col-6">
                         <label class="form-label">Nombre:</label>
-                        <input #nombre="ngModel" type="text" class="form-control" id="nombre" name="nombre" style="max-width: 200px;"
-                        [(ngModel)]="name"
-                        required
-                        [ngClass]="{'is-invalid' : nombre.invalid && (nombre.dirty || nombre.touched), 'is-valid' : nombre.valid}"/>
-                        @if (nombre.invalid && (nombre.dirty || nombre.touched)) {
-                            @if (nombre.getError('required')) {
-                                <div class="text-danger"> Campo Obligatorio </div>
-                            }
-                        }
-
+                        <input type="text" class="form-control" id="nombre" name="nombre" style="max-width: 200px;"
+                        [(ngModel)]="variableName"/>
                         <label class="form-label">Valor:</label>
-                        <input #valor="ngModel" type="text" class="form-control" id="valor" name="valor" style="max-width: 200px;"
-                        [(ngModel)]="value"
-                        required
-                        [ngClass]="{'is-invalid' : valor.invalid && (valor.dirty || nombre.touched), 'is-valid' : valor.valid}"/>
-                        @if (valor.invalid && (valor.dirty || valor.touched)) {
-                            @if (nombre.getError('required')) {
-                                <div class="text-danger"> Campo Obligatorio </div>
-                            }
-                        }
+                        <input type="text" class="form-control" id="valor" name="valor" style="max-width: 200px;"
+                        [(ngModel)]="variableValue"/>
                     </div>
                     <div class="col-6">
                         <button type="button" class="btn btn-secondary mb-3" (click)="addVariables()">+</button>
@@ -68,17 +65,15 @@
                     </div>
                 </div>
             </div>
-
             -->
-            <div>
-                <h6>Plantillas</h6>
+            <h6>Plantillas</h6>
                 <select #plantillas="ngModel" class="form-select" style="max-width: 200px;" name="plantillas" id="plantillas"
-                [(ngModel)]="templateID"
+                [(ngModel)]="template_id"
                 required
                 [ngClass]="{'is-invalid': plantillas.invalid && (plantillas.dirty || plantillas.touched), 'is-valid': plantillas.valid && (plantillas.dirty || plantillas.touched)}">
                 
-                @for (item of templates; track $index) {
-                    <option [value]=item.id> {{item.name}} </option>
+                @for (item of allTemplates; track $index) {
+                    <option [value]="item.id"> {{item.name}} </option>
                 }
                 </select>
                 @if (plantillas.invalid && (plantillas.dirty || plantillas.touched)) {
@@ -86,7 +81,7 @@
                         <div class="text-danger"> Campo Obligatorio </div>
                     }
                 }
-            </div>
+                
             <!-- Si encuentran otra forma de hacerlo, haganlo-->
             <div class="row"> 
                 <div class="col-1"></div>
@@ -105,4 +100,3 @@
         </form>
     </div>
 </div>
-

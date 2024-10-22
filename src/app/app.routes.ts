@@ -3,6 +3,7 @@ import { TemplateEmailComponent } from '../modules/components/template-email/tem
 import { TemplateListComponent } from '../modules/components/template-list/template-list.component';
 import { TemplateEditionComponent } from '../modules/components/template-edition/template-edition.component';
 import { SendEmailComponent } from '../modules/components/send-email/send-email.component';
+import { SendEmailContactComponent } from '../modules/components/send-email-contact/send-email-contact.component';
 
 export const routes: Routes = [
   {
@@ -21,4 +22,8 @@ export const routes: Routes = [
     path: 'send-email',
     component: SendEmailComponent,
   },
+  {
+    path: 'send-email-contact',
+    component: SendEmailContactComponent,
+  }
 ];
