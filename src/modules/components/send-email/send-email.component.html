@@ -3,24 +3,60 @@
         <form #form="ngForm" (ngSubmit)="enviar(form)">
             <div class="mb-3">
                 <label class="form-label">Enviar a:</label>
-                <input type="email" class="form-control" id="email" name="email" style="max-width: 400px;"
-                [(ngModel)]="emailToSend"/>
+                <input #email="ngModel" type="email" class="form-control" id="email" name="email" style="max-width: 400px;"
+                [(ngModel)]="emailToSend"
+                required
+                [ngClass]="{'is-invalid' : email.invalid && (email.dirty || email.touched), 'is-valid' : email.valid}"/>
+                @if (email.invalid && (email.dirty || email.touched)) {
+                    @if (email.getError('required')) {
+                        <div class="text-danger"> Campo Obligatorio </div>
+                    }
+                    @if (email.getError('email')) {
+                        <div class="text-danger"> Correo Inválido </div>
+                    }
+                }
             </div>
             <div class="mb-3">
                 <label class="form-label">Asunto:</label>
-                <input type="text" class="form-control" id="asunto" name="asunto" style="max-width: 400px;"
-                [(ngModel)]="subject"/>
+                <input #asunto="ngModel" type="text" class="form-control" id="asunto" name="asunto" style="max-width: 400px;"
+                [(ngModel)]="subject"
+                required minlength="3"
+                [ngClass]="{'is-invalid' : asunto.invalid && (asunto.dirty || asunto.touched), 'is-valid' : asunto.valid}"/>
+                @if (asunto.invalid && (asunto.dirty || asunto.touched)) {
+                    @if (email.getError('minlength')) {
+                        <div class="text-danger"> Debe contener mínimo tres caracteres </div>
+                    }@else {
+                        <div class="text-danger"> Campo Obligatorio </div>
+                    }
+                }
             </div>
+            <!--
+            
             <h6>Variables</h6>
             <div class="mb-3">
                 <div class="row">
                     <div class="col-6">
                         <label class="form-label">Nombre:</label>
-                        <input type="text" class="form-control" id="nombre" name="nombre" style="max-width: 200px;"
-                        [(ngModel)]="name"/>
+                        <input #nombre="ngModel" type="text" class="form-control" id="nombre" name="nombre" style="max-width: 200px;"
+                        [(ngModel)]="name"
+                        required
+                        [ngClass]="{'is-invalid' : nombre.invalid && (nombre.dirty || nombre.touched), 'is-valid' : nombre.valid}"/>
+                        @if (nombre.invalid && (nombre.dirty || nombre.touched)) {
+                            @if (nombre.getError('required')) {
+                                <div class="text-danger"> Campo Obligatorio </div>
+                            }
+                        }
+
                         <label class="form-label">Valor:</label>
-                        <input type="text" class="form-control" id="valor" name="valor" style="max-width: 200px;"
-                        [(ngModel)]="value"/>
+                        <input #valor="ngModel" type="text" class="form-control" id="valor" name="valor" style="max-width: 200px;"
+                        [(ngModel)]="value"
+                        required
+                        [ngClass]="{'is-invalid' : valor.invalid && (valor.dirty || nombre.touched), 'is-valid' : valor.valid}"/>
+                        @if (valor.invalid && (valor.dirty || valor.touched)) {
+                            @if (nombre.getError('required')) {
+                                <div class="text-danger"> Campo Obligatorio </div>
+                            }
+                        }
                     </div>
                     <div class="col-6">
                         <button type="button" class="btn btn-secondary mb-3" (click)="addVariables()">+</button>
@@ -32,24 +68,24 @@
                     </div>
                 </div>
             </div>
+
+            -->
             <div>
                 <h6>Plantillas</h6>
-                <!--
-                <select class="form-select" style="max-width: 200px;" name="plantillas" id="plantillas"
-                [(ngModel)]="templateID">
-                    <option [value]="1">One</option>
-                    <option [value]="2">Two</option>
-                    <option [value]="3">Three</option>
-                </select>
-                -->
+                <select #plantillas="ngModel" class="form-select" style="max-width: 200px;" name="plantillas" id="plantillas"
+                [(ngModel)]="templateID"
+                required
+                [ngClass]="{'is-invalid': plantillas.invalid && (plantillas.dirty || plantillas.touched), 'is-valid': plantillas.valid && (plantillas.dirty || plantillas.touched)}">
                 
-                <select class="form-select" style="max-width: 200px;" name="plantillas" id="plantillas"
-                [(ngModel)]="templateID">
                 @for (item of templates; track $index) {
                     <option [value]=item.id> {{item.name}} </option>
                 }
                 </select>
-                
+                @if (plantillas.invalid && (plantillas.dirty || plantillas.touched)) {
+                    @if (plantillas.getError('required')) {
+                        <div class="text-danger"> Campo Obligatorio </div>
+                    }
+                }
             </div>
             <!-- Si encuentran otra forma de hacerlo, haganlo-->
             <div class="row"> 
@@ -64,7 +100,7 @@
                 <div class="col-1"></div>
                 <div class="col-1"></div>
                 <div class="col-1"></div>
-                <div class="col-1"><button type="submit" class="btn btn-primary">Enviar</button></div>
+                <div class="col-1"><button type="submit" class="btn btn-primary" [disabled]="form.invalid">Enviar</button></div>
             </div>
         </form>
     </div>

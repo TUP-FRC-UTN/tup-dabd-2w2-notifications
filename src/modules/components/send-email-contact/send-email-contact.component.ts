@@ -35,6 +35,7 @@ export class SendEmailContactComponent implements OnInit{
   selectedContactId : number = 0
   variableName : string = ""
   variableValue : string = ""
+  
   /*emailDataWithContact = new FormGroup({
     subject : new FormControl(''),
     variables : new FormControl(''),
