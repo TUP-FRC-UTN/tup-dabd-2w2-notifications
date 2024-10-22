@@ -6,9 +6,16 @@
                 <div class="col-6">
                     <label class="form-label">Elegir Contactos:</label>
                     <div class="d-flex align-items-center">
-                        <select class="form-select me-2" style="max-width: 350px;" name="Contactos" id="contactos" [(ngModel)]="selectedContactId">
+                        <select #contactos="ngModel" class="form-select me-2" style="max-width: 350px;" name="Contactos" id="contactos" [(ngModel)]="selectedContactId"
+                        required
+                        [ngClass]="{'is-invalid': contactos.invalid && (contactos.dirty || contactos.touched), 'is-valid': contactos.valid && (contactos.dirty || contactos.touched)}">
                             @for (c of allContacts; track $index) {
                                 <option [value]="c.id"> {{c.contact_value}} </option>
+                            }
+                            @if (contactos.invalid && (contactos.dirty || contactos.touched)) {
+                                @if (contactos.getError('required')) {
+                                    <div class="text-danger"> Campo Obligatorio </div>
+                                }
                             }
                         </select>
                         <button type="button" class="btn btn-secondary"(click)="addContact()"> + </button>
@@ -19,12 +26,24 @@
                     @for (selectedContactId of contacts_id; track $index) {
                         <p> {{showContactById(selectedContactId)}} </p>
                     }
+                    @if (contacts_id.length == 0) {
+                        <div class="text-danger"> Debe seleccionar al menos un contacto </div>
+                    }
                 </div>
             </div>
             <!---->
             <label class="form-label mt-3">Asunto:</label>
-            <input name="subject" type="text" class="form-control" style="max-width: 350px;" [(ngModel)]="subjectToSend">
-            <!---->
+            <input #asunto="ngModel" name="subject" type="text" class="form-control mb-3" style="max-width: 350px;" [(ngModel)]="subjectToSend"
+            required minlength="3"
+                [ngClass]="{'is-invalid' : asunto.invalid && (asunto.dirty || asunto.touched), 'is-valid' : asunto.valid}"/>
+                @if (asunto.invalid && (asunto.dirty || asunto.touched)) {
+                    @if (asunto.getError('minlength')) {
+                        <div class="text-danger"> Debe contener mínimo tres caracteres </div>
+                    }@else {
+                        <div class="text-danger"> Campo Obligatorio </div>
+                    }
+                }
+            <!--
             <h6 class="mt-3">Variables</h6>
             <div class="mb-3">
                 <div class="row">
@@ -46,14 +65,22 @@
                     </div>
                 </div>
             </div>
-            <!---->
+            -->
             <h6>Plantillas</h6>
-                <select class="form-select" style="max-width: 200px;" name="plantillas" id="plantillas"
-                [(ngModel)]="template_id">
+                <select #plantillas="ngModel" class="form-select" style="max-width: 200px;" name="plantillas" id="plantillas"
+                [(ngModel)]="template_id"
+                required
+                [ngClass]="{'is-invalid': plantillas.invalid && (plantillas.dirty || plantillas.touched), 'is-valid': plantillas.valid && (plantillas.dirty || plantillas.touched)}">
+                
                 @for (item of allTemplates; track $index) {
                     <option [value]="item.id"> {{item.name}} </option>
                 }
                 </select>
+                @if (plantillas.invalid && (plantillas.dirty || plantillas.touched)) {
+                    @if (plantillas.getError('required')) {
+                        <div class="text-danger"> Campo Obligatorio </div>
+                    }
+                }
                 
             <!-- Si encuentran otra forma de hacerlo, haganlo-->
             <div class="row"> 
@@ -68,7 +95,7 @@
                 <div class="col-1"></div>
                 <div class="col-1"></div>
                 <div class="col-1"></div>
-                <div class="col-1"><button type="submit" class="btn btn-primary">Enviar</button></div>
+                <div class="col-1"><button type="submit" class="btn btn-primary" [disabled]="form.invalid">Enviar</button></div>
             </div>
         </form>
     </div>

@@ -8,11 +8,12 @@ import { ContactsService } from '../../../app/services/contacts.service';
 import { EmailTemplate } from '../../../app/models/emailTemplates';
 import { Base64Service } from '../../../app/services/base64-service.service';
 import { EmailDataContact } from '../../../app/models/emailDataContact';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-send-email-contact',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, CommonModule],
   templateUrl: './send-email-contact.component.html',
   styleUrl: './send-email-contact.component.css'
 })
@@ -35,7 +36,7 @@ export class SendEmailContactComponent implements OnInit{
   selectedContactId : number = 0
   variableName : string = ""
   variableValue : string = ""
-  
+
   /*emailDataWithContact = new FormGroup({
     subject : new FormControl(''),
     variables : new FormControl(''),
@@ -60,6 +61,7 @@ export class SendEmailContactComponent implements OnInit{
     if (this.selectedContactId != 0) {
       this.contacts_id.push(this.selectedContactId)
     }
+    this.selectedContactId = 0
   }
   showContactById(id: number): string {
     const contact = this.allContacts.find(contact => contact.id == id);

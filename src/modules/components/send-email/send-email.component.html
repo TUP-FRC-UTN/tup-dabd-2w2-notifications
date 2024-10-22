@@ -23,7 +23,7 @@
                 required minlength="3"
                 [ngClass]="{'is-invalid' : asunto.invalid && (asunto.dirty || asunto.touched), 'is-valid' : asunto.valid}"/>
                 @if (asunto.invalid && (asunto.dirty || asunto.touched)) {
-                    @if (email.getError('minlength')) {
+                    @if (asunto.getError('minlength')) {
                         <div class="text-danger"> Debe contener mínimo tres caracteres </div>
                     }@else {
                         <div class="text-danger"> Campo Obligatorio </div>
