@@ -1,6 +1,5 @@
 import { inject, Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment as env, environment } from '../../environments/environment.development';
 import { Observable } from 'rxjs';
 import { Base64Service } from './base64-service.service';
 import { TemplateSendModel } from '../models/templateSendModel';
@@ -8,6 +7,7 @@ import { TemplateModelResponse } from '../models/templateModelResponse';
 import { EmailData } from '../models/emailData';
 import { EmailTemplate } from '../models/emailTemplates';
 import { EmailDataContact } from '../models/emailDataContact';
+import { environmentNotifications } from '../../environments/environment.development.notifications';
 @Injectable({
   providedIn: 'root',
 })
@@ -16,12 +16,11 @@ export class EmailServiceService {
   private readonly http = inject(HttpClient);
 
   base64Service: Base64Service = new Base64Service();
-  urlBase : string = "http://localhost:8081"
 
   sendEmailTemplate(
     template: TemplateSendModel
   ): Observable<TemplateModelResponse> {
-    const url = `${this.urlBase}/email-templates`;
+    const url = `${environmentNotifications.apiUrl}/email-templates`;
 
     return this.http.post<TemplateModelResponse>(url, {
       name: template.name,
@@ -31,14 +30,14 @@ export class EmailServiceService {
 
   getEmailTemplates() {
     
-    const url = `${this.urlBase}/email-templates`;
+    const url = `${environmentNotifications.apiUrl}/email-templates`;
 
     return this.http.get<TemplateModelResponse[]>(url);
   }
 
   editEmailTemplate(template:TemplateModelResponse) : Observable<TemplateModelResponse> {
 
-    const url = `${this.urlBase}/email-templates/` + template.id;
+    const url = `${environmentNotifications.apiUrl}/email-templates/` + template.id;
 
     return this.http.put<TemplateModelResponse>(url, {
       name: template.name,
@@ -50,14 +49,14 @@ export class EmailServiceService {
 
   
   getEmailTemplatesNew(): Observable<EmailTemplate[]> {
-    return this.http.get<EmailTemplate[]>(`${this.urlBase}/email-templates`)
+    return this.http.get<EmailTemplate[]>(`${environmentNotifications.apiUrl}/email-templates`)
   }
   sendEmail(data: EmailData) {
-    const url = `${this.urlBase}/emails/send`
+    const url = `${environmentNotifications.apiUrl}/emails/send`
     return this.http.post<EmailData>(url, data)
   }
   sendEmailWithContacts(data : EmailDataContact) {
-    const url = `${this.urlBase}/emails/send-to-contacts`
+    const url = `${environmentNotifications.apiUrl}/emails/send-to-contacts`
     return this.http.post<EmailDataContact>(url, data)
   }
 

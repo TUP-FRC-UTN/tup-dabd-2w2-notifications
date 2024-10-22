@@ -2,22 +2,22 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { Contacts } from '../models/contacts';
+import { environmentContacts } from '../../environments/environment.development.contacts';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ContactsService {
 
-  /*private readonly*/ http : HttpClient = inject(HttpClient)
-  urlBase : string = "http://localhost:8585/contacts"
+  http : HttpClient = inject(HttpClient)
   
   getAllContacts() {
-    //const url = `${environment + "/contacts"}`
-    return this.http.get<Contacts[]>(this.urlBase)
+    const url = `${environmentContacts.apiUrl + "/contacts"}`
+    return this.http.get<Contacts[]>(url)
   }
   getContactById(id : number) {
-    //const url = `${environment + "/contacts/" + id}`
-    console.log(this.urlBase + "/" + id)
-    return this.http.get<Contacts>(this.urlBase + "/" + id)
+    const url = `${environment + "/contacts/" + id}`
+    console.log(environmentContacts.apiUrl + "/" + id)
+    return this.http.get<Contacts>(url + "/" + id)
   }
 }
