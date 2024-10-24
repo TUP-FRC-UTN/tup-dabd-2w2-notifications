@@ -4,6 +4,7 @@ import { TemplateListComponent } from '../modules/components/template-list/templ
 import { TemplateEditionComponent } from '../modules/components/template-edition/template-edition.component';
 import { SendEmailComponent } from '../modules/components/send-email/send-email.component';
 import { SendEmailContactComponent } from '../modules/components/send-email-contact/send-email-contact.component';
+import { ContactAuditHistoryComponent } from '../modules/components/contact-audit-history/contact-audit-history.component';
 
 export const routes: Routes = [
   {
@@ -25,5 +26,8 @@ export const routes: Routes = [
   {
     path: 'send-email-contact',
     component: SendEmailContactComponent,
-  }
+  },
+  {
+    path: 'contact-audit', component: ContactAuditHistoryComponent
+},
 ];

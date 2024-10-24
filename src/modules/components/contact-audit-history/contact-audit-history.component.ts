@@ -4,6 +4,7 @@ import {TableColumn, TableComponent} from 'ngx-dabd-grupo01';
 import {  ContactAudit } from '../../../app/models/contacts/contactAudit';
 import { ContactAuditService } from '../../../app/services/contact-audit.service';
 import { Subscription } from 'rxjs';
+import { ContactType } from '../../../app/models/contacts/contactType';
 @Component({
   selector: 'app-contact-audit-history',
   standalone: true,
@@ -12,6 +13,10 @@ import { Subscription } from 'rxjs';
   styleUrl: './contact-audit-history.component.css'
 })
 export class ContactAuditHistoryComponent implements OnInit {
+
+
+    
+
 
 
   items: ContactAudit[] = [];
@@ -27,7 +32,7 @@ export class ContactAuditHistoryComponent implements OnInit {
   loadData():void {
     this.isLoading = true;
     this.subscription.add(
-      this.contactAuditService.get().subscribe({
+      this.contactAuditService.getContactAudits().subscribe({
         next: (data : ContactAudit[]) => this.items = data
       })
     )
@@ -38,9 +43,9 @@ export class ContactAuditHistoryComponent implements OnInit {
       { headerName: "ID del Contacto", accessorKey: "contactId" },
       { headerName: "Fecha del cambio", accessorKey: "revisionDate" },
       { headerName: "ID del cambio", accessorKey: "revisionId" },
-      { headerName: "Tipo de cambio", accessorKey: "contactType" },
+      { headerName: "Tipo de revision", accessorKey: "revisionType" },
       { headerName: "Tipo de contacto", accessorKey: "contactType" },
-      { headerName: "Valor del contacto", accessorKey: "contactValue" }
+      { headerName: "Valor del contacto", accessorKey: "value" }
      
     ];
     this.loadData();
