@@ -14,12 +14,13 @@ export class ContactService {
 
   getAllContacts() {
     const url = `${environmentContacts.apiUrl + "/contacts"}`
+    //console.log(url);
     return this.http.get<Contact[]>(url)
   }
 
   getContactById(id: number) {
     const url = `${environment + "/contacts/" + id}`
-    console.log(environmentContacts.apiUrl + "/" + id)
+    //console.log(environmentContacts.apiUrl + "/" + id)
     return this.http.get<Contact>(url + "/" + id)
   }
 

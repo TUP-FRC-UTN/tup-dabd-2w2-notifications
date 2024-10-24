@@ -28,21 +28,18 @@ export class ContactModifySubsEmailComponent implements OnInit{
   })
 
   allContacts : Contact[] = []
-  //selectedContactId : number = 0
   selectedContact : Contact | undefined
   allSubsFromSelectedContact : Subscription[] = []
 
   ngOnInit(): void {
     this.serviceContact.getAllContacts().subscribe((data) => {
       data.forEach(c => {
-        if (c.contactType === 'EMAIL') {
+        if (c.contactType === "EMAIL") {
           this.allContacts.push(c)
         }
       })
     })
-    this.serviceContact.getContactById(this.modification.get('contactId')?.value).subscribe((data) => {
-      this.selectedContact = data
-    })
+    console.log(this.allContacts);
   }
   
   //Al array de nombres lo manda como array de objetos Subscription que coincidan con ese name
@@ -65,7 +62,11 @@ export class ContactModifySubsEmailComponent implements OnInit{
       this.allSubsFromSelectedContact = subscriptions;
     });
   }
-  
+  set() {
+    this.serviceContact.getContactById(this.modification.get('contactId')?.value).subscribe((data) => {
+      this.selectedContact = data
+    })
+  }
   
 
   submit() {
