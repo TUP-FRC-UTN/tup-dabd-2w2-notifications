@@ -4,7 +4,7 @@ import {TableColumn, TableComponent} from 'ngx-dabd-grupo01';
 import {  ContactAudit } from '../../../app/models/contacts/contactAudit';
 import { ContactAuditService } from '../../../app/services/contact-audit.service';
 import { Subscription } from 'rxjs';
-import { ContactType } from '../../../app/models/contacts/contactType';
+
 @Component({
   selector: 'app-contact-audit-history',
   standalone: true,
@@ -33,7 +33,12 @@ export class ContactAuditHistoryComponent implements OnInit {
     this.isLoading = true;
     this.subscription.add(
       this.contactAuditService.getContactAudits().subscribe({
-        next: (data : ContactAudit[]) => this.items = data
+        next: (data : ContactAudit[]) => 
+        {
+          console.log('Datos que llegan al componente: ', data)
+          this.items = data;
+        }
+         
       })
     )
   }
