@@ -13,6 +13,7 @@ import { environmentNotifications } from '../../environments/environment.develop
 })
 @Inject('Base64Service')
 export class EmailServiceService {
+  
   private readonly http = inject(HttpClient);
 
   base64Service: Base64Service = new Base64Service();
@@ -29,7 +30,7 @@ export class EmailServiceService {
   }
 
   getEmailTemplates() {
-    
+
     const url = `${environmentNotifications.apiUrl}/email-templates`;
 
     return this.http.get<TemplateModelResponse[]>(url);
@@ -42,12 +43,12 @@ export class EmailServiceService {
     return this.http.put<TemplateModelResponse>(url, {
       name: template.name,
       base64body: this.base64Service.encodeToBase64(template.base64body),
-      
+
     });
-    
+
   }
 
-  
+
   getEmailTemplatesNew(): Observable<EmailTemplate[]> {
     return this.http.get<EmailTemplate[]>(`${environmentNotifications.apiUrl}/email-templates`)
   }

@@ -1,0 +1,60 @@
+<div class="custom-form">
+  <h1>Listado de Contactos</h1><br>
+
+
+  <div class="d-flex align-items-center mb-3">
+      <label for="search" class="text-orange me-2 fw-bold">Buscar:  ID</label>
+      <input type="text" class="form-control custom-input me-3" id="search" name="search">
+
+      <button type="button" class="btn btn-danger me-2">PDF</button>
+
+      <button type="button" class="btn btn-success me-2">Excel</button>
+  </div>
+
+
+  <table class="table custom-input">
+      <thead>
+          <tr>
+              <th>Email</th>
+              <th>Tipo de Contacto </th>
+          </tr>
+      </thead>
+      <tbody>
+          @for(x of contacts; track $index){
+          <tr>
+              <td>{{ x.contactValue }}</td>
+              <td class="template-body-cell" style="text-align: center;">
+              </td>
+
+          </tr>
+          <tr>
+            <td>{{ x.contactType }}</td>
+            <td class="template-body-cell" style="text-align: center;">
+            </td>
+
+        </tr>
+        <tr>
+          <td>{{ x.subscriptions }}</td>
+          <td class="template-body-cell" style="text-align: center;">
+          </td>
+
+      </tr>
+
+          }
+
+      </tbody>
+
+  </table>
+
+
+  <!-- Modal -->
+  <!-- <div class="modal" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+          <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
+          <iframe #iframePreview style="width: 100%; border: none;"></iframe>
+          <button type="button" class="btn btn-primary" (click)="closeModalToRenderHTML()">Aceptar</button>
+      </div>
+  </div> -->
+
+
+</div>

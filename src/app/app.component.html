@@ -1,14 +1,20 @@
 <div class="d-flex">
-    <!-- Sidebar -->
-    <nav class="sidebar">
-        <ul class="sidebar-list">
-            <li><a routerLink="/templates/new">Registrar Template</a></li>
-            <li><a routerLink="/templates">Listar Plantillas</a></li>
-            <li><a routerLink="/send-email">Enviar Notificación</a></li>
-            <li><a routerLink="/send-email-contact">Notificación a Contactos</a></li>
-            <!-- Agrega más enlaces si es necesario -->
-        </ul>
-    </nav>
+<!-- Sidebar -->
+<nav class="sidebar">
+  <ul class="sidebar-list">
+      <li><a routerLink="/templates/new">Registrar Template</a></li>
+      <li><a routerLink="/templates">Listar Plantillas</a></li>
+      <li><a routerLink="/send-email">Enviar Notificación</a></li>
+      <li>
+          <a href="#" data-bs-toggle="collapse" data-bs-target="#contactosMenu" aria-expanded="false" aria-controls="contactosMenu">Contactos</a>
+          <ul class="collapse" id="contactosMenu">
+              <li><a routerLink="/contacts">Listar Contactos</a></li>
+              <li><a routerLink="/contact/new">Registrar Contacto</a></li>
+          </ul>
+      </li>
+  </ul>
+</nav>
+
 
     <!-- Main content -->
     <div class="main-content">
@@ -33,6 +39,7 @@
                         <li class="nav-item">
                             <a class="nav-link" routerLink="/send-email-contact">Notificación a Contactos</a>
                         </li>
+
                     </ul>
                 </div>
             </div>
