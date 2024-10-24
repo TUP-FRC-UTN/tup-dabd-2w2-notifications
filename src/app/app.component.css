@@ -8,9 +8,9 @@
 /* Sidebar fijo */
 .sidebar {
     width: 200px; /* Ancho del sidebar */
-    background-color: #FFEFD5; /* Color de fondo del sidebar */
+    background-color: #080808; /* Color de fondo del sidebar */
     padding: 20px; /* Espaciado interno */
-    border-right: 2px solid #FFA500; /* Borde derecho */
+    border-right: 2px solid #fffefb; /* Borde derecho */
     position: fixed; /* Fijar el sidebar */
     top: 0; /* Alinearlo al tope */
     bottom: 0; /* Alinearlo a la parte inferior */
@@ -30,11 +30,11 @@
 
 .sidebar-list a {
     text-decoration: none; /* Sin subrayado */
-    color: #000;
+    color: #ffffff;
 }
 
 .sidebar-list a:hover {
-    color: #FFA500;
+    color: #ffffff;
 }
 
 /* Estilo para el contenido principal */

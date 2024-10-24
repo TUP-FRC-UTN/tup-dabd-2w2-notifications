@@ -1,85 +1,63 @@
 import { inject, Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment as env } from '../../environments/environment.development';
-import { Base64Service } from './base64-service.service';
 import { Observable } from 'rxjs';
-import { EmailTemplate } from '../models/emailTemplates';
+import { Base64Service } from './base64-service.service';
+import { TemplateSendModel } from '../models/templateSendModel';
+import { TemplateModelResponse } from '../models/templateModelResponse';
 import { EmailData } from '../models/emailData';
+import { EmailTemplate } from '../models/emailTemplates';
+import { EmailDataContact } from '../models/emailDataContact';
+import { environmentNotifications } from '../../environments/environment.development.notifications';
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-
-
-@Inject("Base64Service")
+@Inject('Base64Service')
 export class EmailServiceService {
-
-  private readonly http = inject(HttpClient)
+  private readonly http = inject(HttpClient);
 
   base64Service: Base64Service = new Base64Service();
 
-  public async sendEmailTemplate(templateName: string, templateBody: string): Promise<any> {
+  sendEmailTemplate(
+    template: TemplateSendModel
+  ): Observable<TemplateModelResponse> {
+    const url = `${environmentNotifications.apiUrl}/email-templates`;
 
-    const url = `${env.apiUrl}/email-templates`;
-
-    try {
-
-      const response = await this.http.post<any>(url, { name: templateName, base64body: this.base64Service.encodeToBase64(templateBody) }).toPromise();
-
-      return response?.id != '' ? response : null;
-
-    } catch (error) {
-
-      console.error('Error to send the template, try again please:', error);
-      return error;
-
-    }
+    return this.http.post<TemplateModelResponse>(url, {
+      name: template.name,
+      base64body: this.base64Service.encodeToBase64(template.body),
+    });
   }
 
+  getEmailTemplates() {
+    
+    const url = `${environmentNotifications.apiUrl}/email-templates`;
 
-  public async getEmailTemplates() {
-
-    const url = `${env.apiUrl}/email-templates`;
-
-    try {
-
-      const response = await this.http.get<any>(url).toPromise();
-
-      return response?.length != 0 ? response.map((x: any) => { return { id: x.id, name: x.name, body: this.base64Service.decodeFromBase64(x.base64body) } }) : null;
-
-    } catch (error) {
-
-      console.error('Un error ha ocurrido al obtener los templates, re intente nuevamente.', error);
-      return error;
-
-    }
-
-
+    return this.http.get<TemplateModelResponse[]>(url);
   }
 
-  public async editEmailTemplate(templateName: string, templateBody: string, id: string): Promise<any> {
+  editEmailTemplate(template:TemplateModelResponse) : Observable<TemplateModelResponse> {
 
-    const url = `${env.apiUrl}/email-templates/` + id;
+    const url = `${environmentNotifications.apiUrl}/email-templates/` + template.id;
 
-    try {
-
-      const response = await this.http.put<any>(url, { name: templateName, base64body: this.base64Service.encodeToBase64(templateBody) }).toPromise();
-
-      return response?.id != '' ? response : null;
-
-    } catch (error) {
-
-      console.error('Un error ha ocurrido al tratar de actualizar el template intente nuevamente...', error);
-      return error;
-
-    }
+    return this.http.put<TemplateModelResponse>(url, {
+      name: template.name,
+      base64body: this.base64Service.encodeToBase64(template.base64body),
+      
+    });
+    
   }
 
+  
   getEmailTemplatesNew(): Observable<EmailTemplate[]> {
-    return this.http.get<EmailTemplate[]>(`${env.apiUrl}/email-templates`)
+    return this.http.get<EmailTemplate[]>(`${environmentNotifications.apiUrl}/email-templates`)
   }
-
   sendEmail(data: EmailData) {
-    const url = `${env.apiUrl}/emails/send`
+    const url = `${environmentNotifications.apiUrl}/emails/send`
     return this.http.post<EmailData>(url, data)
   }
+  sendEmailWithContacts(data : EmailDataContact) {
+    const url = `${environmentNotifications.apiUrl}/emails/send-to-contacts`
+    return this.http.post<EmailDataContact>(url, data)
+  }
+
 }

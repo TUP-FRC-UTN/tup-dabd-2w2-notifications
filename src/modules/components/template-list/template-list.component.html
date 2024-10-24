@@ -1,5 +1,5 @@
 <div class="custom-form">
-    <h1>Listado de Templates</h1><br>
+    <h1>Listado de Plantillas</h1><br>
 
 
     <div class="d-flex align-items-center mb-3">
@@ -19,7 +19,6 @@
         <thead>
             <tr>
                 <th>Nombre</th>
-                <th>Template</th>
                 <th>Previsualizar / Editar </th>
             </tr>
         </thead>
@@ -27,7 +26,6 @@
             @for(x of templates; track $index){
             <tr>
                 <td>{{ x.name }}</td>
-                <td class="template-body-cell">{{ x.body }}</td>
                 <td class="template-body-cell" style="text-align: center;">
                     <button type="button" class="btn btn-secondary me-2"
                         (click)="previewContent($index)">Previsualizar</button>

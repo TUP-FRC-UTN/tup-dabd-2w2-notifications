@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { Form, FormsModule } from '@angular/forms';
 import { EmailServiceService } from     '../../../app/services/email-service.service';
-import { EmailTemplate } from '../../../app/models/emailTemplates';
+import { TemplateModelResponse } from '../../../app/models/templateModelResponse';
 import { EmailData } from '../../../app/models/emailData';
 import { Variable } from '../../../app/models/variables';
+import { Base64Service } from '../../../app/services/base64-service.service';
 
 @Component({
   selector: 'app-send-email',
@@ -13,9 +14,14 @@ import { Variable } from '../../../app/models/variables';
   templateUrl: './send-email.component.html',
   styleUrl: './send-email.component.css'
 })
+
+@Inject('EmailServiceService')
+@Inject('Base64Service')
 export class SendEmailComponent implements OnInit{
 
-  service : EmailServiceService = inject(EmailServiceService);
+  service = new EmailServiceService();
+
+  base64Service: Base64Service = new Base64Service();
 
   emailToSend : string = ""
   subject : string = ""
@@ -24,12 +30,19 @@ export class SendEmailComponent implements OnInit{
   templateID : number = 0
 
   variables : Variable[] = []
-  templates : EmailTemplate[] = []
+  templates : TemplateModelResponse[] = []
 
   ngOnInit(): void {
-    this.service.getEmailTemplatesNew().subscribe((data) => {
-      this.templates = data
-    })
+
+    this.service.getEmailTemplates().subscribe((data) => {
+      this.templates = data;
+
+      this.templates.forEach((x, index) => {
+        this.templates[index].base64body = this.base64Service.decodeFromBase64(
+          x.base64body
+        );
+      });
+    });
   }
 
   enviar(form : Form) {
