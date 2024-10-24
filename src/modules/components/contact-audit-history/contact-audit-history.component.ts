@@ -1,8 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 
 import {TableColumn, TableComponent} from 'ngx-dabd-grupo01';
-import { ContactType } from '../../../app/models/contacts/contactType';
-import { AuditHistory, ContactAudit } from '../../../app/models/contacts/contactAudit';
+import {  ContactAudit } from '../../../app/models/contacts/contactAudit';
 import { ContactAuditService } from '../../../app/services/contact-audit.service';
 import { Subscription } from 'rxjs';
 @Component({
@@ -28,7 +27,7 @@ export class ContactAuditHistoryComponent implements OnInit {
   loadData():void {
     this.isLoading = true;
     this.subscription.add(
-      this.contactAuditService.getContactAuditHistory().subscribe({
+      this.contactAuditService.get().subscribe({
         next: (data : ContactAudit[]) => this.items = data
       })
     )
@@ -36,11 +35,13 @@ export class ContactAuditHistoryComponent implements OnInit {
 
   ngOnInit():void {
     this.columns = [
-      { headerName: "ID del Contacto", accessorKey: "entityId" },
+      { headerName: "ID del Contacto", accessorKey: "contactId" },
       { headerName: "Fecha del cambio", accessorKey: "revisionDate" },
-      { headerName: "Cambiado por", accessorKey: "changedBy" },
-      { headerName: "Tipo de contacto", accessorKey: "contactTpe" },
-      { headerName: "Valor", accessorKey: "value" }
+      { headerName: "ID del cambio", accessorKey: "revisionId" },
+      { headerName: "Tipo de cambio", accessorKey: "contactType" },
+      { headerName: "Tipo de contacto", accessorKey: "contactType" },
+      { headerName: "Valor del contacto", accessorKey: "contactValue" }
+     
     ];
     this.loadData();
   }
