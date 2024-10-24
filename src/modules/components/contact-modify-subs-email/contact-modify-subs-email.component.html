@@ -2,7 +2,7 @@
     <div class="card-body">
         <form [formGroup]="modification" (ngSubmit)="submit()">
             <h6> Elegir el Contacto </h6>
-            <select name="contactos" id="contactos" formControlName="contactId" class="form-select" style="max-width: 350px;" [(ngModel)]="selectedContactId">
+            <select name="contactos" id="contactos" formControlName="contactId" class="form-select mb-3" style="max-width: 350px;">
                 @for (contact of allContacts; track $index) {
                     <option [value]="contact.id"> {{contact.contactValue}} </option>
                 }
@@ -11,7 +11,9 @@
 
             <h6> Elegir Suscripción por Anular </h6>            
             <select name="suscripciones" id="suscripciones" formControlName="subscriptionId" class="form-select" style="max-width: 350px;">
-
+                @for (subs of allSubsFromSelectedContact; track $index) {
+                    <option [value]="subs.id"> {{subs.name}} </option>
+                }
             </select>
         </form>
     </div>
