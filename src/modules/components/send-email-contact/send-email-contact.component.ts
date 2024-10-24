@@ -3,8 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { EmailServiceService } from '../../../app/services/email-service.service';
 import { Variable } from '../../../app/models/variables';
-import { Contacts } from '../../../app/models/contacts';
-import { ContactsService } from '../../../app/services/contacts.service';
+import { Contact } from '../../../app/models/contact';
+import { ContactService } from '../../../app/services/contact.service';
 import { EmailTemplate } from '../../../app/models/emailTemplates';
 import { Base64Service } from '../../../app/services/base64-service.service';
 import { EmailDataContact } from '../../../app/models/emailDataContact';
@@ -21,17 +21,17 @@ import { CommonModule } from '@angular/common';
 @Inject('ContactsService')
 @Inject('Base64Service')
 export class SendEmailContactComponent implements OnInit{
-  
+
   subjectToSend : string = ""
   variables : Variable[] = []
   template_id : number = 0
   contacts_id : number[] = []
 
   serviceEmail = new EmailServiceService()
-  serviceContacts = new ContactsService()
+  serviceContacts = new ContactService()
   base64Service: Base64Service = new Base64Service();
 
-  allContacts : Contacts[] = []
+  allContacts : Contact[] = []
   allTemplates : EmailTemplate[] = []
   selectedContactId : number = 0
   variableName : string = ""
@@ -48,7 +48,7 @@ export class SendEmailContactComponent implements OnInit{
   ngOnInit(): void {
     this.serviceContacts.getAllContacts().subscribe((data) => {
       data.forEach(contact => {
-        if (contact.contact_type === "EMAIL") {
+        if (contact.contactType === "EMAIL") {
           this.allContacts.push(contact)
         }
       })
@@ -65,7 +65,7 @@ export class SendEmailContactComponent implements OnInit{
   }
   showContactById(id: number): string {
     const contact = this.allContacts.find(contact => contact.id == id);
-    return contact ? contact.contact_value : '';
+    return contact ? contact.contactValue : '';
   }
   addVariables() {
     if (this.variableName != null && this.variableName !== "" && this.variableValue != null && this.variableValue !== "") {
@@ -78,7 +78,7 @@ export class SendEmailContactComponent implements OnInit{
       this.variables.push(newVariable)
       this.variableName = "";
       this.variableValue = "";
-    }    
+    }
   }
   submit() {
     const data : EmailDataContact = {
@@ -89,7 +89,7 @@ export class SendEmailContactComponent implements OnInit{
     }
 
     console.log(data);
-    
+
     this.serviceEmail.sendEmailWithContacts(data).subscribe({
       next: (response) => {
         alert("Enviado con exito")

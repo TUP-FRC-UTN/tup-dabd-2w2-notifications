@@ -4,6 +4,8 @@ import { TemplateListComponent } from '../modules/components/template-list/templ
 import { TemplateEditionComponent } from '../modules/components/template-edition/template-edition.component';
 import { SendEmailComponent } from '../modules/components/send-email/send-email.component';
 import { SendEmailContactComponent } from '../modules/components/send-email-contact/send-email-contact.component';
+import { ContactListComponent } from '../modules/components/contact-list/contact-list.component';
+import { ContactNewComponent } from '../modules/components/contact-new/contact-new.component';
 
 export const routes: Routes = [
   {
@@ -25,5 +27,14 @@ export const routes: Routes = [
   {
     path: 'send-email-contact',
     component: SendEmailContactComponent,
+  },
+  {
+
+    path: 'contacts',
+    component: ContactListComponent
+
+  }, {
+    path: 'contact/new',
+    component: ContactNewComponent
   }
 ];

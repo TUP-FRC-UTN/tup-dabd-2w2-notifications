@@ -1,0 +1,60 @@
+<div class="container mt-5 custom-form">
+  <h2 class="text-orange">Registrar Contacto</h2><br>
+
+  <form [formGroup]="form" (ngSubmit)="sendForm()" class="row g-3 container">
+    <div class="col-md-4">
+      <label for="validationCustom01" class="form-label">Contacto:</label>
+      <input [ngClass]="{'is-invalid':form.controls['contactValue'].invalid && form.controls['contactValue'].touched }"
+        formControlName="contactValue" type="text" class="form-control">
+      @if(form.controls['contactValue'].invalid && form.controls['contactValue'].touched){
+      @if(form.controls['contactValue'].errors?.['required']){
+      <div class="text-danger">Contacto Obligatorio</div>
+      }}
+
+    </div>
+    <div class="col-md-3">
+      <label for="brandSelect" class="form-label">Tipo Contacto</label>
+      <select class="form-select" [(ngModel)]="contacTypeSelected" name="selectedContactType" id="selectedContactType">
+        @for(x of contactTypes;track $index){
+
+        <option [value]="x.contactType">{{x.contactType}}</option>
+
+        }
+
+      </select>
+      <div class="invalid-feedback">Mensaje validacion.</div>
+    </div>
+
+
+
+    <!-- Botones de Acción alineados a la derecha -->
+    <div class="d-flex justify-content-end mb-3">
+      <button type="button" class="btn btn-danger me-2">Cancelar</button>
+      <!-- <button type="submit" class="btn btn-primary"
+        (click)="sendEmailTemplate(this.templateName,this.templateBody)">Guardar</button> -->
+      <button type="submit" class="btn btn-primary">Enviar</button>
+    </div>
+  </form>
+</div>
+
+
+<!-- Modal -->
+<div [class.show]="isModalOpen" [style.display]="isModalOpen ? 'block' : 'none'" class="modal fade" id="myModal"
+  tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalLabel">{{ modalTitle }}</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ modalMessage }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" (click)="closeModal()">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Backdrop para la modal -->
+<div *ngIf="isModalOpen" class="modal-backdrop fade show"></div>

@@ -10,7 +10,7 @@
                         required
                         [ngClass]="{'is-invalid': contactos.invalid && (contactos.dirty || contactos.touched), 'is-valid': contactos.valid && (contactos.dirty || contactos.touched)}">
                             @for (c of allContacts; track $index) {
-                                <option [value]="c.id"> {{c.contact_value}} </option>
+                                <option [value]="c.id"> {{c.contactValue}} </option>
                             }
                             @if (contactos.invalid && (contactos.dirty || contactos.touched)) {
                                 @if (contactos.getError('required')) {
@@ -71,7 +71,7 @@
                 [(ngModel)]="template_id"
                 required
                 [ngClass]="{'is-invalid': plantillas.invalid && (plantillas.dirty || plantillas.touched), 'is-valid': plantillas.valid && (plantillas.dirty || plantillas.touched)}">
-                
+
                 @for (item of allTemplates; track $index) {
                     <option [value]="item.id"> {{item.name}} </option>
                 }
@@ -81,9 +81,9 @@
                         <div class="text-danger"> Campo Obligatorio </div>
                     }
                 }
-                
+
             <!-- Si encuentran otra forma de hacerlo, haganlo-->
-            <div class="row"> 
+            <div class="row">
                 <div class="col-1"></div>
                 <div class="col-1"></div>
                 <div class="col-1"></div>
