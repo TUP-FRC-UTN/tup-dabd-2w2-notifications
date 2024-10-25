@@ -11,4 +11,5 @@ export interface Contact { //lo mapeo en este sin el snake_case
     subscriptions: string[]
     contactValue: string
     contactType: string
+    showSubscriptions: false
 }
