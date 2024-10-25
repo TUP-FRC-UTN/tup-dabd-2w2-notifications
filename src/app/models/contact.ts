@@ -4,4 +4,5 @@ export interface Contact {
     subscriptions: string[]
     contactValue: string
     contactType: string
+    showSubscriptions: false
 }

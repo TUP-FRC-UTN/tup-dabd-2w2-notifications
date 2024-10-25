@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { FormArray, FormControl, FormGroup, FormsModule, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Contact } from '../../../app/models/contact';
 import { ContactService } from '../../../app/services/contact.service';
@@ -15,118 +15,51 @@ import { ContactType } from '../../../app/models/contactType';
   styleUrl: './contact-new.component.css'
 })
 
-@Inject('ContactsService')
+@Inject('ContactService')
 export class ContactNewComponent {
 
+  selectedContactType: string = '';
+  email: string = '';
+  phone: string = '';
+  isModalOpen: boolean = false;
   modalTitle: string = '';
   modalMessage: string = '';
-  isModalOpen = false;
 
-  contactTypes: ContactType[] = [];
-  contacTypeSelected: string = '';
-
-  contactService: ContactService = new ContactService();
-
-
-  contact: Contact = {
-    id: 0,
-    subscriptions: [],
-    contactValue: '',
-    contactType: ''
-  };
-
-
-  form: FormGroup = new FormGroup({
-
-    id: new FormControl(0),
-    contactType: new FormControl('', [Validators.required, Validators.minLength(5)]),
-    contactValue: new FormControl('', [Validators.required, Validators.minLength(5)]),
-    suscriptions: new FormArray([])
-
-  })
-
-
-
-  get suscriptions() {
-    return this.form.controls['suscriptions'] as FormArray
+  onContactTypeChange() {
+    // Resetear los valores cuando cambia el tipo de contacto
+    this.email = '';
+    this.phone = '';
   }
 
-  addSuscriptions() {
-
-    const suscription = new FormGroup({
-
-      name: new FormControl('', Validators.required),
-
-    })
-    this.suscriptions.push(suscription)
-
+  resetForm(form: NgForm) {
+    form.resetForm();
+    this.selectedContactType = '';
+    this.email = '';
+    this.phone = '';
   }
 
-  deleteSuscription(index: number) {
+  sendForm(form: NgForm) {
+    if (form.valid) {
+      const contactData = {
+        type: this.selectedContactType,
+        value: this.selectedContactType === 'email' ? this.email : this.phone
+      };
 
-    this.suscriptions.removeAt(index)
-
-  }
-
-  getContactsType() {
-
-    this.contactTypes[0].contactType = "EMAIL";
-
-    // this.contactService.getContactType().subscribe((data) => {
-
-    //   this.contactTypes = data;
-
-    // })
-  }
-
-
-
-  sendForm() {
-
-    if (this.form.valid) {
-
-      this.contact = this.form.value as Contact
-
-      console.log(this.contact);
-
-      this.contactService.postContact(this.contact).subscribe(
-
-        {
-          next: (response) => {
-            this.openModal(
-              'Éxito',
-              'El template se ha guardado de manera correcta.'
-            );
-            // this.resetForm();
-          },
-          error: (error: HttpErrorResponse) => {
-            this.openModal(
-              'Error',
-              'Hubo un problema al guardar el template. Por favor, intente nuevamente.'
-            );
-            console.error('Error al enviar el template:', error);
-          },
-        });
-
+      console.log('Datos del formulario:', contactData);
+      this.showModal('Éxito', 'El contacto ha sido registrado correctamente');
+      this.resetForm(form);
+    } else {
+      this.showModal('Error', 'Por favor complete todos los campos requeridos correctamente');
     }
   }
 
-
-  openModal(title: string, message: string) {
+  showModal(title: string, message: string) {
     this.modalTitle = title;
     this.modalMessage = message;
     this.isModalOpen = true;
-    document.body.classList.add('modal-open');
   }
 
   closeModal() {
     this.isModalOpen = false;
-    document.body.classList.remove('modal-open');
   }
-
-  // private resetForm() {
-  //   this.templateName = '';
-  //   this.templateBody = '';
-  // }
-
 }

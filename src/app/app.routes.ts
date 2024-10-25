@@ -6,6 +6,7 @@ import { SendEmailComponent } from '../modules/components/send-email/send-email.
 import { SendEmailContactComponent } from '../modules/components/send-email-contact/send-email-contact.component';
 import { ContactListComponent } from '../modules/components/contact-list/contact-list.component';
 import { ContactNewComponent } from '../modules/components/contact-new/contact-new.component';
+import { ContactTableComponent } from '../modules/components/salva-test/contact-table.component';
 
 export const routes: Routes = [
   {
@@ -36,5 +37,9 @@ export const routes: Routes = [
   }, {
     path: 'contact/new',
     component: ContactNewComponent
+  }, {
+
+    path: 'contact/table',
+    component: ContactTableComponent
   }
 ];
