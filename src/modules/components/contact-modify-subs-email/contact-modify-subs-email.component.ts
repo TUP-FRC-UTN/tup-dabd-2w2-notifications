@@ -1,10 +1,10 @@
-import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
+import { Component, inject, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ContactService } from '../../../app/services/contact.service';
 import { Contact } from '../../../app/models/contact';
 import { SubscriptionService } from '../../../app/services/subscription.service';
-import { Subscription } from '../../../app/models/subscription';
+import { Subscription, SubscriptionMod } from '../../../app/models/subscription';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -17,6 +17,8 @@ import { Observable } from 'rxjs';
 @Inject('ContactService')
 @Inject('SubscriptionService')
 export class ContactModifySubsEmailComponent implements OnInit{
+
+  location : Location = inject(Location)
   
   serviceContact : ContactService = new ContactService()
   serviceSubs : SubscriptionService = new SubscriptionService()
@@ -41,7 +43,6 @@ export class ContactModifySubsEmailComponent implements OnInit{
     this.serviceContact.getAllContacts().subscribe((data) => {
       this.allContacts = data.filter(c => c.contactType === "EMAIL");
     })
-    //this.set()
   }
   
   //Al array de nombres lo manda como array de objetos Subscription que coincidan con ese name
@@ -72,12 +73,26 @@ export class ContactModifySubsEmailComponent implements OnInit{
         this.selectedContact = c
       }
     })
-    console.log(this.selectedContact);
   }
   
 
   submit() {
-
+    const modification : SubscriptionMod = {
+      contactId : this.modification.get('contactId')?.value,
+      subscriptionId : this.modification.get('subscriptionId')?.value,
+      subscriptionValue : this.modification.get('subscriptionValue')?.value
+    }
+    this.serviceContact.modifacateSubscription(modification).subscribe({
+      next : (response) => {
+        alert("Suscripción anulada con éxito")
+        this.clean()
+      },
+      error : (error) => {
+        alert("Hubo un error al anular la suscripción")
+        console.log(error);
+        
+      } 
+    })
   }
 
   setContact() {
@@ -85,4 +100,12 @@ export class ContactModifySubsEmailComponent implements OnInit{
     this.set()
     this.loadSubscriptions()
   }
+  clean() {
+    this.modification.reset({
+      contactId: '',
+      subscriptionId: '',
+      subscriptionValue: false
+    });
+    window.location.reload()
+  }  
 }
