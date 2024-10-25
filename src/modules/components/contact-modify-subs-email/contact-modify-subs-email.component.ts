@@ -28,28 +28,30 @@ export class ContactModifySubsEmailComponent implements OnInit{
   })
 
   allContacts : Contact[] = []
-  selectedContact : Contact | undefined
+  selectedContact : Contact = {
+    id: 0,
+    subscriptions: [],
+    contactValue: '',
+    contactType: ''
+  }
   allSubsFromSelectedContact : Subscription[] = []
+  selected : Boolean = false
 
   ngOnInit(): void {
     this.serviceContact.getAllContacts().subscribe((data) => {
-      data.forEach(c => {
-        if (c.contactType === "EMAIL") {
-          this.allContacts.push(c)
-        }
-      })
+      this.allContacts = data.filter(c => c.contactType === "EMAIL");
     })
-    console.log(this.allContacts);
+    //this.set()
   }
   
   //Al array de nombres lo manda como array de objetos Subscription que coincidan con ese name
   setSubscriptions(): Observable<Subscription[]> {
     return new Observable((observer) => {
-      this.serviceSubs.getAllSubsriptions().subscribe((data) => {
+      this.serviceSubs.getAllSubscriptions().subscribe((data) => {
         const subscriptionsMap = new Set(data.map(sub => sub.name));
         const aux = this.selectedContact?.subscriptions
           .filter(sub1 => subscriptionsMap.has(sub1))
-          .map(sub1 => data.find(sub2 => sub2.name === sub1))
+          .map(sub1 => data.find(sub2 => sub2.name === sub1 && sub2.isUnsubscribable))
           .filter((sub): sub is Subscription => sub !== undefined); 
   
         observer.next(aux);
@@ -63,13 +65,24 @@ export class ContactModifySubsEmailComponent implements OnInit{
     });
   }
   set() {
-    this.serviceContact.getContactById(this.modification.get('contactId')?.value).subscribe((data) => {
-      this.selectedContact = data
+    const contactId = this.modification.get('contactId')?.value;
+
+    this.allContacts.forEach(c => {
+      if (c.id == contactId) {
+        this.selectedContact = c
+      }
     })
+    console.log(this.selectedContact);
   }
   
 
   submit() {
 
+  }
+
+  setContact() {
+    this.selected = true
+    this.set()
+    this.loadSubscriptions()
   }
 }

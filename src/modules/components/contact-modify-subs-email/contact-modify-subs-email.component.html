@@ -2,19 +2,25 @@
     <div class="card-body">
         <form [formGroup]="modification" (ngSubmit)="submit()">
             <h6> Elegir el Contacto </h6>
-            <select name="contactos" id="contactos" formControlName="contactId" class="form-select mb-3" style="max-width: 350px;">
-                @for (contact of allContacts; track $index) {
-                    <option [value]="contact.id"> {{contact.contactValue}} </option>
-                }
-            </select>
-            
+            <div class="d-flex align-items-center mb-3">
+                <select name="contactos" id="contactos" formControlName="contactId" class="form-select me-3" style="max-width: 350px;">
+                    @for (contact of allContacts; track $index) {
+                        <option [value]="contact.id"> {{contact.contactValue}} </option>
+                    }
+                </select>
+                <button type="button" class="btn btn-secondary"(click)="setContact()"> Seleccionar </button>
+            </div>
 
-            <h6> Elegir Suscripción por Anular </h6>            
-            <select name="suscripciones" id="suscripciones" formControlName="subscriptionId" class="form-select" style="max-width: 350px;">
+            
+            @if (selected) {
+                <h6> Elegir Suscripción por Anular </h6>            
+                <select name="suscripciones" id="suscripciones" formControlName="subscriptionId" class="form-select" style="max-width: 350px;">
                 @for (subs of allSubsFromSelectedContact; track $index) {
                     <option [value]="subs.id"> {{subs.name}} </option>
                 }
-            </select>
+                </select>
+            }
+            
 
             <div class="row"> 
                 <div class="col-1"></div>
@@ -28,7 +34,7 @@
                 <div class="col-1"></div>
                 <div class="col-1"></div>
                 <div class="col-1"></div>
-                <div class="col-1"><button type="submit" class="btn btn-primary" [disabled]="modification.invalid">Enviar</button></div>
+                <div class="col-1"><button type="submit" class="btn btn-primary" [disabled]="modification.invalid">Aceptar</button></div>
             </div>
         </form>
     </div>

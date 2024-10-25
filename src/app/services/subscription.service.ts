@@ -9,8 +9,9 @@ import { Subscription } from '../models/subscription';
 export class SubscriptionService {
   private http : HttpClient = inject(HttpClient)
 
-  getAllSubsriptions() {
+  getAllSubscriptions() {
     const url = `${environmentContacts.apiUrl}/subscriptions`
     return this.http.get<Subscription[]>(url)
   }
+  
 }
