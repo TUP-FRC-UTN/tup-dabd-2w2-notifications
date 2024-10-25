@@ -3,20 +3,33 @@
         <form [formGroup]="modification" (ngSubmit)="submit()">
             <h6> Elegir el Contacto </h6>
             <div class="d-flex align-items-center mb-3">
-                <select name="contactos" id="contactos" formControlName="contactId" class="form-select me-3" style="max-width: 350px;">
+                <select name="contactos" id="contactos" formControlName="contactId" class="form-select me-3" style="max-width: 350px;"
+                [ngClass]="{'is-invalid': modification.controls['contactId'].invalid && (modification.controls['contactId'].touched || modification.controls['contactId'].dirty)}">
                     @for (contact of allContacts; track $index) {
                         <option [value]="contact.id"> {{contact.contactValue}} </option>
                     }
                 </select>
+                @if (modification.controls['contactId'].invalid && (modification.controls['contactId'].touched || modification.controls['contactId'].dirty)) {
+                    @if (modification.controls['contactId'].errors?.['required']) {
+                        <div class="text-danger"> Debe seleccionar un Contacto </div>
+                    }
+                }
+                
                 <button type="button" class="btn btn-secondary"(click)="setContact()"> Seleccionar </button>
             </div>
 
             
             @if (selected) {
                 <h6> Elegir Suscripción por Anular </h6>            
-                <select name="suscripciones" id="suscripciones" formControlName="subscriptionId" class="form-select" style="max-width: 350px;">
+                <select name="suscripciones" id="suscripciones" formControlName="subscriptionId" class="form-select" style="max-width: 350px;"
+                [ngClass]="{'is-invalid': modification.controls['subscriptionId'].invalid && (modification.controls['subscriptionId'].touched || modification.controls['subscriptionId'].dirty)}">
                 @for (subs of allSubsFromSelectedContact; track $index) {
                     <option [value]="subs.id"> {{subs.name}} </option>
+                }
+                @if (modification.controls['subscriptionId'].invalid && (modification.controls['subscriptionId'].touched || modification.controls['subscriptionId'].dirty)) {
+                    @if (modification.controls['subscriptionId'].errors?.['required']) {
+                        <div class="text-danger"> Debe seleccionar una Suscripción </div>
+                    }
                 }
                 </select>
             }
