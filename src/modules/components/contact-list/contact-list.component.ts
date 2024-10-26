@@ -1,4 +1,4 @@
-import { Component, ViewChild, Inject, inject, OnInit } from '@angular/core';
+import { Component, ViewChild, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -6,116 +6,169 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ContactService } from '../../../app/services/contact.service';
 import { Contact } from '../../../app/models/contact';
 import { Router } from '@angular/router';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbPagination, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { MainContainerComponent } from 'ngx-dabd-grupo01';
+import { ToastService } from 'ngx-dabd-grupo01';
 
 @Component({
   selector: 'app-contact-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    NgbPagination,
+    NgbDropdownModule,
+    MainContainerComponent
+  ],
   templateUrl: './contact-list.component.html',
   styleUrls: ['./contact-list.component.css']
 })
-
-@Inject('ContactService')
 export class ContactListComponent implements OnInit {
 
-  private readonly router = inject(Router);
 
-  private contactService = new ContactService();
+  private router = inject(Router);
+  private contactService = inject(ContactService);
+  private toastService = inject(ToastService)
+
+  // Paginación
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
+  sizeOptions: number[] = [10, 25, 50];
+
+  // Filtros
+  searchTerm = '';
+  isActiveContactFilter: boolean | undefined = true;
+  selectedContactType: string = '';
+
+  // Datos y estados
+  contacts: Contact[] = [{
+    id: 1,
+    subscriptions: ["Newsletter", "Ofertas"],
+    contactType: "Email",
+    contactValue: "gbritos13@gmail.com",
+    active: true,
+    showSubscriptions: false,
+  },
+  {
+    id: 2,
+    subscriptions: ["Noticias"],
+    contactType: "Email",
+    contactValue: "guillee_bmx_13@gmail.com",
+    active: true,
+    showSubscriptions: false,
+  },
+  {
+    id: 3,
+    subscriptions: ["Newsletter", "Promociones", "Eventos"],
+    contactType: "Phone",
+    contactValue: "123-456-7890",
+    active: true,
+    showSubscriptions: false,
+  }];
+  filteredContacts: Contact[] = [];
+
+  // Estados de modales
+  isModalOpen = false;
+  isEditModalOpen = false;
+  isDeleteModalOpen = false;
+  modalTitle = '';
+  modalMessage = '';
+
+  // Referencias
+  @ViewChild('editForm') editForm!: NgForm;
+  contactToDelete: Contact | null = null;
+  editingContact: Contact = this.getEmptyContact();
 
   constructor() {
     this.initializePagination();
   }
 
   ngOnInit(): void {
-    this.getFilteredContacts();
+    this.loadContacts();
   }
 
-  @ViewChild('editForm') editForm!: NgForm;
+  private getEmptyContact(): Contact {
+    return {
+      id: 0,
+      subscriptions: [],
+      contactValue: '',
+      contactType: '',
+      active: true,
+      showSubscriptions: false
+    };
+  }
 
-  //Region filters
-  searchTerm = '';
-  isActiveContactFilter : boolean | undefined;
-  selectedContactType: string | undefined = '';
-  //End region filters
-  contacts: Contact[] = [];
-
-  currentPage = 1;
-  itemsPerPage = 10;
-  totalItems = 0;
-  totalPages = 0;
-  pages: number[] = [];
-
- 
-
-
-  isModalOpen = false;
-  isEditModalOpen = false;
-  modalTitle = '';
-  modalMessage = '';
-
-
-  isDeleteModalOpen = false;
-  contactToDelete?: Contact | null = null;
-
-
-  editingContact: Contact = {
-    id: 0,
-    subscriptions: [],
-    contactValue: '',
-    contactType: '',
-    active: true,
-    showSubscriptions: false,
-  };
-
-  getFilteredContacts(): void {
-    this.contactService.getFilteredContactsFromBackend(this.isActiveContactFilter, this.searchTerm, this.selectedContactType)
-      .subscribe(filteredContacts => {
-        this.contacts = filteredContacts;
+  // Carga de datos
+  loadContacts() {
+    this.contactService
+      .getFilteredContactsFromBackend(
+        this.isActiveContactFilter,
+        this.searchTerm,
+        this.selectedContactType
+      )
+      .subscribe({
+        next: (contacts) => {
+          this.contacts = contacts;
+          this.filteredContacts = [...this.contacts];
+          this.updatePagination();
+        },
+        error: (error) => {
+          this.showModal('Error', 'Error al cargar los contactos');
+          console.error('Error loading contacts:', error);
+        }
       });
   }
 
-  onSearchTextChange(newSearchText : string) : void {
-    this.searchTerm = newSearchText;
-    this.getFilteredContacts();
-
-  }
-
-
-  // Métodos para filtros de estado
+  // Filtros
   filterByStatus(status: 'all' | 'active' | 'inactive') {
-    if(status==='all'){
-      this.isActiveContactFilter=undefined;
-    }
-    else if(status==='active') {
-      this.isActiveContactFilter = true;
-    }
-    else if(status==='inactive'){
-      this.isActiveContactFilter=false;
-    }
-    this.getFilteredContacts();
+    this.isActiveContactFilter = status === 'all'
+      ? undefined
+      : status === 'active';
+    this.loadContacts();
   }
 
-  onStatusChange(newStatus : boolean | undefined) : void {
-    this.isActiveContactFilter = newStatus;
-    this.getFilteredContacts();
+  filterByContactType(contactType: string) {
+    this.selectedContactType = contactType;
+    this.loadContacts();
   }
 
-  filterByContactType(contactType: string): void {
-    this.contactService.getFilteredContactsFromBackend(this.isActiveContactFilter, this.searchTerm, contactType)
-      .subscribe(filteredContacts => {
-          this.contacts = filteredContacts;
-      });
-}
+  onSearchTextChange(searchTerm: string) {
+    this.searchTerm = searchTerm;
+    this.loadContacts();
+  }
 
+  clearSearch() {
+    this.searchTerm = '';
+    this.selectedContactType = '';
+    this.isActiveContactFilter = true;
+    this.loadContacts();
+  }
 
+  // Paginación
+  initializePagination() {
+    this.updatePagination();
+  }
 
+  updatePagination() {
+    this.totalItems = this.contacts.length;
+  }
+
+  onItemsPerPageChange() {
+    this.currentPage = 1;
+    this.loadContacts();
+  }
+
+  changePage(page: number) {
+    this.currentPage = page;
+    this.loadContacts();
+  }
+
+  // CRUD Operations
   saveContact() {
-
     this.router.navigate(['/contact/new']);
-
   }
-
 
   editContact(contact: Contact) {
     this.contactService.updateContact(contact).subscribe({
@@ -125,11 +178,12 @@ export class ContactListComponent implements OnInit {
           this.contacts[index] = { ...contact };
         }
         this.closeEditModal();
-        this.showModal('Éxito', 'El contacto ha sido actualizado correctamente');
+        this.toastService.sendSuccess('Éxito El contacto ha sido actualizado correctamente')
+
       },
       error: (error: HttpErrorResponse) => {
+        this.toastService.sendError('Error Ha ocurrido un error al intentar actualizar el contacto intente nuevamente...')
         this.closeEditModal();
-        this.showModal('Error', 'Ha ocurrido un error al intentar actualizar el contacto intente nuevamente...');
         console.error('Error al editar el contacto:', error);
       },
     });
@@ -152,49 +206,7 @@ export class ContactListComponent implements OnInit {
     });
   }
 
-  initializePagination() {
-    this.totalItems = this.contacts.length;
-    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  get startIndex(): number {
-    return (this.currentPage - 1) * this.itemsPerPage;
-  }
-
-  get endIndex(): number {
-    return this.startIndex + this.itemsPerPage;
-  }
-
-  changePage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-    }
-  }
-
-  onItemsPerPageChange() {
-    this.currentPage = 1;
-    this.initializePagination();
-  }
-
-
-  get filteredContacts(): Contact[] {
-    if (!this.searchTerm.trim()) {
-      return this.contacts;
-    }
-
-    const term = this.searchTerm.toLowerCase();
-    return this.contacts.filter(contact =>
-      contact.contactValue.toLowerCase().includes(term) ||
-      contact.contactType.toLowerCase().includes(term) ||
-      contact.subscriptions.some(sub => sub.toLowerCase().includes(term))
-    );
-  }
-
-  clearSearch() {
-    this.searchTerm = '';
-  }
-
+  // Modal handlers
   showModal(title: string, message: string) {
     this.modalTitle = title;
     this.modalMessage = message;
@@ -204,7 +216,6 @@ export class ContactListComponent implements OnInit {
   closeModal() {
     this.isModalOpen = false;
   }
-
 
   openEditModal(contact: Contact) {
     this.editingContact = { ...contact };
@@ -222,8 +233,6 @@ export class ContactListComponent implements OnInit {
       showSubscriptions: false
     };
   }
-
-
   openDeleteModal(contact: Contact) {
     this.contactToDelete = contact;
     this.isDeleteModalOpen = true;
@@ -241,28 +250,25 @@ export class ContactListComponent implements OnInit {
     }
   }
 
+
   saveEditedContact() {
     if (this.editForm.form.valid) {
       this.editContact(this.editingContact);
     }
   }
 
-
-
   exportToExcel() {
-    // Implementar lógica de exportación a Excel
-    this.showModal('Exportar', 'Exportando a Excel...');
+    // Implementar la lógica de exportación a Excel
+    console.log('Exportando a Excel...');
   }
 
   exportToPDF() {
-    // Implementar lógica de exportación a PDF
-    this.showModal('Exportar', 'Exportando a PDF...');
+    // Implementar la lógica de exportación a PDF
+    console.log('Exportando a PDF...');
   }
 
-
-
-  // Método para mostrar información
   showInfo() {
-    this.showModal('Información', 'Sistema de gestión de contactos y suscripciones.');
+    this.showModal('Información', 'Sistema de gestión de contactos. Aquí puedes administrar todos los contactos del sistema.');
   }
+
 }

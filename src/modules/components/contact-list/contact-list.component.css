@@ -1,3 +1,11 @@
+.table-container {
+  overflow-x: auto;
+}
+
+.fixed-table {
+  min-width: 100%;
+}
+
 .subscription-list {
   margin: 0;
   padding: 0;
@@ -7,18 +15,32 @@
   display: flex;
   align-items: center;
   padding: 0.1rem 0;
-  color: #495057;
-  font-size: 0.9rem;
 }
 
-.subscription-item i {
-  font-size: 1.2rem;
-  margin-right: 0.25rem;
-  color: #0d6efd;
+.btn-group .dropdown-menu {
+  min-width: auto;
 }
 
-.text-muted {
-  font-size: 0.9rem;
+.input-group {
+  width: auto;
+  margin-left: 1rem;
+}
+
+.dropdown-item {
+  cursor: pointer;
+}
+
+.dropdown-item i {
+  width: 1rem;
+  text-align: center;
+}
+
+.btn-group .dropdown-menu {
+  min-width: 8rem;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
 }
 
 .modal {
@@ -34,19 +56,3 @@
   z-index: 1050;
 }
 
-
-.form-label {
-  font-weight: 500;
-  color: #212529;
-}
-
-.form-control:focus,
-.form-select:focus {
-  border-color: #86b7fe;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
-
-.btn-primary:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
-}
