@@ -21,8 +21,6 @@ import { ToastService } from 'ngx-dabd-grupo01';
 @Inject('Base64Service')
 export class SendEmailComponent implements OnInit{
   toastService : ToastService = inject(ToastService)
-  //toastService : Toast = inject(Toast) 
-  //constructor(private toastService: ToastService) {}
 
   service = new EmailServiceService();
 
@@ -63,15 +61,12 @@ export class SendEmailComponent implements OnInit{
     this.service.sendEmail(data).subscribe({
       next: (data) => {
         this.toastService.sendSuccess("Enviado con exito")
-        //alert("Enviado con exito")
         this.clean()
       },
       error: (errr) => {
         this.toastService.sendError("Hubo un error al enviar el correo, pruebe más tarde")
-        //alert("Hubo un error al enviar el correo, pruebe más tarde")
       }
     })
-    //this.clean()
   }
   addVariables() {
     if (this.name != null && this.name !== "" && this.value != null && this.value !== "") {

@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, inject, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { EmailServiceService } from '../../../app/services/email-service.service';
@@ -9,6 +9,7 @@ import { EmailTemplate } from '../../../app/models/emailTemplates';
 import { Base64Service } from '../../../app/services/base64-service.service';
 import { EmailDataContact } from '../../../app/models/emailDataContact';
 import { CommonModule } from '@angular/common';
+import { ToastService } from 'ngx-dabd-grupo01';
 
 @Component({
   selector: 'app-send-email-contact',
@@ -29,7 +30,8 @@ export class SendEmailContactComponent implements OnInit{
 
   serviceEmail = new EmailServiceService()
   serviceContacts = new ContactService()
-  base64Service: Base64Service = new Base64Service();
+  base64Service: Base64Service = new Base64Service()
+  toastService : ToastService = inject(ToastService)
 
   allContacts : Contact[] = []
   allTemplates : EmailTemplate[] = []
@@ -89,12 +91,11 @@ export class SendEmailContactComponent implements OnInit{
     }
     this.serviceEmail.sendEmailWithContacts(data).subscribe({
       next: (response) => {
-        alert("Enviado con exito")
+        this.toastService.sendSuccess("Enviado con exito")
         this.clean()
       },
       error: (errr) => {
-        console.log(errr);
-        alert("Hubo un error al enviar el correo, pruebe más tarde")
+        this.toastService.sendError("Hubo un error al enviar el correo, pruebe más tarde")
       }
     })
   }
