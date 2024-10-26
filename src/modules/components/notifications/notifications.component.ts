@@ -16,12 +16,14 @@ export class NotificationsComponent implements OnInit {
   selectedNotification: NotificationFront | null = null;
   showNotifications = false;
   showModal = false;
-  notificationService = new NotificationService();
-  ngOnInit() {
 
-    this.notificationService.getAllNotification().subscribe({
+  notificationService = new NotificationService();
+
+  ngOnInit() {
+    this.notificationService.getNotificationByContact().subscribe({
       next: (notification) => {
         this.notifications = notification;
+        console.log(notification);
       },
       error: (error) => {
         console.error('Error al cargar las notificaciones', error);
@@ -43,6 +45,7 @@ export class NotificationsComponent implements OnInit {
 
   showNotificationDetails(notification: NotificationFront) {
     this.selectedNotification = notification;
+    console.log(notification, this.selectedNotification)
     this.showModal = true;
     this.notificationService.isRead(notification.id).subscribe({
       next: () => {

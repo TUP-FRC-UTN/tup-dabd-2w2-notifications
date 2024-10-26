@@ -23,7 +23,7 @@
               [style.color]="notification.isRead ? '#28a745' : '#007bff'">
             </i>
           </div>
-          <p class="notification-time">{{ notification.dateNotification | date:'short' }}</p>
+          <p class="notification-time">{{ notification.dateNotification }}</p>
           <div class="d-flex justify-content-end">
             <button class="btn btn-link btn-sm text-primary" (click)="showNotificationDetails(notification)">
               Leer más
@@ -47,7 +47,7 @@
         <button type="button" class="btn-close"  data-bs-dismiss="modal" (click)="closeModal()"></button>
       </div>
       <p class="notification-time-modal">{{ selectedNotification?.dateSend | date:'short' }}</p>
-      <div class="modal-body" [innerHTML]="selectedNotification?.content">
+      <div class="modal-body" [innerHTML]="selectedNotification?.body">
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Cerrar</button>

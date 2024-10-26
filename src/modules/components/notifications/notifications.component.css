@@ -12,6 +12,7 @@
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
   z-index: 1000;
+  color: black;
 }
 
 .notifications-header {
@@ -64,7 +65,7 @@
 
 .modal {
   background-color: rgba(0, 0, 0, 0.5);
-  
+  color: black;
 }
 
 .modal-backdrop {
@@ -75,3 +76,22 @@
   height: 100vh;
   background-color:  rgba(0, 0, 0, 0.5);
 }
+.modal-body {
+  max-width: 100%;
+  width: auto;
+  height: auto;
+}
+
+.modal-dialog {
+  max-width: 50%; /* Limita el ancho máximo para que no ocupe toda la pantalla */
+  width: auto;    /* Permite que el ancho se ajuste al contenido */
+  margin: 1rem auto; /* Espaciado superior e inferior */
+}
+
+.modal-content {
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  padding: 1rem;
+}
+

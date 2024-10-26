@@ -4,7 +4,7 @@ export interface NotificationApi {
     contactId : number;
     subject: string;
     templateId: number;
-    content : string;
+    body : string;
     dateSend: string; 
     isRead : boolean;
     statusSend : string;
@@ -16,7 +16,7 @@ export interface NotificationFront {
     contactId : number;
     subject: string;
     templateId: number;
-    content : string;
+    body : string;
     dateSend: Date; 
     isRead : boolean;
     statusSend : string;

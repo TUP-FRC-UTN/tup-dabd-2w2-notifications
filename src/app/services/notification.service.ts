@@ -1,8 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { NotificationApi } from '../models/notification';
-import { forkJoin, map, switchMap } from 'rxjs';
+import { NotificationApi, NotificationFront } from '../models/notification';
+import { forkJoin, map, Observable, switchMap } from 'rxjs';
 
 interface EmailTemplate {
   id: number;
@@ -18,64 +18,77 @@ export class NotificationService {
   private apiUrl: string;
 
   constructor() {
-
+    
     this.apiUrl = environment.apis.notifications.url;
-
   }
 
   private http: HttpClient = inject(HttpClient)
-  getNotificationByContact() {
-    const params = new HttpParams().set('contactId', 1);//Esta seteado en 1
-    const url = `${this.apiUrl}/notifications`;
-    return this.http.get<NotificationApi[]>(url, { params }).pipe(
-      switchMap((notifications) => {
-        const notificationRequests = notifications.map((notification) =>
-          this.getTemplateById(notification.templateId).pipe(
-            map((template) => ({
 
+  getNotificationByContact(){
+    const params = new HttpParams().set('contactId', 1); 
+    const url = `${this.apiUrl}/notifications`;
+  
+    return this.http.get<NotificationApi[]>(url, { params }).pipe(
+      switchMap(notifications => {
+        const detailedRequests = notifications.map(notification =>
+          this.http.get<NotificationApi>(`${this.apiUrl}/notifications/${notification.id}`).pipe(
+            map(detailedNotification => ({
               ...notification,
-              content: template.body,
+              body: detailedNotification.body || '', 
               isRead: notification.statusSend === 'VISUALIZED',
               dateSend: this.convertDateString(notification.dateSend),
-              dateNotification: new Date().toISOString()
+              dateNotification: new Date().toLocaleDateString() 
             }))
           )
         );
-        return forkJoin(notificationRequests);
+  
+        return forkJoin(detailedRequests);
       }),
       map((notificationsWithTemplates) =>
         notificationsWithTemplates.sort((a, b) => b.id - a.id)
       )
     );
   }
+
   getAllNotification() {
     const url = `${this.apiUrl}/notifications`;
     return this.http.get<NotificationApi[]>(url).pipe(
-      switchMap((notifications) => {
-        const notificationRequests = notifications.map((notification) =>
-          this.getTemplateById(notification.templateId).pipe(
-            map((template) => ({
-
+      switchMap(notifications => {
+        const detailedRequests = notifications.map(notification =>
+          this.http.get<NotificationApi>(`${this.apiUrl}/notifications/${notification.id}`).pipe(
+            map(detailedNotification => ({
               ...notification,
-              content: this.template,
+              body: detailedNotification.body || '', 
               isRead: notification.statusSend === 'VISUALIZED',
               dateSend: this.convertDateString(notification.dateSend),
-              dateNotification: new Date().toISOString() //lo cree aca pq no lo manda desde el back
+              dateNotification: new Date().toLocaleDateString() 
             }))
           )
         );
-        return forkJoin(notificationRequests);
+  
+        return forkJoin(detailedRequests);
       }),
       map((notificationsWithTemplates) =>
         notificationsWithTemplates.sort((a, b) => b.id - a.id)
       )
     );
   }
-
-  getTemplateById(id: number) {
-    const url = `${this.apiUrl}/email-templates/${id}`;
-    return this.http.get<EmailTemplate>(url);
+  
+  private formatDate(date: Date | string): string {
+    if (typeof date === 'string') return date; // Si ya es cadena, no cambiar
+    return date.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
   }
+
+
+  getNotificationById(id: number) {
+    const url = `${this.apiUrl}/notifications/${id}`;
+    return this.http.get<NotificationApi>(url);
+  }
+
+  // getTemplateById(id: number) {
+  //   const url = `${this.apiUrl}/email-templates/${id}`;
+  //   return this.http.get<EmailTemplate>(url);
+  // }
 
   isRead(id: number) {
     const url = `${this.apiUrl}/notifications/${id}`
