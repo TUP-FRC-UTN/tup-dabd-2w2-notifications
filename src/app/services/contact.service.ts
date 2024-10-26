@@ -43,6 +43,10 @@ export class ContactService {
       map(response => this.transformToContact(response))
     );
   }
+  modifacateSubscription(data : SubscriptionMod) {
+    const url = `${environmentContacts.apiUrl}/contacts/subscription`
+    return this.http.put<SubscriptionMod>(url, data)
+  }
 
   updateContact(contact: Contact): Observable<Contact> {
     const apiContact = this.transformToApiContact(contact);
