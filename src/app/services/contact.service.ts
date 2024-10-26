@@ -4,6 +4,7 @@ import { Contact } from '../models/contact';
 import { environment } from '../../environments/environment';
 import { Observable, map } from 'rxjs';
 import {SubscriptionMod} from '../../app/models/subscription'
+
 @Injectable({
   providedIn: 'root'
 })
@@ -27,7 +28,21 @@ export class ContactService {
     );
   }
 
-  getAllContactsWithFilters(searchText: string = '', isActive?: boolean): Observable<Contact[]> {
+  getFilteredContactsFromBackend(active: boolean = true, searchText: string = '', contactType?: string): Observable<Contact[]> {
+    let url = `${this.apiUrl}/contacts?active=${active}`;
+  
+    if (searchText) {
+      url += `&search=${encodeURIComponent(searchText)}`;
+    }
+    if (contactType !== undefined && contactType !== '') {
+      url += `&contactType=${contactType}`;
+    }
+    return this.http.get<any[]>(url).pipe(
+      map(contacts => contacts.map(contact => this.transformToContact(contact)))
+    );
+  }
+
+  getAllContactsWithClientSideFilters(searchText: string = '', isActive?: boolean): Observable<Contact[]> {
     return this.getAllContacts().pipe(
       map(contacts => {
 
@@ -46,6 +61,8 @@ export class ContactService {
       })
     );
   }
+
+
 
   
 

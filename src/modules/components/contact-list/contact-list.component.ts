@@ -6,7 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ContactService } from '../../../app/services/contact.service';
 import { Contact } from '../../../app/models/contact';
 import { Router } from '@angular/router';
-import { stat } from 'fs';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-contact-list',
@@ -33,6 +33,11 @@ export class ContactListComponent implements OnInit {
 
   @ViewChild('editForm') editForm!: NgForm;
 
+  //Region filters
+  searchTerm = '';
+  isActiveContactFilter : boolean | undefined;
+  selectedContactType: string | undefined = '';
+  //End region filters
   contacts: Contact[] = [];
 
   currentPage = 1;
@@ -40,8 +45,8 @@ export class ContactListComponent implements OnInit {
   totalItems = 0;
   totalPages = 0;
   pages: number[] = [];
-  searchTerm = '';
-  isActiveFilter : boolean | undefined;
+
+ 
 
 
   isModalOpen = false;
@@ -64,11 +69,11 @@ export class ContactListComponent implements OnInit {
   };
 
   getFilteredContacts(): void {
-    this.contactService.getAllContactsWithFilters(this.searchTerm, this.isActiveFilter)
-    .subscribe(filteredContacts => {
-      this.contacts = filteredContacts;
-    })
-  };
+    this.contactService.getFilteredContactsFromBackend(this.isActiveContactFilter, this.searchTerm, this.selectedContactType)
+      .subscribe(filteredContacts => {
+        this.contacts = filteredContacts;
+      });
+  }
 
   onSearchTextChange(newSearchText : string) : void {
     this.searchTerm = newSearchText;
@@ -77,24 +82,31 @@ export class ContactListComponent implements OnInit {
   }
 
 
-    // Métodos para filtros de estado
-    filterByStatus(status: 'all' | 'active' | 'inactive') {
-      if(status==='all'){
-        this.isActiveFilter=undefined;
-      }
-      else if(status==='active') {
-        this.isActiveFilter = true;
-      }
-      else if(status==='inactive'){
-        this.isActiveFilter=false;
-      }
-      this.getFilteredContacts();
+  // Métodos para filtros de estado
+  filterByStatus(status: 'all' | 'active' | 'inactive') {
+    if(status==='all'){
+      this.isActiveContactFilter=undefined;
     }
-
-  onStatusChange(newStatus : boolean | undefined) : void {
-    this.isActiveFilter = newStatus;
+    else if(status==='active') {
+      this.isActiveContactFilter = true;
+    }
+    else if(status==='inactive'){
+      this.isActiveContactFilter=false;
+    }
     this.getFilteredContacts();
   }
+
+  onStatusChange(newStatus : boolean | undefined) : void {
+    this.isActiveContactFilter = newStatus;
+    this.getFilteredContacts();
+  }
+
+  filterByContactType(contactType: string): void {
+    this.contactService.getFilteredContactsFromBackend(this.isActiveContactFilter, this.searchTerm, contactType)
+      .subscribe(filteredContacts => {
+          this.contacts = filteredContacts;
+      });
+}
 
 
 
