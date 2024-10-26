@@ -4,8 +4,6 @@ import { CommonModule } from '@angular/common';
 import { Contact } from '../../../app/models/contact';
 import { ContactService } from '../../../app/services/contact.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ContactType } from '../../../app/models/contactType';
-
 
 @Component({
   selector: 'app-contact-new',
@@ -25,8 +23,9 @@ export class ContactNewComponent {
   modalTitle: string = '';
   modalMessage: string = '';
 
+  contactService = new ContactService();
+
   onContactTypeChange() {
-    // Resetear los valores cuando cambia el tipo de contacto
     this.email = '';
     this.phone = '';
   }
@@ -39,18 +38,46 @@ export class ContactNewComponent {
   }
 
   sendForm(form: NgForm) {
+
     if (form.valid) {
-      const contactData = {
-        type: this.selectedContactType,
-        value: this.selectedContactType === 'email' ? this.email : this.phone
+
+      const contact: Contact = {
+        id: 1,
+        subscriptions: [
+          'General',
+          'Moderación',
+          'Construcción',
+          'Pago a empleados',
+          'Vencimiento de gastos',
+          'Deuda',
+          'Factura general',
+          'Pago',
+          'Usuario',
+          'Usuario asociado creado',
+          'Salida tardía del trabajador',
+          'Inventario',
+          'Gasto general'],
+        contactValue: this.selectedContactType === 'email' ? this.email : this.phone,
+        contactType: this.selectedContactType,
+        active: true,
+        showSubscriptions: false
       };
 
-      console.log('Datos del formulario:', contactData);
-      this.showModal('Éxito', 'El contacto ha sido registrado correctamente');
-      this.resetForm(form);
-    } else {
-      this.showModal('Error', 'Por favor complete todos los campos requeridos correctamente');
+      this.contactService.postContact(contact).subscribe({
+        next: (response) => {
+          this.showModal('Éxito', 'El contacto ha sido registrado correctamente');
+          this.resetForm(form);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.showModal('Error', 'Por favor complete todos los campos requeridos correctamente');
+          console.error('Error al enviar el template:', error);
+        },
+      });
+
+
     }
+
+
   }
 
   showModal(title: string, message: string) {

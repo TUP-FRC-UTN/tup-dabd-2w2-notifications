@@ -1,69 +1,57 @@
+import { Component, ViewChild, Inject, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ContactService } from '../../../app/services/contact.service';
 import { Contact } from '../../../app/models/contact';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-contact-list',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './contact-list.component.html',
-  styleUrl: './contact-list.component.css'
+  styleUrls: ['./contact-list.component.css']
 })
 
-
-
-@Inject('ContactsService')
+@Inject('ContactService')
 export class ContactListComponent {
 
-  private subscriptionVisibility = new Map<number, boolean>();
+  private readonly router = inject(Router);
 
+  private contactService = new ContactService();
 
+  constructor() {
+    this.initializePagination();
+  }
 
+  @ViewChild('editForm') editForm!: NgForm;
 
   contacts: Contact[] = [
     {
       id: 1,
-      subscriptions: ["Multas", "Acceso"],
+      subscriptions: ["Newsletter", "Ofertas"],
       contactType: "Email",
       contactValue: "gbritos13@gmail.com",
-      showSubscriptions: false
+      active: true,
+      showSubscriptions: false,
     },
     {
       id: 2,
-      subscriptions: ["Multas"],
+      subscriptions: ["Noticias"],
       contactType: "Email",
       contactValue: "guillee_bmx_13@gmail.com",
-      showSubscriptions: false
+      active: true,
+      showSubscriptions: false,
     },
     {
       id: 3,
-      subscriptions: ["Multas", "Promociones", "Eventos"],
+      subscriptions: ["Newsletter", "Promociones", "Eventos"],
       contactType: "Phone",
       contactValue: "123-456-7890",
-      showSubscriptions: false
-    },
-    {
-      id: 4,
-      subscriptions: [],
-      contactType: "Email",
-      contactValue: "maria.garcia@empresa.com",
-      showSubscriptions: false
-    },
-    {
-      id: 5,
-      subscriptions: ["Newsletter"],
-      contactType: "Phone",
-      contactValue: "098-765-4321",
-      showSubscriptions: false
-    },
-    {
-      id: 6,
-      subscriptions: ["Ofertas", "Eventos"],
-      contactType: "Email",
-      contactValue: "juan.perez@compañia.com",
-      showSubscriptions: false
+      active: true,
+      showSubscriptions: false,
     }
   ];
 
@@ -73,13 +61,69 @@ export class ContactListComponent {
   totalPages = 0;
   pages: number[] = [];
   searchTerm = '';
+
+
   isModalOpen = false;
+  isEditModalOpen = false;
   modalTitle = '';
   modalMessage = '';
 
 
-  constructor() {
-    this.initializePagination();
+  isDeleteModalOpen = false;
+  contactToDelete?: Contact | null = null;
+
+
+  editingContact: Contact = {
+    id: 0,
+    subscriptions: [],
+    contactValue: '',
+    contactType: '',
+    active: true,
+    showSubscriptions: false,
+  };
+
+
+
+  saveContact() {
+
+    this.router.navigate(['/contact/new']);
+
+  }
+
+
+  editContact(contact: Contact) {
+    this.contactService.editContact(contact).subscribe({
+      next: (response) => {
+        const index = this.contacts.findIndex(c => c.id === contact.id);
+        if (index !== -1) {
+          this.contacts[index] = { ...contact };
+        }
+        this.closeEditModal();
+        this.showModal('Éxito', 'El contacto ha sido actualizado correctamente');
+      },
+      error: (error: HttpErrorResponse) => {
+        this.closeEditModal();
+        this.showModal('Error', 'Ha ocurrido un error al intentar actualizar el contacto intente nuevamente...');
+        console.error('Error al editar el contacto:', error);
+      },
+    });
+  }
+
+  deleteContact(contact: Contact) {
+    this.contactService.deleteContact(contact.id).subscribe({
+      next: () => {
+        this.contacts = this.contacts.filter(c => c.id !== contact.id);
+        this.closeDeleteModal();
+        this.showModal('Éxito', 'El contacto ha sido eliminado correctamente');
+
+        this.initializePagination();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.closeDeleteModal();
+        this.showModal('Error', 'Ha ocurrido un error al intentar eliminar el contacto. Por favor, intente nuevamente.');
+        console.error('Error al eliminar el contacto:', error);
+      }
+    });
   }
 
   initializePagination() {
@@ -107,56 +151,7 @@ export class ContactListComponent {
     this.initializePagination();
   }
 
-  exportToExcel() {
-    // Implementar lógica de exportación a Excel
-    this.showModal('Export to Excel', 'Exportación a Excel iniciada');
-  }
 
-  exportToPdf() {
-    // Implementar lógica de exportación a PDF
-    this.showModal('Export to PDF', 'Exportación a PDF iniciada');
-  }
-
-  editContact(contact: Contact) {
-    // Implementar lógica de edición
-    console.log('Editando contacto:', contact);
-  }
-
-  deleteContact(contact: Contact) {
-    // Implementar lógica de eliminación
-    console.log('Eliminando contacto:', contact);
-  }
-
-  addSubscription(contact: Contact) {
-    // Implementar lógica para agregar suscripción
-    console.log('Agregando suscripción a:', contact);
-  }
-
-  clearSearch() {
-    this.searchTerm = '';
-    // Implementar lógica de limpieza de filtros
-  }
-
-  showInfo() {
-    this.showModal('Información', 'Sistema de gestión de contactos y suscripciones.');
-  }
-
-  showModal(title: string, message: string) {
-    this.modalTitle = title;
-    this.modalMessage = message;
-    this.isModalOpen = true;
-  }
-
-  closeModal() {
-    this.isModalOpen = false;
-  }
-
-  filterContacts(status: 'all' | 'active' | 'inactive') {
-    // Implementar lógica de filtrado
-    console.log('Filtrando por estado:', status);
-  }
-
-  // Método para filtrar los contactos según el término de búsqueda
   get filteredContacts(): Contact[] {
     if (!this.searchTerm.trim()) {
       return this.contacts;
@@ -170,19 +165,82 @@ export class ContactListComponent {
     );
   }
 
-    // Método para verificar si las suscripciones están visibles
-    isSubscriptionVisible(contactId: number): boolean {
-      return this.subscriptionVisibility.get(contactId) || false;
+  clearSearch() {
+    this.searchTerm = '';
+  }
+
+  showModal(title: string, message: string) {
+    this.modalTitle = title;
+    this.modalMessage = message;
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+  }
+
+
+  openEditModal(contact: Contact) {
+    this.editingContact = { ...contact };
+    this.isEditModalOpen = true;
+  }
+
+  closeEditModal() {
+    this.isEditModalOpen = false;
+    this.editingContact = {
+      id: 0,
+      subscriptions: [],
+      contactValue: '',
+      contactType: '',
+      active: true,
+      showSubscriptions: false
+    };
+  }
+
+
+  openDeleteModal(contact: Contact) {
+    this.contactToDelete = contact;
+    this.isDeleteModalOpen = true;
+  }
+
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.contactToDelete = null;
+  }
+
+  confirmDelete() {
+    if (this.contactToDelete) {
+      this.deleteContact(this.contactToDelete);
     }
+  }
 
-    // Método para alternar la visibilidad
-    toggleSubscriptions(contact: Contact): void {
-      const currentVisibility = this.subscriptionVisibility.get(contact.id) || false;
-      this.subscriptionVisibility.set(contact.id, !currentVisibility);
+  saveEditedContact() {
+    if (this.editForm.form.valid) {
+      this.editContact(this.editingContact);
     }
+  }
 
 
+
+  exportToExcel() {
+    // Implementar lógica de exportación a Excel
+    this.showModal('Exportar', 'Exportando a Excel...');
+  }
+
+  exportToPDF() {
+    // Implementar lógica de exportación a PDF
+    this.showModal('Exportar', 'Exportando a PDF...');
+  }
+
+  // Métodos para filtros de estado
+  filterContacts(status: 'all' | 'active' | 'inactive') {
+    // Implementar lógica de filtrado por estado
+    console.log('Filtrando por estado:', status);
+  }
+
+  // Método para mostrar información
+  showInfo() {
+    this.showModal('Información', 'Sistema de gestión de contactos y suscripciones.');
+  }
 }
-
-
-

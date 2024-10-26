@@ -71,13 +71,15 @@
             }
           </td>
           <td>
-            <button class="btn btn-primary btn-sm me-1">
+            <button class="btn btn-primary btn-sm me-1" (click)="openEditModal(contact)">
               <i class="bi bi-pencil"></i>
             </button>
-            <button class="btn btn-danger btn-sm me-1">
+
+
+            <button class="btn btn-danger btn-sm me-1" (click)="openDeleteModal(contact)">
               <i class="bi bi-trash"></i>
             </button>
-            <button class="btn btn-success btn-sm">
+            <button class="btn btn-success btn-sm" (click)="saveContact()">
               <i class="bi bi-plus-lg"></i>
             </button>
           </td>
@@ -86,6 +88,8 @@
       </tbody>
     </table>
   </div>
+
+
 
   <!-- Última fila: Paginador e Información -->
   <div class="row align-items-center">
@@ -121,7 +125,7 @@
   </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal de Mensaje -->
 <div [class.show]="isModalOpen" [style.display]="isModalOpen ? 'block' : 'none'" class="modal fade" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -139,6 +143,87 @@
   </div>
 </div>
 
+<!-- Modal de Edición -->
+<div [class.show]="isEditModalOpen" [style.display]="isEditModalOpen ? 'block' : 'none'" class="modal fade"
+  tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Contacto</h5>
+        <button type="button" class="btn-close" (click)="closeEditModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form #editForm="ngForm">
+          <!-- Tipo de Contacto -->
+          <div class="mb-3">
+            <label for="contactType" class="form-label">Tipo de Contacto</label>
+            <select class="form-select" id="contactType" name="contactType" [(ngModel)]="editingContact.contactType"
+              required>
+              <option value="Email">Email</option>
+              <option value="Phone">Teléfono</option>
+            </select>
+          </div>
+
+          <!-- Valor del Contacto -->
+          <div class="mb-3">
+            <label for="contactValue" class="form-label">Valor del Contacto</label>
+            <input type="text" class="form-control" id="contactValue" name="contactValue"
+              [(ngModel)]="editingContact.contactValue" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeEditModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="saveEditedContact()" [disabled]="!editForm.form.valid">
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrops para los modales -->
 @if(isModalOpen){
 <div class="modal-backdrop fade show"></div>
 }
+@if(isEditModalOpen){
+<div class="modal-backdrop fade show"></div>
+}
+
+
+<div [class.show]="isDeleteModalOpen" [style.display]="isDeleteModalOpen ? 'block' : 'none'"
+  class="modal fade delete-modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
+      </div>
+      <div class="modal-body">
+        @if(contactToDelete){
+        <p>¿Está seguro que desea eliminar el siguiente contacto?</p>
+        <div class="contact-details mt-3">
+          <p><strong>Tipo de Contacto:</strong> {{contactToDelete.contactType}}</p>
+          <p><strong>Valor:</strong> {{contactToDelete.contactValue}}</p>
+          @if(contactToDelete.subscriptions.length > 0){
+          <p><strong>Suscripciones:</strong></p>
+          <ul class="list-unstyled">
+            @for(subscription of contactToDelete.subscriptions; track $index){
+            <li><i class="bi bi-dot"></i> {{subscription}}</li>
+            }
+          </ul>
+          }
+        </div>
+        } @else {
+        <p>No se ha seleccionado ningún contacto para eliminar.</p>
+        }
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="!contactToDelete">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
