@@ -22,7 +22,8 @@
         <span class="input-group-text border-start-0">
           Buscar
         </span>
-        <input type="text" class="form-control" placeholder="Buscar contacto..." [(ngModel)]="searchTerm">
+        <input [(ngModel)]="searchTerm" (input)="onSearchTextChange(searchTerm)"   type="text" class="form-control" placeholder="Buscar contacto..." [(ngModel)]="searchTerm">
+        
         <button class="btn btn-outline-secondary" title="Limpiar filtros">
           <i class="bi bi-trash"></i>
         </button>
@@ -34,9 +35,21 @@
   <div class="row mb-3">
     <div class="col-12 text-end">
       <div class="btn-group">
-        <button class="btn btn-outline-primary">Todos</button>
-        <button class="btn btn-outline-success">Activos</button>
-        <button class="btn btn-outline-secondary">Inactivos</button>
+        <button class="btn btn-outline-primary" (click)="filterByStatus('all')" >Todos</button>
+        <button class="btn btn-outline-success" (click)="filterByStatus('active')">Activos</button>
+        <button class="btn btn-outline-secondary" (click)="filterByStatus('inactive')">Inactivos</button>
+        
+        <div class="dropdown">
+          <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-funnel-fill"></i> Filtros
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" (click)="filterByContactType('')">Todos</a></li>
+            <li><a class="dropdown-item" (click)="filterByContactType('EMAIL')">Email</a></li>
+            <li><a class="dropdown-item" (click)="filterByContactType('PHONE')">Teléfono</a></li>
+            <li><a class="dropdown-item" (click)="filterByContactType('SOCIAL_MEDIA_LINK')">Redes Sociales</a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { ContactAudit, ContactAuditResponse } from '../models/contacts/contactAudit';
 import { environment } from '../../environments/environment';
 import { map } from 'rxjs/operators';
-import * as _ from 'lodash';
+
 import { ContactType } from '../models/contacts/contactAudit';
 
 
@@ -15,12 +15,6 @@ export class ContactAuditService {
 
 
 
-
-
-  private mapToCamelCase(audit: ContactAuditResponse): ContactAudit {
-    return _.mapKeys(audit, (value: any, key: any) => _.camelCase(key)) as ContactAudit;
-
-  }
 
   private mockApiUrl = 'https://my-json-server.typicode.com/114050-RODI-CARO-Nicolas/contact-audit-mock/audit_history'
 

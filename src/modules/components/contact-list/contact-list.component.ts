@@ -1,4 +1,4 @@
-import { Component, ViewChild, Inject, inject } from '@angular/core';
+import { Component, ViewChild, Inject, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -6,6 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ContactService } from '../../../app/services/contact.service';
 import { Contact } from '../../../app/models/contact';
 import { Router } from '@angular/router';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-contact-list',
@@ -16,7 +17,7 @@ import { Router } from '@angular/router';
 })
 
 @Inject('ContactService')
-export class ContactListComponent {
+export class ContactListComponent implements OnInit {
 
   private readonly router = inject(Router);
 
@@ -26,8 +27,17 @@ export class ContactListComponent {
     this.initializePagination();
   }
 
+  ngOnInit(): void {
+    this.getFilteredContacts();
+  }
+
   @ViewChild('editForm') editForm!: NgForm;
 
+  //Region filters
+  searchTerm = '';
+  isActiveContactFilter : boolean | undefined;
+  selectedContactType: string | undefined = '';
+  //End region filters
   contacts: Contact[] = [];
 
   currentPage = 1;
@@ -35,7 +45,8 @@ export class ContactListComponent {
   totalItems = 0;
   totalPages = 0;
   pages: number[] = [];
-  searchTerm = '';
+
+ 
 
 
   isModalOpen = false;
@@ -56,6 +67,46 @@ export class ContactListComponent {
     active: true,
     showSubscriptions: false,
   };
+
+  getFilteredContacts(): void {
+    this.contactService.getFilteredContactsFromBackend(this.isActiveContactFilter, this.searchTerm, this.selectedContactType)
+      .subscribe(filteredContacts => {
+        this.contacts = filteredContacts;
+      });
+  }
+
+  onSearchTextChange(newSearchText : string) : void {
+    this.searchTerm = newSearchText;
+    this.getFilteredContacts();
+
+  }
+
+
+  // Métodos para filtros de estado
+  filterByStatus(status: 'all' | 'active' | 'inactive') {
+    if(status==='all'){
+      this.isActiveContactFilter=undefined;
+    }
+    else if(status==='active') {
+      this.isActiveContactFilter = true;
+    }
+    else if(status==='inactive'){
+      this.isActiveContactFilter=false;
+    }
+    this.getFilteredContacts();
+  }
+
+  onStatusChange(newStatus : boolean | undefined) : void {
+    this.isActiveContactFilter = newStatus;
+    this.getFilteredContacts();
+  }
+
+  filterByContactType(contactType: string): void {
+    this.contactService.getFilteredContactsFromBackend(this.isActiveContactFilter, this.searchTerm, contactType)
+      .subscribe(filteredContacts => {
+          this.contacts = filteredContacts;
+      });
+}
 
 
 
@@ -208,11 +259,7 @@ export class ContactListComponent {
     this.showModal('Exportar', 'Exportando a PDF...');
   }
 
-  // Métodos para filtros de estado
-  filterContacts(status: 'all' | 'active' | 'inactive') {
-    // Implementar lógica de filtrado por estado
-    console.log('Filtrando por estado:', status);
-  }
+
 
   // Método para mostrar información
   showInfo() {
