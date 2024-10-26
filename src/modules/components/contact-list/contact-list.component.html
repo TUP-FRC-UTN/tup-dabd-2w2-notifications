@@ -22,7 +22,8 @@
         <span class="input-group-text border-start-0">
           Buscar
         </span>
-        <input type="text" class="form-control" placeholder="Buscar contacto..." [(ngModel)]="searchTerm">
+        <input [(ngModel)]="searchTerm" (input)="onSearchTextChange(searchTerm)"   type="text" class="form-control" placeholder="Buscar contacto..." [(ngModel)]="searchTerm">
+        
         <button class="btn btn-outline-secondary" title="Limpiar filtros">
           <i class="bi bi-trash"></i>
         </button>
@@ -34,9 +35,9 @@
   <div class="row mb-3">
     <div class="col-12 text-end">
       <div class="btn-group">
-        <button class="btn btn-outline-primary">Todos</button>
-        <button class="btn btn-outline-success">Activos</button>
-        <button class="btn btn-outline-secondary">Inactivos</button>
+        <button class="btn btn-outline-primary" (click)="filterByStatus('all')" >Todos</button>
+        <button class="btn btn-outline-success" (click)="filterByStatus('active')">Activos</button>
+        <button class="btn btn-outline-secondary" (click)="filterByStatus('inactive')">Inactivos</button>
       </div>
     </div>
   </div>

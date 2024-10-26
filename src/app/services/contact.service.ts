@@ -27,6 +27,28 @@ export class ContactService {
     );
   }
 
+  getAllContactsWithFilters(searchText: string = '', isActive?: boolean): Observable<Contact[]> {
+    return this.getAllContacts().pipe(
+      map(contacts => {
+
+        let filteredContacts = contacts;
+        if (searchText) {
+          filteredContacts = filteredContacts.filter(contact =>
+            contact.contactValue.toLowerCase().includes(searchText.toLowerCase()) ||
+            contact.contactType.toLowerCase().includes(searchText.toLowerCase())
+          );
+        }
+
+        if (isActive !== undefined) {
+          filteredContacts = filteredContacts.filter(contact => contact.active === isActive);
+        }
+        return filteredContacts;
+      })
+    );
+  }
+
+  
+
 
   getContactById(id: number): Observable<Contact> {
     return this.http.get<any>(`${this.apiUrl}/contacts/${id}`).pipe(
