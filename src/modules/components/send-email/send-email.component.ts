@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, inject, Inject, OnInit } from '@angular/core';
 import { Form, FormsModule } from '@angular/forms';
 import { EmailServiceService } from     '../../../app/services/email-service.service';
 import { TemplateModelResponse } from '../../../app/models/templateModelResponse';
 import { EmailData } from '../../../app/models/emailData';
 import { Variable } from '../../../app/models/variables';
 import { Base64Service } from '../../../app/services/base64-service.service';
+import { ToastService } from 'ngx-dabd-grupo01';
+
 
 @Component({
   selector: 'app-send-email',
@@ -18,6 +20,9 @@ import { Base64Service } from '../../../app/services/base64-service.service';
 @Inject('EmailServiceService')
 @Inject('Base64Service')
 export class SendEmailComponent implements OnInit{
+  toastService : ToastService = inject(ToastService)
+  //toastService : Toast = inject(Toast) 
+  //constructor(private toastService: ToastService) {}
 
   service = new EmailServiceService();
 
@@ -57,11 +62,13 @@ export class SendEmailComponent implements OnInit{
     console.log(data)
     this.service.sendEmail(data).subscribe({
       next: (data) => {
-        alert("Enviado con exito")
+        this.toastService.sendSuccess("Enviado con exito")
+        //alert("Enviado con exito")
         this.clean()
       },
       error: (errr) => {
-        alert("Hubo un error al enviar el correo, pruebe más tarde")
+        this.toastService.sendError("Hubo un error al enviar el correo, pruebe más tarde")
+        //alert("Hubo un error al enviar el correo, pruebe más tarde")
       }
     })
     //this.clean()
