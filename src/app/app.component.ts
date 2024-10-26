@@ -6,7 +6,7 @@ import { ToastsContainer } from 'ngx-dabd-grupo01';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterModule,NotificationsComponent,ToastsContainer],
+  imports: [RouterOutlet, RouterModule,NotificationsComponent, ToastsContainer],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
