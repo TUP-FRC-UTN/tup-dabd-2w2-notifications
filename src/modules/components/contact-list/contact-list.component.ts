@@ -9,6 +9,8 @@ import { Router } from '@angular/router';
 import { NgbPagination, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { ToastService } from 'ngx-dabd-grupo01';
+import { SubscriptionService } from '../../../app/services/subscription.service';
+import { map } from 'rxjs';
 
 
 @Component({
@@ -25,26 +27,23 @@ import { ToastService } from 'ngx-dabd-grupo01';
   templateUrl: './contact-list.component.html',
   styleUrls: ['./contact-list.component.css']
 })
+
 export class ContactListComponent implements OnInit {
 
 
   private router = inject(Router);
   private contactService = inject(ContactService);
-  toastService : ToastService = inject(ToastService)
-   availableSubscriptions: string [] = [
-    'General',
-    'Moderación',
-    'Construcción',
-    'Pago a empleados',
-    'Vencimiento de gastos',
-    'Deuda',
-    'Factura general',
-    'Pago',
-    'Usuario',
-    'Usuario asociado creado',
-    'Salida tardía del trabajador',
-    'Inventario',
-    'Gasto general']
+  toastService: ToastService = inject(ToastService)
+  suscriptionService: SubscriptionService = inject(SubscriptionService);
+
+  availableSubscriptions: string[] = []
+
+  getSuscriptions() {
+    this.suscriptionService.getAllSubscriptions().pipe(
+      map(x => x.map(y => this.availableSubscriptions.push(y.name)))
+    );
+  }
+
 
   // Paginación
   currentPage = 1;
@@ -76,7 +75,7 @@ export class ContactListComponent implements OnInit {
   },
   {
     id: 3,
-    subscriptions: ["Gasto General", "Usuario", "Pago"],
+    subscriptions: ["Gasto General", "Deuda", "Pago"],
     contactType: "Phone",
     contactValue: "123-456-7890",
     active: true,
@@ -259,7 +258,7 @@ export class ContactListComponent implements OnInit {
   }
 
   openEditModal(contact: Contact) {
-    this.editingContact = {...contact}
+    this.editingContact = { ...contact }
     this.isEditModalOpen = true;
   }
 

@@ -7,6 +7,7 @@ import { Subscription } from '../models/subscription';
   providedIn: 'root'
 })
 export class SubscriptionService {
+  
   private http: HttpClient = inject(HttpClient)
 
   getAllSubscriptions() {
