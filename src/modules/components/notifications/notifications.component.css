@@ -53,20 +53,8 @@
   font-size: 1.2rem;
 }
 
-.modal {
-  background-color: white;
-}
-
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color:  rgba(0, 0, 0, 0.5);
-}
 .notification-time-modal {
-  font-size: 0.5rem;       
+  font-size: 0.8em;       
   color: #6c757d;        
   margin-left: auto;      
   align-self: center;    

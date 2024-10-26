@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environmentNotifications } from '../../environments/environment.development.notifications';
 import { NotificationApi } from '../models/notification';
@@ -15,19 +15,17 @@ interface EmailTemplate {
 })
 export class NotificationService {
     private http : HttpClient = inject(HttpClient)
-  //Estaba probando habria que hacerlo con ContactID
     getNotificationByContact() {
-    const contactId = "1";
-    const url = `${environmentNotifications.apiUrl}/notifications/?contactId=${contactId}`;
-
-    return this.http.get<NotificationApi[]>(url).pipe(
+    const params = new HttpParams().set('contactId', 1);//Esta seteado en 1
+    const url = `${environmentNotifications.apiUrl}/notifications`;
+    return this.http.get<NotificationApi[]>(url, { params }).pipe(
         switchMap((notifications) => {
             const notificationRequests = notifications.map((notification) => 
                 this.getTemplateById(notification.templateId).pipe(
                     map((template) => ({
                     
                         ...notification,
-                        content: this.template,
+                        content: template.body,
                         isRead: notification.statusSend === 'VISUALIZED',
                         dateSend : this.convertDateString(notification.dateSend), 
                         dateNotification : new Date().toISOString()
@@ -48,7 +46,7 @@ export class NotificationService {
             const notificationRequests = notifications.map((notification) => 
                 this.getTemplateById(notification.templateId).pipe(
                     map((template) => ({
-                    
+                        
                         ...notification,
                         content: this.template,
                         isRead: notification.statusSend === 'VISUALIZED',

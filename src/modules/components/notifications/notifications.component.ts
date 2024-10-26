@@ -26,25 +26,6 @@ export class NotificationsComponent implements OnInit {
   showModal = false;
   notificationService = new NotificationService();
   ngOnInit() {
-    // Ejemplo de notificaciones  
-  //   this.notifications = [
-  //     {
-  //       id: 1,
-  //       title: 'Nueva plantilla creada',
-  //       content: this.template,
-  //       isRead: false,
-  //       timestamp: new Date()
-  //     },
-  //     {
-  //       id: 2,
-  //       title: 'Contacto actualizado',
-  //       content: 'El contacto <em>Juan Pérez</em> ha sido actualizado.',
-  //       isRead: true,
-  //       timestamp: new Date(Date.now() - 3600000)
-  //     }
-  //   ];
-  // }
-
     //Cambiar por getNotificationByContact
     this.notificationService.getAllNotification().subscribe({
       next: (notification) => {
