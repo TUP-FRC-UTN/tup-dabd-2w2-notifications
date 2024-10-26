@@ -28,32 +28,7 @@ export class ContactListComponent {
 
   @ViewChild('editForm') editForm!: NgForm;
 
-  contacts: Contact[] = [
-    {
-      id: 1,
-      subscriptions: ["Newsletter", "Ofertas"],
-      contactType: "Email",
-      contactValue: "gbritos13@gmail.com",
-      active: true,
-      showSubscriptions: false,
-    },
-    {
-      id: 2,
-      subscriptions: ["Noticias"],
-      contactType: "Email",
-      contactValue: "guillee_bmx_13@gmail.com",
-      active: true,
-      showSubscriptions: false,
-    },
-    {
-      id: 3,
-      subscriptions: ["Newsletter", "Promociones", "Eventos"],
-      contactType: "Phone",
-      contactValue: "123-456-7890",
-      active: true,
-      showSubscriptions: false,
-    }
-  ];
+  contacts: Contact[] = [];
 
   currentPage = 1;
   itemsPerPage = 10;
