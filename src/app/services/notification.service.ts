@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { environmentNotifications } from '../../environments/environment.development.notifications';
+import { environment } from '../../environments/environment';
 import { NotificationApi } from '../models/notification';
 import { forkJoin, map, switchMap } from 'rxjs';
 
@@ -17,7 +17,7 @@ export class NotificationService {
     private http : HttpClient = inject(HttpClient)
     getNotificationByContact() {
     const params = new HttpParams().set('contactId', 1);//Esta seteado en 1
-    const url = `${environmentNotifications.apiUrl}/notifications`;
+    const url = `${environment.apis.notifications.url}/notifications`;
     return this.http.get<NotificationApi[]>(url, { params }).pipe(
         switchMap((notifications) => {
             const notificationRequests = notifications.map((notification) => 
@@ -40,7 +40,7 @@ export class NotificationService {
     );
     }
     getAllNotification() {
-    const url = `${environmentNotifications.apiUrl}/notifications`;
+    const url = `${environment.apis.notifications.url}/notifications`;
     return this.http.get<NotificationApi[]>(url).pipe(
         switchMap((notifications) => {
             const notificationRequests = notifications.map((notification) => 
@@ -64,12 +64,12 @@ export class NotificationService {
     }
 
     getTemplateById(id : number){
-    const url = `${environmentNotifications.apiUrl}/email-templates/${id}`;
+    const url = `${environment.apis.notifications.url}/email-templates/${id}`;
     return this.http.get<EmailTemplate>(url);
     }
 
     isRead(id : number){
-        const url = `${environmentNotifications.apiUrl}/notifications/${id}`
+        const url = `${environment.apis.notifications.url}/notifications/${id}`
         const body = { statusSend: 'VISUALIZED' };
         return this.http.put(url, body)
     }
