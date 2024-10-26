@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ContactAudit, ContactAuditResponse } from '../models/contacts/contactAudit';
-import { environmentContacts } from '../../environments/environment.development.contacts';
+import { environment } from '../../environments/environment';
 import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { ContactType } from '../models/contacts/contactAudit';
@@ -19,25 +19,25 @@ export class ContactAuditService {
 
   private mapToCamelCase(audit: ContactAuditResponse): ContactAudit {
     return _.mapKeys(audit, (value: any, key: any) => _.camelCase(key)) as ContactAudit;
-    
+
   }
 
   private mockApiUrl = 'https://my-json-server.typicode.com/114050-RODI-CARO-Nicolas/contact-audit-mock/audit_history'
 
-  
+
   private mapContactType(contactType: ContactType): string {
     switch (contactType) {
       case ContactType.EMAIL:
-        return 'Correo eléctronico';  
+        return 'Correo eléctronico';
       case ContactType.PHONE:
-        return 'Teléfono';   
+        return 'Teléfono';
       case ContactType.SOCIAL_MEDIA_LINK:
-        return 'Red social'; 
+        return 'Red social';
       default:
         throw new Error(`Unknown contact type: ${contactType}`);
     }
   }
-  
+
   private transformResponseToContactAudit = (response: ContactAuditResponse): ContactAudit => {
     return {
       contactId: response.contact_id,
@@ -49,9 +49,9 @@ export class ContactAuditService {
     };
   }
 
- 
-  
-  
+
+
+
 
 
 

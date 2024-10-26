@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import { Contact } from '../models/contact';
 import { environment } from '../../environments/environment';
 import { Observable, map } from 'rxjs';
@@ -20,9 +19,6 @@ export class ContactService {
 
     this.apiUrl = environment.apis.contacts.url;
 
-    if (isPlatformBrowser(this.platformId)) {
-      console.log('API URL:', this.apiUrl);
-    }
   }
 
   getAllContacts(): Observable<Contact[]> {
