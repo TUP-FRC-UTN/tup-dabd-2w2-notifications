@@ -84,8 +84,8 @@ export class SendEmailContactComponent implements OnInit{
     const data : EmailDataContact = {
       subject: this.subjectToSend,
       variables: this.variables,
-      template_id: this.template_id,
-      contact_ids: this.contacts_id
+      templateId: this.template_id,
+      contactIds: this.contacts_id
     }
 
     console.log(data);
