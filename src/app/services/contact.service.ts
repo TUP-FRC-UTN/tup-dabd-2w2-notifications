@@ -4,6 +4,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Contact } from '../models/contact';
 import { environment } from '../../environments/environment';
 import { Observable, map } from 'rxjs';
+import {SubscriptionMod} from '../../app/models/subscription'
 @Injectable({
   providedIn: 'root'
 })
@@ -44,7 +45,7 @@ export class ContactService {
     );
   }
   modifacateSubscription(data : SubscriptionMod) {
-    const url = `${environmentContacts.apiUrl}/contacts/subscription`
+    const url = `${this.apiUrl}/contacts/subscription`
     return this.http.put<SubscriptionMod>(url, data)
   }
 
