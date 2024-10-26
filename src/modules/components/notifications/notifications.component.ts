@@ -26,7 +26,7 @@ export class NotificationsComponent implements OnInit {
   showModal = false;
   notificationService = new NotificationService();
   ngOnInit() {
-    // Ejemplo de notificaciones
+    // Ejemplo de notificaciones  
   //   this.notifications = [
   //     {
   //       id: 1,
@@ -45,6 +45,7 @@ export class NotificationsComponent implements OnInit {
   //   ];
   // }
 
+    //Cambiar por getNotificationByContact
     this.notificationService.getAllNotification().subscribe({
       next: (notification) => {
         this.notifications = notification;
