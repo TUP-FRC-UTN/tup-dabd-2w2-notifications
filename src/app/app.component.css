@@ -1,49 +1,45 @@
-/* Estilo para el contenedor principal */
-.d-flex {
-    display: flex;
-    height: 100vh; /* Toda la altura de la ventana */
-    overflow: hidden; /* Evitar scroll en todo el contenedor */
-}
 
-/* Sidebar fijo */
 .sidebar {
-    width: 200px; /* Ancho del sidebar */
-    background-color: #080808; /* Color de fondo del sidebar */
-    padding: 20px; /* Espaciado interno */
-    border-right: 2px solid #fffefb; /* Borde derecho */
-    position: fixed; /* Fijar el sidebar */
-    top: 0; /* Alinearlo al tope */
-    bottom: 0; /* Alinearlo a la parte inferior */
-    left: 0; /* Alinearlo al lado izquierdo */
-    overflow-y: auto; /* Hacer scroll si el contenido del sidebar es mayor */
-}
+  width: 250px;
+  height: 100vh;
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  padding: 1rem;
 
-/* Listado del sidebar */
-.sidebar-list {
-    list-style-type: none; /* Eliminar viñetas */
+  .sidebar-list {
+    list-style: none;
     padding: 0;
+    margin: 0;
+
+    li {
+      margin-bottom: 0.5rem;
+
+      a {
+        text-decoration: none;
+        color: #333;
+        display: block;
+        padding: 0.5rem;
+        border-radius: 4px;
+
+        &:hover {
+          background-color: #e9ecef;
+        }
+      }
+
+      ul {
+        list-style: none;
+        padding-left: 1rem;
+      }
+    }
+  }
 }
 
-.sidebar-list li {
-    margin: 10px 0; /* Separación entre elementos */
-}
-
-.sidebar-list a {
-    text-decoration: none; /* Sin subrayado */
-    color: #ffffff;
-}
-
-.sidebar-list a:hover {
-    color: #ffffff;
-}
-
-/* Estilo para el contenido principal */
 .main-content {
-    margin-left: 220px; /* Desplazar el contenido hacia la derecha */
-    width: calc(100% - 220px); /* Ajustar el ancho del contenido */
-    overflow-y: auto; /* Hacer scroll solo en el contenido principal */
-}
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
 
-.content {
-    padding: 20px; /* Espaciado interno */
+  .content {
+    padding: 1rem;
+  }
 }

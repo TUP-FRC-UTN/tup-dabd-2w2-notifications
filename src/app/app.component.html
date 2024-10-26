@@ -1,49 +1,54 @@
 <div class="d-flex">
-    <!-- Sidebar -->
-    <nav class="sidebar">
-        <ul class="sidebar-list">
-            <li><a routerLink="/templates/new">Registrar Template</a></li>
-            <li><a routerLink="/templates">Listar Plantillas</a></li>
-            <li><a routerLink="/send-email">Enviar Notificación</a></li>
-            <li><a routerLink="/send-email-contact">Notificación a Contactos</a></li>
-            <!-- Agrega más enlaces si es necesario -->
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <ul class="sidebar-list">
+      <li>
+        <a href="#" data-bs-toggle="collapse" data-bs-target="#plantillasMenu" aria-expanded="false"
+          aria-controls="plantillasMenu">Plantillas</a>
+        <ul class="collapse" id="plantillasMenu">
+          <li><a routerLink="/templates">Listar Plantillas</a></li>
+          <li><a routerLink="/templates/new">Registrar Plantilla</a></li>
         </ul>
+      </li>
+      <li>
+        <a href="#" data-bs-toggle="collapse" data-bs-target="#contactosMenu" aria-expanded="false"
+          aria-controls="contactosMenu">Contactos</a>
+        <ul class="collapse" id="contactosMenu">
+          <li><a routerLink="/contacts">Listar Contactos</a></li>
+          <li><a routerLink="/contact/new">Registrar Contacto</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#" data-bs-toggle="collapse" data-bs-target="#notificacionesMenu" aria-expanded="false"
+          aria-controls="notificacionesMenu">Notificaciones</a>
+        <ul class="collapse" id="notificacionesMenu">
+          <li><a routerLink="/send-email">Enviar Notificación</a></li>
+          <li><a routerLink="/send-email-contact">Notificación a Contactos</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Menu</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <div class="ms-auto">
+            <app-notifications></app-notifications>
+          </div>
+        </div>
+      </div>
     </nav>
 
-    <!-- Main content -->
-    <div class="main-content">
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">Menu</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link active" routerLink="/templates/new">Registrar Plantillas</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" routerLink="/templates">Listar Templates</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" routerLink="/send-email">Enviar Notificación</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" routerLink="/send-email-contact">Notificación a Contactos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" routerLink="/contact-audit">Auditoría Contactos</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Contenido principal -->
-        <div class="content">
-            <router-outlet></router-outlet>
-        </div>
+    <!-- Contenido principal -->
+    <div class="content">
+      <router-outlet></router-outlet>
     </div>
+  </div>
 </div>
