@@ -1,57 +1,133 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Contact, ContactApi } from '../models/contact';
-import { ContactType } from '../models/contactType';
-import { environmentContacts } from '../../environments/environment.development.contacts';
-import { map } from 'rxjs';
-import { SubscriptionMod } from '../models/subscription';
+import { inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Contact } from '../models/contact';
+import { environment } from '../../environments/environment';
+import { Observable, map } from 'rxjs';
+import {SubscriptionMod} from '../../app/models/subscription';
+import { ContactType } from '../models/contacts/contactAudit';
 
 @Injectable({
   providedIn: 'root'
 })
+
+
 export class ContactService {
 
-  http: HttpClient = inject(HttpClient)
+  private platformId = inject(PLATFORM_ID);
+  private http = inject(HttpClient);
+  private apiUrl: string;
 
-  getAllContacts() {
-    const url = `${environmentContacts.apiUrl + "/contacts"}`;
-    return this.http.get<ContactApi[]>(url).pipe(
-      map(contacts => contacts.map(contact => ({
-        id: contact.id,
-        subscriptions: contact.subscriptions || [], // Asignar un array vacío si es null
-        contactValue: contact.contact_value, // Mapeo del nombre de la propiedad
-        contactType: contact.contact_type // Mapeo del nombre de la propiedad
-      })))
+  constructor() {
+
+    this.apiUrl = environment.apis.contacts.url;
+
+  }
+
+  getAllContacts(): Observable<Contact[]> {
+    return this.http.get<any[]>(`${this.apiUrl + "/contacts"}`).pipe(
+      map(contacts => contacts.map(contact => this.transformToContact(contact)))
     );
   }
 
-  getContactById(id: number) {
-    const url = `${environmentContacts.apiUrl + "/contacts/" + id}`
-    return this.http.get<ContactApi>(url).pipe(
-      map(contact => ({
-        id : contact.id,
-        subscriptions : contact.subscriptions || [],
-        contactValue: contact.contact_value, // Mapeo
-        contactType: contact.contact_type
-      }))
-    )
+  getFilteredContactsFromBackend(active: boolean = true, searchText: string = '', contactType?: string): Observable<Contact[]> {
+    let url = `${this.apiUrl}/contacts?active=${active}`;
+  
+    if (searchText) {
+      url += `&search=${encodeURIComponent(searchText)}`;
+    }
+    if (contactType !== undefined && contactType !== '') {
+      url += `&contactType=${contactType}`;
+    }
+    return this.http.get<any[]>(url).pipe(
+      map(contacts => contacts.map(contact => this.transformToContact(contact)))
+    );
   }
 
-  getContactType() {
-    const url = `${environmentContacts.apiUrl + "/contactsType"}`
-    return this.http.get<ContactType[]>(url)
+  getAllContactsWithClientSideFilters(searchText: string = '', isActive?: boolean): Observable<Contact[]> {
+    return this.getAllContacts().pipe(
+      map(contacts => {
+
+        let filteredContacts = contacts;
+        if (searchText) {
+          filteredContacts = filteredContacts.filter(contact =>
+            contact.contactValue.toLowerCase().includes(searchText.toLowerCase()) ||
+            contact.contactType.toLowerCase().includes(searchText.toLowerCase())
+          );
+        }
+
+        if (isActive !== undefined) {
+          filteredContacts = filteredContacts.filter(contact => contact.active === isActive);
+        }
+        return filteredContacts;
+      })
+    );
   }
 
-  postContact(contact: Contact) {
 
-    const url = `${environmentContacts.apiUrl + "/contacts/"}`
 
-    return this.http.post<Contact>(url, contact);
+  
 
+
+  getContactById(id: number): Observable<Contact> {
+    return this.http.get<any>(`${this.apiUrl}/contacts/${id}`).pipe(
+      map(contact => this.transformToContact(contact))
+    );
+  }
+
+  saveContact(contact: Contact): Observable<Contact> {
+    const apiContact = this.transformToApiContact(contact);
+    return this.http.post<any>(`${this.apiUrl}/contacts`, apiContact).pipe(
+      map(response => this.transformToContact(response))
+    );
   }
   modifacateSubscription(data : SubscriptionMod) {
-    const url = `${environmentContacts.apiUrl}/contacts/subscription`
+    const url = `${this.apiUrl}/contacts/subscription`
     return this.http.put<SubscriptionMod>(url, data)
   }
 
+  updateContact(contact: Contact): Observable<Contact> {
+    const apiContact = this.transformToApiContact(contact);
+    return this.http.put<any>(`${this.apiUrl}/contacts/${contact.id}`, apiContact).pipe(
+      map(response => this.transformToContact(response))
+    );
+  }
+
+  deleteContact(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/contacts/${id}`);
+  }
+
+  private transformToContact(data: any): Contact {
+    return {
+      id: data.id,
+      subscriptions: data.subscriptions,
+      contactValue: data.contact_value,
+      contactType: this.mapContactType(data.contact_type),
+      active: data.active,
+      showSubscriptions: false
+    };
+  };
+
+  private transformToApiContact(contact: Contact): any {
+    return {
+      id: contact.id,
+      subscriptions: contact.subscriptions,
+      contact_value: contact.contactValue,
+      contact_type: contact.contactType,
+      active: contact.active
+    };
+  }
+
+  private mapContactType(contactType: ContactType): string {
+    switch (contactType) {
+      case ContactType.EMAIL:
+        return 'Correo eléctronico';
+      case ContactType.PHONE:
+        return 'Teléfono';
+      case ContactType.SOCIAL_MEDIA_LINK:
+        return 'Red social';
+      default:
+        throw new Error(`Unknown contact type: ${contactType}`);
+    }
+  }
 }
+

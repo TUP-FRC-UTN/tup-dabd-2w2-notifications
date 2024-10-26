@@ -4,24 +4,26 @@ import { Observable } from 'rxjs';
 import { Base64Service } from './base64-service.service';
 import { TemplateSendModel } from '../models/templateSendModel';
 import { TemplateModelResponse } from '../models/templateModelResponse';
-import { EmailData } from '../models/emailData';
+import { EmailData, EmailDataApi } from '../models/emailData';
 import { EmailTemplate } from '../models/emailTemplates';
-import { EmailDataContact } from '../models/emailDataContact';
-import { environmentNotifications } from '../../environments/environment.development.notifications';
+import { EmailDataContact, EmailDataContactApi } from '../models/emailDataContact';
+import { environment } from '../../environments/environment';
 @Injectable({
   providedIn: 'root',
 })
 @Inject('Base64Service')
 export class EmailServiceService {
-  
+
   private readonly http = inject(HttpClient);
+
+  private apiUrl = environment.apis.contacts.url;
 
   base64Service: Base64Service = new Base64Service();
 
   sendEmailTemplate(
     template: TemplateSendModel
   ): Observable<TemplateModelResponse> {
-    const url = `${environmentNotifications.apiUrl}/email-templates`;
+    const url = `${this.apiUrl}/email-templates`;
 
     return this.http.post<TemplateModelResponse>(url, {
       name: template.name,
@@ -31,14 +33,14 @@ export class EmailServiceService {
 
   getEmailTemplates() {
 
-    const url = `${environmentNotifications.apiUrl}/email-templates`;
+    const url = `${this.apiUrl}/email-templates`;
 
     return this.http.get<TemplateModelResponse[]>(url);
   }
 
-  editEmailTemplate(template:TemplateModelResponse) : Observable<TemplateModelResponse> {
+  editEmailTemplate(template: TemplateModelResponse): Observable<TemplateModelResponse> {
 
-    const url = `${environmentNotifications.apiUrl}/email-templates/` + template.id;
+    const url = `${this.apiUrl}/email-templates/` + template.id;
 
     return this.http.put<TemplateModelResponse>(url, {
       name: template.name,
@@ -50,15 +52,34 @@ export class EmailServiceService {
 
 
   getEmailTemplatesNew(): Observable<EmailTemplate[]> {
-    return this.http.get<EmailTemplate[]>(`${environmentNotifications.apiUrl}/email-templates`)
+    return this.http.get<EmailTemplate[]>(`${this.apiUrl}/email-templates`)
   }
   sendEmail(data: EmailData) {
-    const url = `${environmentNotifications.apiUrl}/emails/send`
-    return this.http.post<EmailData>(url, data)
+    const emailDataApi = this.transformEmailDataApi(data)
+    const url = `${this.apiUrl}/emails/send`
+    return this.http.post<EmailDataApi>(url, emailDataApi)
   }
-  sendEmailWithContacts(data : EmailDataContact) {
-    const url = `${environmentNotifications.apiUrl}/emails/send-to-contacts`
-    return this.http.post<EmailDataContact>(url, data)
+  sendEmailWithContacts(data: EmailDataContact) {
+    const emailDataContactApi = this.transformEmailDataContactApi(data)
+    const url = `${this.apiUrl}/emails/send-to-contacts`
+    return this.http.post<EmailDataContactApi>(url, emailDataContactApi)
+  }
+
+  private transformEmailDataApi(data: EmailData): EmailDataApi {
+    return {
+      recipient : data.recipient,
+      subject: data.recipient,
+      variables: data.variables,
+      template_id: data.templateId
+    }
+  }
+  private transformEmailDataContactApi(data: EmailDataContact): EmailDataContactApi {
+    return {
+      subject: data.subject,
+      variables: data.variables,
+      template_id: data.templateId,
+      contact_ids: data.contactIds
+    }
   }
 
 }

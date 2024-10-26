@@ -3,14 +3,6 @@ import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../app/services/notification.service';
 import { NotificationApi, NotificationFront } from '../../../app/models/notification';
 
-// interface Notification {
-//   id: number;
-//   title: string;
-//   content: string;
-//   isRead: boolean;
-//   timestamp: Date;
-// }
-
 @Component({
   selector: 'app-notifications',
   standalone: true,
@@ -26,7 +18,7 @@ export class NotificationsComponent implements OnInit {
   showModal = false;
   notificationService = new NotificationService();
   ngOnInit() {
-    //Cambiar por getNotificationByContact
+
     this.notificationService.getAllNotification().subscribe({
       next: (notification) => {
         this.notifications = notification;
@@ -54,20 +46,19 @@ export class NotificationsComponent implements OnInit {
     this.showModal = true;
     this.notificationService.isRead(notification.id).subscribe({
       next: () => {
-        notification.isRead = true; 
+        notification.isRead = true;
       },
       error: (error) => {
         console.error('Error al actualizar la notificación como leída', error);
       }
     });
   }
-  
+
   closeModal() {
     this.showModal = false;
     this.selectedNotification = null;
   }
 
-  // Click fuera del dropdown para cerrarlo
   @HostListener('document:click', ['$event'])
   onClick(event: MouseEvent) {
     const target = event.target as HTMLElement;

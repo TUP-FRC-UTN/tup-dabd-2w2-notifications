@@ -1,146 +1,238 @@
+import { Component, ViewChild, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ContactService } from '../../../app/services/contact.service';
 import { Contact } from '../../../app/models/contact';
+import { Router } from '@angular/router';
+import { NgbPagination, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { MainContainerComponent } from 'ngx-dabd-grupo01';
+import { ToastService } from 'ngx-dabd-grupo01';
 
 @Component({
   selector: 'app-contact-list',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    NgbPagination,
+    NgbDropdownModule,
+    MainContainerComponent
+  ],
   templateUrl: './contact-list.component.html',
-  styleUrl: './contact-list.component.css'
+  styleUrls: ['./contact-list.component.css']
 })
+export class ContactListComponent implements OnInit {
 
 
+  private router = inject(Router);
+  private contactService = inject(ContactService);
+  private toastService = inject(ToastService)
 
-@Inject('ContactsService')
-export class ContactListComponent {
-
-  private subscriptionVisibility = new Map<number, boolean>();
-
-
-
-
-  contacts: Contact[] = [
-    {
-      id: 1,
-      subscriptions: ["Multas", "Acceso"],
-      contactType: "Email",
-      contactValue: "gbritos13@gmail.com",
-      showSubscriptions: false
-    },
-    {
-      id: 2,
-      subscriptions: ["Multas"],
-      contactType: "Email",
-      contactValue: "guillee_bmx_13@gmail.com",
-      showSubscriptions: false
-    },
-    {
-      id: 3,
-      subscriptions: ["Multas", "Promociones", "Eventos"],
-      contactType: "Phone",
-      contactValue: "123-456-7890",
-      showSubscriptions: false
-    },
-    {
-      id: 4,
-      subscriptions: [],
-      contactType: "Email",
-      contactValue: "maria.garcia@empresa.com",
-      showSubscriptions: false
-    },
-    {
-      id: 5,
-      subscriptions: ["Newsletter"],
-      contactType: "Phone",
-      contactValue: "098-765-4321",
-      showSubscriptions: false
-    },
-    {
-      id: 6,
-      subscriptions: ["Ofertas", "Eventos"],
-      contactType: "Email",
-      contactValue: "juan.perez@compañia.com",
-      showSubscriptions: false
-    }
-  ];
-
+  // Paginación
   currentPage = 1;
   itemsPerPage = 10;
   totalItems = 0;
-  totalPages = 0;
-  pages: number[] = [];
+  sizeOptions: number[] = [10, 25, 50];
+
+  // Filtros
   searchTerm = '';
+  isActiveContactFilter: boolean | undefined = true;
+  selectedContactType: string = '';
+
+  // Datos y estados
+  contacts: Contact[] = [{
+    id: 1,
+    subscriptions: ["Newsletter", "Ofertas"],
+    contactType: "Email",
+    contactValue: "gbritos13@gmail.com",
+    active: true,
+    showSubscriptions: false,
+  },
+  {
+    id: 2,
+    subscriptions: ["Noticias"],
+    contactType: "Email",
+    contactValue: "guillee_bmx_13@gmail.com",
+    active: true,
+    showSubscriptions: false,
+  },
+  {
+    id: 3,
+    subscriptions: ["Newsletter", "Promociones", "Eventos"],
+    contactType: "Phone",
+    contactValue: "123-456-7890",
+    active: true,
+    showSubscriptions: false,
+  }];
+  filteredContacts: Contact[] = [];
+
+  // Estados de modales
   isModalOpen = false;
+  isEditModalOpen = false;
+  isDeleteModalOpen = false;
   modalTitle = '';
   modalMessage = '';
+  isDetailModalOpen = false;
+  selectedContact: Contact | null = null;
 
+  //Estado de filtors
+  showInput: boolean = false;
+
+  // Referencias
+  @ViewChild('editForm') editForm!: NgForm;
+  contactToDelete: Contact | null = null;
+  editingContact: Contact = this.getEmptyContact();
 
   constructor() {
     this.initializePagination();
   }
 
-  initializePagination() {
-    this.totalItems = this.contacts.length;
-    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  ngOnInit(): void {
+    this.loadContacts();
   }
 
-  get startIndex(): number {
-    return (this.currentPage - 1) * this.itemsPerPage;
+  private getEmptyContact(): Contact {
+    return {
+      id: 0,
+      subscriptions: [],
+      contactValue: '',
+      contactType: '',
+      active: true,
+      showSubscriptions: false
+    };
   }
 
-  get endIndex(): number {
-    return this.startIndex + this.itemsPerPage;
+  getFilteredContacts(): void {
+    this.contactService.getFilteredContactsFromBackend(this.isActiveContactFilter, this.searchTerm, this.selectedContactType)
+      .subscribe(filteredContacts => {
+        this.contacts = filteredContacts;
+      });
   }
 
-  changePage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
+  filterByStatus(status: 'all' | 'active' | 'inactive') {
+    if (status === 'all') {
+      this.isActiveContactFilter = undefined;
     }
+    else if (status === 'active') {
+      this.isActiveContactFilter = true;
+    }
+    else if (status === 'inactive') {
+      this.isActiveContactFilter = false;
+    }
+    this.getFilteredContacts();
+  }
+
+  onSearchTextChange(searchTerm: string) {
+    this.searchTerm = searchTerm;
+    this.getFilteredContacts();
+  }
+
+
+  filterByContactType(contactType: string): void {
+    this.contactService.getFilteredContactsFromBackend(this.isActiveContactFilter, this.searchTerm, contactType)
+      .subscribe(filteredContacts => {
+        this.contacts = filteredContacts;
+      });
+      this.showInput = true;
+  }
+
+  // Carga de datos
+  loadContacts() {
+    this.contactService
+      .getFilteredContactsFromBackend(
+        this.isActiveContactFilter,
+        this.searchTerm,
+        this.selectedContactType
+      )
+      .subscribe({
+        next: (contacts) => {
+          this.contacts = contacts;
+          this.filteredContacts = [...this.contacts];
+          this.updatePagination();
+        },
+        error: (error) => {
+          this.showModal('Error', 'Error al cargar los contactos');
+          console.error('Error loading contacts:', error);
+        }
+      });
+  }
+
+
+
+
+  clearSearch() {
+    this.searchTerm = '';
+    this.selectedContactType = '';
+    this.isActiveContactFilter = true;
+    this.showInput = false; // Ocultar input al limpiar
+    this.loadContacts();
+  }
+
+
+
+  // Paginación
+  initializePagination() {
+    this.updatePagination();
+  }
+
+  updatePagination() {
+    this.totalItems = this.contacts.length;
   }
 
   onItemsPerPageChange() {
     this.currentPage = 1;
-    this.initializePagination();
+    this.loadContacts();
   }
 
-  exportToExcel() {
-    // Implementar lógica de exportación a Excel
-    this.showModal('Export to Excel', 'Exportación a Excel iniciada');
+  changePage(page: number) {
+    this.currentPage = page;
+    this.loadContacts();
   }
 
-  exportToPdf() {
-    // Implementar lógica de exportación a PDF
-    this.showModal('Export to PDF', 'Exportación a PDF iniciada');
+  saveContact() {
+    this.router.navigate(['/contact/new']);
   }
 
   editContact(contact: Contact) {
-    // Implementar lógica de edición
-    console.log('Editando contacto:', contact);
+    this.contactService.updateContact(contact).subscribe({
+      next: (response) => {
+        const index = this.contacts.findIndex(c => c.id === contact.id);
+        if (index !== -1) {
+          this.contacts[index] = { ...contact };
+        }
+        this.closeEditModal();
+        this.toastService.sendSuccess('Éxito El contacto ha sido actualizado correctamente')
+
+      },
+      error: (error: HttpErrorResponse) => {
+        this.toastService.sendError('Error Ha ocurrido un error al intentar actualizar el contacto intente nuevamente...')
+        this.closeEditModal();
+        console.error('Error al editar el contacto:', error);
+      },
+    });
   }
 
   deleteContact(contact: Contact) {
-    // Implementar lógica de eliminación
-    console.log('Eliminando contacto:', contact);
+    this.contactService.deleteContact(contact.id).subscribe({
+      next: () => {
+        this.contacts = this.contacts.filter(c => c.id !== contact.id);
+        this.closeDeleteModal();
+        this.showModal('Éxito', 'El contacto ha sido eliminado correctamente');
+
+        this.initializePagination();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.closeDeleteModal();
+        this.showModal('Error', 'Ha ocurrido un error al intentar eliminar el contacto. Por favor, intente nuevamente.');
+        console.error('Error al eliminar el contacto:', error);
+      }
+    });
   }
 
-  addSubscription(contact: Contact) {
-    // Implementar lógica para agregar suscripción
-    console.log('Agregando suscripción a:', contact);
-  }
-
-  clearSearch() {
-    this.searchTerm = '';
-    // Implementar lógica de limpieza de filtros
-  }
-
-  showInfo() {
-    this.showModal('Información', 'Sistema de gestión de contactos y suscripciones.');
-  }
-
+  // Modal handlers
   showModal(title: string, message: string) {
     this.modalTitle = title;
     this.modalMessage = message;
@@ -151,38 +243,85 @@ export class ContactListComponent {
     this.isModalOpen = false;
   }
 
-  filterContacts(status: 'all' | 'active' | 'inactive') {
-    // Implementar lógica de filtrado
-    console.log('Filtrando por estado:', status);
+  openEditModal(contact: Contact) {
+    this.editingContact = { ...contact };
+    this.isEditModalOpen = true;
   }
 
-  // Método para filtrar los contactos según el término de búsqueda
-  get filteredContacts(): Contact[] {
-    if (!this.searchTerm.trim()) {
-      return this.contacts;
-    }
-
-    const term = this.searchTerm.toLowerCase();
-    return this.contacts.filter(contact =>
-      contact.contactValue.toLowerCase().includes(term) ||
-      contact.contactType.toLowerCase().includes(term) ||
-      contact.subscriptions.some(sub => sub.toLowerCase().includes(term))
-    );
+  closeEditModal() {
+    this.isEditModalOpen = false;
+    this.editingContact = {
+      id: 0,
+      subscriptions: [],
+      contactValue: '',
+      contactType: '',
+      active: true,
+      showSubscriptions: false
+    };
   }
 
-    // Método para verificar si las suscripciones están visibles
-    isSubscriptionVisible(contactId: number): boolean {
-      return this.subscriptionVisibility.get(contactId) || false;
+  openDetailModal(contact: Contact) {
+    if (contact) {
+      this.selectedContact = { ...contact };
+      this.isDetailModalOpen = true;
     }
+  }
 
-    // Método para alternar la visibilidad
-    toggleSubscriptions(contact: Contact): void {
-      const currentVisibility = this.subscriptionVisibility.get(contact.id) || false;
-      this.subscriptionVisibility.set(contact.id, !currentVisibility);
+  closeDetailModal() {
+    this.isDetailModalOpen = false;
+    this.selectedContact = null;
+  }
+
+
+  openDeleteModal(contact: Contact) {
+    this.contactToDelete = contact;
+    this.isDeleteModalOpen = true;
+  }
+
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.contactToDelete = null;
+  }
+
+  confirmDelete() {
+    if (this.contactToDelete) {
+      this.deleteContact(this.contactToDelete);
     }
+  }
+
+
+  saveEditedContact() {
+    if (this.editForm.form.valid) {
+      this.editContact(this.editingContact);
+    }
+  }
+
+  exportToExcel() {
+    // Implementar la lógica de exportación a Excel
+    console.log('Exportando a Excel...');
+  }
+
+  exportToPDF() {
+    // Implementar la lógica de exportación a PDF
+    console.log('Exportando a PDF...');
+  }
+
+
+  showInfo() {
+    const message = `
+      <strong>Sistema de gestión de contactos</strong><br>
+      Aquí puedes administrar todos los contactos del sistema.<br><br>
+
+      <strong>Iconografía:</strong><br>
+      Activos: <i class="bi bi-check2-circle text-success large-icon"></i><br>
+      Inactivos: <i class="bi bi-x-circle text-danger large-icon"></i>
+    `;
+
+    this.showModal('Información', message);
+  }
+
+
 
 
 }
-
-
-
