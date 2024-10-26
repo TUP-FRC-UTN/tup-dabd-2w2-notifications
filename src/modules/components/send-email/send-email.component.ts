@@ -51,7 +51,7 @@ export class SendEmailComponent implements OnInit{
       recipient: this.emailToSend,
       subject: this.subject,
       variables: this.variables,
-      template_id: this.templateID
+      templateId: this.templateID
     }
     
     console.log(data)
