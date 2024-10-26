@@ -136,6 +136,7 @@ export class ContactListComponent implements OnInit {
       .subscribe(filteredContacts => {
         this.contacts = filteredContacts;
       });
+      this.showInput = true;
   }
 
   // Carga de datos
