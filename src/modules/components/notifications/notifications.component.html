@@ -1,27 +1,29 @@
 <div class="notifications-wrapper">
   <button class="btn btn-link position-relative" (click)="toggleNotifications()">
     <i class="bi bi-bell-fill fs-5"></i>
-    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-      *ngIf="unreadCount > 0">
+    @if(unreadCount>0){
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
       {{ unreadCount }}
     </span>
+  }
   </button>
-
-  <div class="notifications-dropdown" *ngIf="showNotifications">
+  @if(showNotifications){
+  <div class="notifications-dropdown">
     <div class="notifications-header">
       <h6 class="mb-0">Notificaciones</h6>
     </div>
     <div class="notifications-list">
-      <div class="notification-item" *ngFor="let notification of notifications">
+      @for (notification of notifications; track notification) {
+      <div class="notification-item">
         <div class="notification-content">
           <div class="d-flex justify-content-between align-items-start">
-            <h6 class="notification-title mb-1">{{ notification.title }}</h6>
+            <h6 class="notification-title mb-1">{{ notification.subject }}</h6>
             <i class="bi" [class.bi-check-circle-fill]="!notification.isRead"
               [class.bi-check-circle-double-fill]="notification.isRead"
               [style.color]="notification.isRead ? '#28a745' : '#007bff'">
             </i>
           </div>
-          <p class="notification-time">{{ notification.timestamp | date:'short' }}</p>
+          <p class="notification-time">{{ notification.dateSend | date:'short' }}</p>
           <div class="d-flex justify-content-end">
             <button class="btn btn-link btn-sm text-primary" (click)="showNotificationDetails(notification)">
               Leer más
@@ -29,16 +31,19 @@
           </div>
         </div>
       </div>
+      }
     </div>
   </div>
+  }
 </div>
+
 
 <!-- Modal -->
 <div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{ selectedNotification?.title }}</h5>
+        <h5 class="modal-title">{{ selectedNotification?.subject }}</h5>
         <button type="button" class="btn-close" (click)="closeModal()"></button>
       </div>
       <div class="modal-body" [innerHTML]="selectedNotification?.content">
@@ -48,5 +53,7 @@
       </div>
     </div>
   </div>
-  <div class="modal-backdrop fade show" *ngIf="showModal" (click)="closeModal()"></div>
+  <!-- Esto hace que si tocas cualquier parte de la pantalla cuando esta el modal se cierre, pero hace que se vea borroso -->
+  <!-- @if(showModal){
+  <div class="modal-backdrop" (click)="closeModal()"></div>} -->
 </div>

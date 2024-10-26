@@ -1,13 +1,15 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NotificationService } from '../../../app/services/notification.service';
+import { NotificationApi, NotificationFront } from '../../../app/models/notification';
 
-interface Notification {
-  id: number;
-  title: string;
-  content: string;
-  isRead: boolean;
-  timestamp: Date;
-}
+// interface Notification {
+//   id: number;
+//   title: string;
+//   content: string;
+//   isRead: boolean;
+//   timestamp: Date;
+// }
 
 @Component({
   selector: 'app-notifications',
@@ -16,30 +18,41 @@ interface Notification {
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.css']
 })
+@Inject("NotificationService")
 export class NotificationsComponent implements OnInit {
-  notifications: Notification[] = [];
+  notifications: NotificationFront[] = [];
+  selectedNotification: NotificationFront | null = null;
   showNotifications = false;
   showModal = false;
-  selectedNotification: Notification | null = null;
-
+  notificationService = new NotificationService();
   ngOnInit() {
     // Ejemplo de notificaciones
-    this.notifications = [
-      {
-        id: 1,
-        title: 'Nueva plantilla creada',
-        content: '<strong>Plantilla de Bienvenida</strong> ha sido creada exitosamente.',
-        isRead: false,
-        timestamp: new Date()
+  //   this.notifications = [
+  //     {
+  //       id: 1,
+  //       title: 'Nueva plantilla creada',
+  //       content: this.template,
+  //       isRead: false,
+  //       timestamp: new Date()
+  //     },
+  //     {
+  //       id: 2,
+  //       title: 'Contacto actualizado',
+  //       content: 'El contacto <em>Juan Pérez</em> ha sido actualizado.',
+  //       isRead: true,
+  //       timestamp: new Date(Date.now() - 3600000)
+  //     }
+  //   ];
+  // }
+
+    this.notificationService.getAllNotification().subscribe({
+      next: (notification) => {
+        this.notifications = notification;
       },
-      {
-        id: 2,
-        title: 'Contacto actualizado',
-        content: 'El contacto <em>Juan Pérez</em> ha sido actualizado.',
-        isRead: true,
-        timestamp: new Date(Date.now() - 3600000)
+      error: (error) => {
+        console.error('Error al cargar las notificaciones', error);
       }
-    ];
+    });
   }
 
   get unreadCount(): number {
@@ -53,12 +66,20 @@ export class NotificationsComponent implements OnInit {
     }
   }
 
-  showNotificationDetails(notification: Notification) {
+
+  showNotificationDetails(notification: NotificationFront) {
     this.selectedNotification = notification;
     this.showModal = true;
-    notification.isRead = true;
+    this.notificationService.isRead(notification.id).subscribe({
+      next: () => {
+        notification.isRead = true; 
+      },
+      error: (error) => {
+        console.error('Error al actualizar la notificación como leída', error);
+      }
+    });
   }
-
+  
   closeModal() {
     this.showModal = false;
     this.selectedNotification = null;
