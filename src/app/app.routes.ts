@@ -4,9 +4,11 @@ import { TemplateListComponent } from '../modules/components/template-list/templ
 import { TemplateEditionComponent } from '../modules/components/template-edition/template-edition.component';
 import { SendEmailComponent } from '../modules/components/send-email/send-email.component';
 import { SendEmailContactComponent } from '../modules/components/send-email-contact/send-email-contact.component';
-import { ContactListComponent } from '../modules/components/contact-list/contact-list.component';
-import { ContactNewComponent } from '../modules/components/contact-new/contact-new.component';
-import { ContactTableComponent } from '../modules/components/salva-test/contact-table.component';
+import { ContactAuditHistoryComponent } from '../modules/components/contact-audit-history/contact-audit-history.component';
+import { ContactListComponent } from '../modules/components/contact-list/contact-list.component'
+import { ContactNewComponent } from '../modules/components/contact-new/contact-new.component'
+import { ContactModifySubsEmailComponent } from '../modules/components/contact-modify-subs-email/contact-modify-subs-email.component'
+
 
 export const routes: Routes = [
   {
@@ -30,16 +32,19 @@ export const routes: Routes = [
     component: SendEmailContactComponent,
   },
   {
+    path: 'contact-audit', component: ContactAuditHistoryComponent
+  },
+  {
 
     path: 'contacts',
     component: ContactListComponent
-
-  }, {
+  },
+  {
     path: 'contact/new',
     component: ContactNewComponent
-  }, {
-
-    path: 'contact/table',
-    component: ContactTableComponent
+  },
+  {
+    path: 'contact/modify-subs',
+    component: ContactModifySubsEmailComponent
   }
 ];
