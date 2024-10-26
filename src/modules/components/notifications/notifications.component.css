@@ -61,3 +61,17 @@
   margin-right: 3%;
   margin-top: 3%;
 }
+
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+  
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color:  rgba(0, 0, 0, 0.5);
+}
