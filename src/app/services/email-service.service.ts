@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 import { Base64Service } from './base64-service.service';
 import { TemplateSendModel } from '../models/templateSendModel';
 import { TemplateModelResponse } from '../models/templateModelResponse';
-import { EmailData } from '../models/emailData';
+import { EmailData, EmailDataApi } from '../models/emailData';
 import { EmailTemplate } from '../models/emailTemplates';
-import { EmailDataContact } from '../models/emailDataContact';
+import { EmailDataContact, EmailDataContactApi } from '../models/emailDataContact';
 import { environment } from '../../environments/environment';
 @Injectable({
   providedIn: 'root',
@@ -55,12 +55,31 @@ export class EmailServiceService {
     return this.http.get<EmailTemplate[]>(`${this.apiUrl}/email-templates`)
   }
   sendEmail(data: EmailData) {
+    const emailDataApi = this.transformEmailDataApi(data)
     const url = `${this.apiUrl}/emails/send`
-    return this.http.post<EmailData>(url, data)
+    return this.http.post<EmailDataApi>(url, emailDataApi)
   }
   sendEmailWithContacts(data: EmailDataContact) {
+    const emailDataContactApi = this.transformEmailDataContactApi(data)
     const url = `${this.apiUrl}/emails/send-to-contacts`
-    return this.http.post<EmailDataContact>(url, data)
+    return this.http.post<EmailDataContactApi>(url, emailDataContactApi)
+  }
+
+  private transformEmailDataApi(data: EmailData): EmailDataApi {
+    return {
+      recipient : data.recipient,
+      subject: data.recipient,
+      variables: data.variables,
+      template_id: data.templateId
+    }
+  }
+  private transformEmailDataContactApi(data: EmailDataContact): EmailDataContactApi {
+    return {
+      subject: data.subject,
+      variables: data.variables,
+      template_id: data.templateId,
+      contact_ids: data.contactIds
+    }
   }
 
 }
