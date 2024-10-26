@@ -9,15 +9,13 @@
                         <option [value]="contact.id"> {{contact.contactValue}} </option>
                     }
                 </select>
-                @if (modification.controls['contactId'].invalid && (modification.controls['contactId'].touched || modification.controls['contactId'].dirty)) {
-                    @if (modification.controls['contactId'].errors?.['required']) {
-                        <div class="text-danger"> Debe seleccionar un Contacto </div>
-                    }
-                }
-                
                 <button type="button" class="btn btn-secondary"(click)="setContact()"> Seleccionar </button>
             </div>
-
+            @if (modification.controls['contactId'].invalid && (modification.controls['contactId'].touched || modification.controls['contactId'].dirty)) {
+                @if (modification.controls['contactId'].errors?.['required']) {
+                    <div class="text-danger"> Debe seleccionar un Contacto </div>
+                }
+            }
             
             @if (selected) {
                 <h6> Elegir Suscripción por Anular </h6>            
