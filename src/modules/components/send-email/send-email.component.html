@@ -31,46 +31,7 @@
                     }
                 }
             </div>
-            <!--
-            
-            <h6>Variables</h6>
-            <div class="mb-3">
-                <div class="row">
-                    <div class="col-6">
-                        <label class="form-label">Nombre:</label>
-                        <input #nombre="ngModel" type="text" class="form-control" id="nombre" name="nombre" style="max-width: 200px;"
-                        [(ngModel)]="name"
-                        required
-                        [ngClass]="{'is-invalid' : nombre.invalid && (nombre.dirty || nombre.touched), 'is-valid' : nombre.valid}"/>
-                        @if (nombre.invalid && (nombre.dirty || nombre.touched)) {
-                            @if (nombre.getError('required')) {
-                                <div class="text-danger"> Campo Obligatorio </div>
-                            }
-                        }
-
-                        <label class="form-label">Valor:</label>
-                        <input #valor="ngModel" type="text" class="form-control" id="valor" name="valor" style="max-width: 200px;"
-                        [(ngModel)]="value"
-                        required
-                        [ngClass]="{'is-invalid' : valor.invalid && (valor.dirty || nombre.touched), 'is-valid' : valor.valid}"/>
-                        @if (valor.invalid && (valor.dirty || valor.touched)) {
-                            @if (nombre.getError('required')) {
-                                <div class="text-danger"> Campo Obligatorio </div>
-                            }
-                        }
-                    </div>
-                    <div class="col-6">
-                        <button type="button" class="btn btn-secondary mb-3" (click)="addVariables()">+</button>
-                        <br>
-                        <h6>Tus Variables:</h6>
-                        @for (item of variables; track $index) {
-                            <p>Nombre: {{item.key}} Valor: {{item.value}}</p>
-                        }
-                    </div>
-                </div>
-            </div>
-
-            -->
+     
             <div>
                 <h6>Plantillas</h6>
                 <select #plantillas="ngModel" class="form-select" style="max-width: 200px;" name="plantillas" id="plantillas"
@@ -88,6 +49,7 @@
                     }
                 }
             </div>
+            <button type="button" class="btn btn-secondary" (click)="previewSelectedTemplate()">Previsualizar</button>
             <!-- Si encuentran otra forma de hacerlo, haganlo-->
             <div class="row"> 
                 <div class="col-1"></div>
@@ -103,7 +65,18 @@
                 <div class="col-1"></div>
                 <div class="col-1"><button type="submit" class="btn btn-primary" [disabled]="form.invalid">Enviar</button></div>
             </div>
+
         </form>
     </div>
+
+            <!-- Modal de previsualización -->
+                <!-- Modal -->
+                <div class="modal" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
+                    <div class="modal-content" (click)="$event.stopPropagation()">
+                        <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
+                        <iframe #iframePreview style="width: 100%; border: none;"></iframe>
+                        <button type="button" class="btn btn-primary" (click)="closeModalToRenderHTML()">Aceptar</button>
+                    </div>
+                </div>
 </div>
 

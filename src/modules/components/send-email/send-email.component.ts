@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Form, FormsModule } from '@angular/forms';
 import { EmailServiceService } from     '../../../app/services/email-service.service';
 import { TemplateModelResponse } from '../../../app/models/templateModelResponse';
 import { EmailData } from '../../../app/models/emailData';
 import { Variable } from '../../../app/models/variables';
 import { Base64Service } from '../../../app/services/base64-service.service';
+import { TemplatePreviewModel } from '../../../app/models/templatePreviewModel';
 
 @Component({
   selector: 'app-send-email',
@@ -19,6 +20,8 @@ import { Base64Service } from '../../../app/services/base64-service.service';
 @Inject('Base64Service')
 export class SendEmailComponent implements OnInit{
 
+  @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef; 
+
   service = new EmailServiceService();
 
   base64Service: Base64Service = new Base64Service();
@@ -27,23 +30,54 @@ export class SendEmailComponent implements OnInit{
   subject : string = ""
   name : string = ""
   value : string = ""
-  templateID : number = 0
+  templateID: string = '';
 
   variables : Variable[] = []
-  templates : TemplateModelResponse[] = []
+  templates : TemplatePreviewModel[] = []
+
+  showModalToRenderHTML: boolean = false;
+
 
   ngOnInit(): void {
 
-    this.service.getEmailTemplates().subscribe((data) => {
+    this.service.getEmailTemplatesForPreview().subscribe((data) => {
       this.templates = data;
 
-      this.templates.forEach((x, index) => {
-        this.templates[index].base64body = this.base64Service.decodeFromBase64(
-          x.base64body
-        );
-      });
+    
     });
   }
+
+
+
+ 
+
+   previewSelectedTemplate(): void { 
+    const selectedTemplate = this.templates.find(t => t.id == this.templateID);
+
+    if (selectedTemplate) {
+      this.showModalToRenderHTML = true;
+      console.log("selectedTemplate ", selectedTemplate);
+      console.log("showModalToRenderHTML ", this.showModalToRenderHTML)
+
+      // Colocamos el contenido HTML de la plantilla en el iframe
+      setTimeout(() => {
+        const iframe = this.iframePreview.nativeElement as HTMLIFrameElement;
+        iframe.srcdoc = selectedTemplate.body;
+        iframe.onload = () => {
+          const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
+          if (iframeDocument) {
+            const height = iframeDocument.documentElement.scrollHeight;
+            iframe.style.height = `${height}px`;
+          }
+        };
+      }, 5);
+    }
+  }
+
+  closeModalToRenderHTML() {
+    this.showModalToRenderHTML = false;
+  }
+
 
   enviar(form : Form) {
 
@@ -51,7 +85,7 @@ export class SendEmailComponent implements OnInit{
       recipient: this.emailToSend,
       subject: this.subject,
       variables: this.variables,
-      templateId: this.templateID
+      templateId: Number(this.templateID)
     }
     
     console.log(data)
@@ -84,7 +118,12 @@ export class SendEmailComponent implements OnInit{
     this.subject = ""
     this.name = ""
     this.value = ""
-    this.templateID = 0
+    this.templateID = '';
     this.variables = []
   }
+
+
+ 
+
+
 }
