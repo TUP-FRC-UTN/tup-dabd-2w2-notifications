@@ -56,8 +56,6 @@ export class SendEmailComponent implements OnInit{
       variables: this.variables,
       templateId: this.templateID
     }
-    
-    console.log(data)
     this.service.sendEmail(data).subscribe({
       next: (data) => {
         this.toastService.sendSuccess("Enviado con exito")

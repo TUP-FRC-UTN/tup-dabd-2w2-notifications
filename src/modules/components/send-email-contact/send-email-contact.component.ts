@@ -39,14 +39,6 @@ export class SendEmailContactComponent implements OnInit{
   variableName : string = ""
   variableValue : string = ""
 
-  /*emailDataWithContact = new FormGroup({
-    subject : new FormControl(''),
-    variables : new FormControl(''),
-    template_id : new FormControl(''),
-    contact_id : new FormControl('')
-  })*/
-
-
   ngOnInit(): void {
     this.serviceContacts.getAllContacts().subscribe((data) => {
       data.forEach(contact => {
