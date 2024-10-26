@@ -10,6 +10,7 @@ import { NgbPagination, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { ToastService } from 'ngx-dabd-grupo01';
 
+
 @Component({
   selector: 'app-contact-list',
   standalone: true,
@@ -29,7 +30,21 @@ export class ContactListComponent implements OnInit {
 
   private router = inject(Router);
   private contactService = inject(ContactService);
-  private toastService = inject(ToastService)
+  toastService : ToastService = inject(ToastService)
+   availableSubscriptions: string [] = [
+    'General',
+    'Moderación',
+    'Construcción',
+    'Pago a empleados',
+    'Vencimiento de gastos',
+    'Deuda',
+    'Factura general',
+    'Pago',
+    'Usuario',
+    'Usuario asociado creado',
+    'Salida tardía del trabajador',
+    'Inventario',
+    'Gasto general']
 
   // Paginación
   currentPage = 1;
@@ -45,7 +60,7 @@ export class ContactListComponent implements OnInit {
   // Datos y estados
   contacts: Contact[] = [{
     id: 1,
-    subscriptions: ["Newsletter", "Ofertas"],
+    subscriptions: ["General", "Inventario"],
     contactType: "Email",
     contactValue: "gbritos13@gmail.com",
     active: true,
@@ -53,7 +68,7 @@ export class ContactListComponent implements OnInit {
   },
   {
     id: 2,
-    subscriptions: ["Noticias"],
+    subscriptions: ["Deuda"],
     contactType: "Email",
     contactValue: "guillee_bmx_13@gmail.com",
     active: true,
@@ -61,7 +76,7 @@ export class ContactListComponent implements OnInit {
   },
   {
     id: 3,
-    subscriptions: ["Newsletter", "Promociones", "Eventos"],
+    subscriptions: ["Gasto General", "Usuario", "Pago"],
     contactType: "Phone",
     contactValue: "123-456-7890",
     active: true,
@@ -136,7 +151,7 @@ export class ContactListComponent implements OnInit {
       .subscribe(filteredContacts => {
         this.contacts = filteredContacts;
       });
-      this.showInput = true;
+    this.showInput = true;
   }
 
   // Carga de datos
@@ -208,7 +223,7 @@ export class ContactListComponent implements OnInit {
 
       },
       error: (error: HttpErrorResponse) => {
-        this.toastService.sendError('Error Ha ocurrido un error al intentar actualizar el contacto intente nuevamente...')
+        this.toastService.sendError('Error Ha ocurrido un error al intentar actualizar el contacto intente nuevamente...');
         this.closeEditModal();
         console.error('Error al editar el contacto:', error);
       },
@@ -220,13 +235,13 @@ export class ContactListComponent implements OnInit {
       next: () => {
         this.contacts = this.contacts.filter(c => c.id !== contact.id);
         this.closeDeleteModal();
-        this.showModal('Éxito', 'El contacto ha sido eliminado correctamente');
+        this.toastService.sendSuccess('Éxito El contacto ha sido eliminado correctamente')
 
         this.initializePagination();
       },
       error: (error: HttpErrorResponse) => {
         this.closeDeleteModal();
-        this.showModal('Error', 'Ha ocurrido un error al intentar eliminar el contacto. Por favor, intente nuevamente.');
+        this.toastService.sendError('Error Ha ocurrido un error al intentar eliminar el contacto intente nuevamente...');
         console.error('Error al eliminar el contacto:', error);
       }
     });
@@ -244,7 +259,7 @@ export class ContactListComponent implements OnInit {
   }
 
   openEditModal(contact: Contact) {
-    this.editingContact = { ...contact };
+    this.editingContact = {...contact}
     this.isEditModalOpen = true;
   }
 
@@ -258,6 +273,19 @@ export class ContactListComponent implements OnInit {
       active: true,
       showSubscriptions: false
     };
+  }
+
+  isSubscribed(subscription: string): boolean {
+    return this.editingContact.subscriptions.includes(subscription);
+  }
+
+  toggleSubscription(subscription: string) {
+    const index = this.editingContact.subscriptions.indexOf(subscription);
+    if (index !== -1) {
+      this.editingContact.subscriptions.splice(index, 1);
+    } else {
+      this.editingContact.subscriptions.push(subscription);
+    }
   }
 
   openDetailModal(contact: Contact) {

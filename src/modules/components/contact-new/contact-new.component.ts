@@ -1,9 +1,11 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject,inject } from '@angular/core';
 import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Contact } from '../../../app/models/contact';
 import { ContactService } from '../../../app/services/contact.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ToastService } from 'ngx-dabd-grupo01';
+
 
 @Component({
   selector: 'app-contact-new',
@@ -24,6 +26,7 @@ export class ContactNewComponent {
   modalMessage: string = '';
 
   contactService = new ContactService();
+  toastService : ToastService = inject(ToastService)
 
   onContactTypeChange() {
     this.email = '';
@@ -65,11 +68,14 @@ export class ContactNewComponent {
 
       this.contactService.saveContact(contact).subscribe({
         next: (response) => {
-          this.showModal('Éxito', 'El contacto ha sido registrado correctamente');
+          this.toastService.sendSuccess('El contacto ha sido registrado correctamente');
+          // this.showModal('Éxito', 'El contacto ha sido registrado correctamente');
           this.resetForm(form);
         },
         error: (error: HttpErrorResponse) => {
-          this.showModal('Error', 'Por favor complete todos los campos requeridos correctamente');
+
+          this.toastService.sendError('Error Por favor complete todos los campos requeridos correctamente')
+          // this.showModal('Error', 'Por favor complete todos los campos requeridos correctamente');
           console.error('Error al enviar el template:', error);
         },
       });
