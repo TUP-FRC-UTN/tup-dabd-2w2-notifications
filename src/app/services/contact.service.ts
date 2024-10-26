@@ -3,7 +3,8 @@ import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { Contact } from '../models/contact';
 import { environment } from '../../environments/environment';
 import { Observable, map } from 'rxjs';
-import {SubscriptionMod} from '../../app/models/subscription'
+import {SubscriptionMod} from '../../app/models/subscription';
+import { ContactType } from '../models/contacts/contactAudit';
 
 @Injectable({
   providedIn: 'root'
@@ -100,7 +101,7 @@ export class ContactService {
       id: data.id,
       subscriptions: data.subscriptions,
       contactValue: data.contact_value,
-      contactType: data.contact_type,
+      contactType: this.mapContactType(data.contact_type),
       active: data.active,
       showSubscriptions: false
     };
@@ -114,6 +115,19 @@ export class ContactService {
       contact_type: contact.contactType,
       active: contact.active
     };
+  }
+
+  private mapContactType(contactType: ContactType): string {
+    switch (contactType) {
+      case ContactType.EMAIL:
+        return 'Correo eléctronico';
+      case ContactType.PHONE:
+        return 'Teléfono';
+      case ContactType.SOCIAL_MEDIA_LINK:
+        return 'Red social';
+      default:
+        throw new Error(`Unknown contact type: ${contactType}`);
+    }
   }
 }
 
