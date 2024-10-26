@@ -75,6 +75,11 @@ export class ContactListComponent implements OnInit {
   isDeleteModalOpen = false;
   modalTitle = '';
   modalMessage = '';
+  isDetailModalOpen = false;
+  selectedContact: Contact | null = null;
+
+  //Estado de filtors
+  showInput: boolean = false;
 
   // Referencias
   @ViewChild('editForm') editForm!: NgForm;
@@ -100,6 +105,39 @@ export class ContactListComponent implements OnInit {
     };
   }
 
+  getFilteredContacts(): void {
+    this.contactService.getFilteredContactsFromBackend(this.isActiveContactFilter, this.searchTerm, this.selectedContactType)
+      .subscribe(filteredContacts => {
+        this.contacts = filteredContacts;
+      });
+  }
+
+  filterByStatus(status: 'all' | 'active' | 'inactive') {
+    if (status === 'all') {
+      this.isActiveContactFilter = undefined;
+    }
+    else if (status === 'active') {
+      this.isActiveContactFilter = true;
+    }
+    else if (status === 'inactive') {
+      this.isActiveContactFilter = false;
+    }
+    this.getFilteredContacts();
+  }
+
+  onSearchTextChange(searchTerm: string) {
+    this.searchTerm = searchTerm;
+    this.getFilteredContacts();
+  }
+
+
+  filterByContactType(contactType: string): void {
+    this.contactService.getFilteredContactsFromBackend(this.isActiveContactFilter, this.searchTerm, contactType)
+      .subscribe(filteredContacts => {
+        this.contacts = filteredContacts;
+      });
+  }
+
   // Carga de datos
   loadContacts() {
     this.contactService
@@ -121,30 +159,18 @@ export class ContactListComponent implements OnInit {
       });
   }
 
-  // Filtros
-  filterByStatus(status: 'all' | 'active' | 'inactive') {
-    this.isActiveContactFilter = status === 'all'
-      ? undefined
-      : status === 'active';
-    this.loadContacts();
-  }
 
-  filterByContactType(contactType: string) {
-    this.selectedContactType = contactType;
-    this.loadContacts();
-  }
 
-  onSearchTextChange(searchTerm: string) {
-    this.searchTerm = searchTerm;
-    this.loadContacts();
-  }
 
   clearSearch() {
     this.searchTerm = '';
     this.selectedContactType = '';
     this.isActiveContactFilter = true;
+    this.showInput = false; // Ocultar input al limpiar
     this.loadContacts();
   }
+
+
 
   // Paginación
   initializePagination() {
@@ -165,7 +191,6 @@ export class ContactListComponent implements OnInit {
     this.loadContacts();
   }
 
-  // CRUD Operations
   saveContact() {
     this.router.navigate(['/contact/new']);
   }
@@ -233,6 +258,20 @@ export class ContactListComponent implements OnInit {
       showSubscriptions: false
     };
   }
+
+  openDetailModal(contact: Contact) {
+    if (contact) {
+      this.selectedContact = { ...contact };
+      this.isDetailModalOpen = true;
+    }
+  }
+
+  closeDetailModal() {
+    this.isDetailModalOpen = false;
+    this.selectedContact = null;
+  }
+
+
   openDeleteModal(contact: Contact) {
     this.contactToDelete = contact;
     this.isDeleteModalOpen = true;
@@ -267,8 +306,21 @@ export class ContactListComponent implements OnInit {
     console.log('Exportando a PDF...');
   }
 
+
   showInfo() {
-    this.showModal('Información', 'Sistema de gestión de contactos. Aquí puedes administrar todos los contactos del sistema.');
+    const message = `
+      <strong>Sistema de gestión de contactos</strong><br>
+      Aquí puedes administrar todos los contactos del sistema.<br><br>
+
+      <strong>Iconografía:</strong><br>
+      Activos: <i class="bi bi-check2-circle text-success large-icon"></i><br>
+      Inactivos: <i class="bi bi-x-circle text-danger large-icon"></i>
+    `;
+
+    this.showModal('Información', message);
   }
+
+
+
 
 }
