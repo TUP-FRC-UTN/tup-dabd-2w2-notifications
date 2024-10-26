@@ -87,9 +87,6 @@ export class SendEmailContactComponent implements OnInit{
       templateId: this.template_id,
       contactIds: this.contacts_id
     }
-
-    console.log(data);
-
     this.serviceEmail.sendEmailWithContacts(data).subscribe({
       next: (response) => {
         alert("Enviado con exito")
