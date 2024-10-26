@@ -63,7 +63,7 @@ export class ContactNewComponent {
         showSubscriptions: false
       };
 
-      this.contactService.postContact(contact).subscribe({
+      this.contactService.saveContact(contact).subscribe({
         next: (response) => {
           this.showModal('Éxito', 'El contacto ha sido registrado correctamente');
           this.resetForm(form);

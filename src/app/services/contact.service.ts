@@ -31,33 +31,28 @@ export class ContactService {
   }
 
 
-  getContactById(id: number) {
-    const url = `${this.apiUrl + "/contacts/" + id}`
-    return this.http.get<Contact>(url + "/" + id)
+  getContactById(id: number): Observable<Contact> {
+    return this.http.get<any>(`${this.apiUrl}/contacts/${id}`).pipe(
+      map(contact => this.transformToContact(contact))
+    );
   }
 
-
-  postContact(contact: Contact) {
-
-    const url = `${this.apiUrl + "/contacts/"}`
-
-    return this.http.post<Contact>(url, contact);
-
+  saveContact(contact: Contact): Observable<Contact> {
+    const apiContact = this.transformToApiContact(contact);
+    return this.http.post<any>(`${this.apiUrl}/contacts`, apiContact).pipe(
+      map(response => this.transformToContact(response))
+    );
   }
 
-  editContact(contact: Contact) {
-
-    const url = `${this.apiUrl + "/contacts/" + contact.id}`
-
-    return this.http.put<Contact>(url, contact.contactValue);
-
+  updateContact(contact: Contact): Observable<Contact> {
+    const apiContact = this.transformToApiContact(contact);
+    return this.http.put<any>(`${this.apiUrl}/contacts/${contact.id}`, apiContact).pipe(
+      map(response => this.transformToContact(response))
+    );
   }
 
-  deleteContact(id: number): Observable<any> {
-
-    const url = `${this.apiUrl +  "/contacts/" + id}`
-
-    return this.http.delete(`${url}/${id}`);
+  deleteContact(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/contacts/${id}`);
   }
 
   private transformToContact(data: any): Contact {
@@ -71,4 +66,14 @@ export class ContactService {
     };
   };
 
+  private transformToApiContact(contact: Contact): any {
+    return {
+      id: contact.id,
+      subscriptions: contact.subscriptions,
+      contact_value: contact.contactValue,
+      contact_type: contact.contactType,
+      active: contact.active
+    };
+  }
 }
+

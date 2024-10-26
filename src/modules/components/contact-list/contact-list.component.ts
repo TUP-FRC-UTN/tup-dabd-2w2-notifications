@@ -92,7 +92,7 @@ export class ContactListComponent {
 
 
   editContact(contact: Contact) {
-    this.contactService.editContact(contact).subscribe({
+    this.contactService.updateContact(contact).subscribe({
       next: (response) => {
         const index = this.contacts.findIndex(c => c.id === contact.id);
         if (index !== -1) {
