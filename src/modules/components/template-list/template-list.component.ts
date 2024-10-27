@@ -47,7 +47,12 @@ export class TemplateListComponent implements OnInit {
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
 
 
-  templates: TemplateModelResponse[] = [{ id: '0', name: 'template 1', body: `HOLA`, active: true },{ id: '0', name: 'template 1', body: `HOLA`, active: true },{ id: '0', name: 'template 1', body: `HOLA`, active: true }];
+  templates: TemplateModelResponse[] = [];
+  mocktemplates : TemplateModelResponse[] = [
+    { id: '1', name: 'Multas', body: `HOLA`, active: true },
+    { id: '2', name: 'Deudas', body: `HOLA`, active: true },
+    { id: '3', name: 'Catastro 1', body: `HOLA`, active: true }
+  ];
   selectedIndex: number | null = null;
   showModalToRenderHTML: boolean = false;
 
@@ -100,6 +105,7 @@ export class TemplateListComponent implements OnInit {
   filterByStatus(status: 'all' | 'active' | 'inactive') {
     if (status === 'all') {
       this.isActivetemplateFilter = undefined;
+      this.templates = this.mocktemplates
     }
     else if (status === 'active') {
       this.isActivetemplateFilter = true;
@@ -211,6 +217,7 @@ export class TemplateListComponent implements OnInit {
 
 
   getEmailTemplates() {
+    this.templates = this.mocktemplates
     this.emailService.getEmailTemplates().subscribe((data) => {
 
       //this.templates = [{ id: '0', name: 'template 1', body: `HOLA`, active: true }];
