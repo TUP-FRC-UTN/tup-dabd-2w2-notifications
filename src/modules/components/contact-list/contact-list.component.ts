@@ -57,30 +57,7 @@ export class ContactListComponent implements OnInit {
   selectedContactType: string = '';
 
   // Datos y estados
-  contacts: Contact[] = [{
-    id: 1,
-    subscriptions: ["General", "Inventario"],
-    contactType: "Email",
-    contactValue: "gbritos13@gmail.com",
-    active: true,
-    showSubscriptions: false,
-  },
-  {
-    id: 2,
-    subscriptions: ["Deuda"],
-    contactType: "Email",
-    contactValue: "guillee_bmx_13@gmail.com",
-    active: true,
-    showSubscriptions: false,
-  },
-  {
-    id: 3,
-    subscriptions: ["Gasto General", "Deuda", "Pago"],
-    contactType: "Phone",
-    contactValue: "123-456-7890",
-    active: true,
-    showSubscriptions: false,
-  }];
+  contacts: Contact[] = [];
   filteredContacts: Contact[] = [];
 
   // Estados de modales
@@ -106,6 +83,7 @@ export class ContactListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadContacts();
+    this.getAllContacts();
   }
 
   private getEmptyContact(): Contact {
@@ -172,6 +150,14 @@ export class ContactListComponent implements OnInit {
           console.error('Error loading contacts:', error);
         }
       });
+  }
+
+  getAllContacts() {
+    this.contactService.getAllContacts().subscribe((data: Contact[]) => {
+
+      this.contacts = data;
+
+    });
   }
 
 

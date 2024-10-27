@@ -7,8 +7,6 @@ import { SendEmailContactComponent } from '../modules/components/send-email-cont
 import { ContactAuditHistoryComponent } from '../modules/components/contact-audit-history/contact-audit-history.component';
 import { ContactListComponent } from '../modules/components/contact-list/contact-list.component'
 import { ContactNewComponent } from '../modules/components/contact-new/contact-new.component'
-import { ContactModifySubsEmailComponent } from '../modules/components/contact-modify-subs-email/contact-modify-subs-email.component'
-
 
 export const routes: Routes = [
   {
@@ -42,9 +40,6 @@ export const routes: Routes = [
   {
     path: 'contact/new',
     component: ContactNewComponent
-  },
-  {
-    path: 'contact/modify-subs',
-    component: ContactModifySubsEmailComponent
   }
+
 ];
