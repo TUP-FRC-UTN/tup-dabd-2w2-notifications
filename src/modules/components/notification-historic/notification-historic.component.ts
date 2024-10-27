@@ -26,6 +26,11 @@ export class NotificationHistoricComponent implements OnInit {
   totalItems = 0;
   sizeOptions: number[] = [10, 25, 50];
 
+  //Modal
+  modalTitle = '';
+  modalMessage = '';
+  isModalOpen = false;
+
 
    // Filtros
   searchTerm = '';
@@ -60,7 +65,7 @@ export class NotificationHistoricComponent implements OnInit {
           templateId: 1,
           templateName: 'Promoción',
           statusSend: 'SENT',
-          dateSend: '2002-12-24',
+          dateSend: '2002-12-24 17:12',
         },
         {
           id: 2,
@@ -69,7 +74,7 @@ export class NotificationHistoricComponent implements OnInit {
           templateId: 2,
           templateName: 'Cuenta',
           statusSend: 'VISUALIZED',
-          dateSend: '2024-05-15',
+          dateSend: '2024-05-15 03:16',
         },
         {
           id: 3,
@@ -78,7 +83,7 @@ export class NotificationHistoricComponent implements OnInit {
           templateId: 1,
           templateName: 'Comentarios',
           statusSend: 'SENT',
-          dateSend:'2024-01-30',
+          dateSend:'2024-01-30 19:46',
         },
         {
           id: 4,
@@ -87,7 +92,7 @@ export class NotificationHistoricComponent implements OnInit {
           templateId: 3,
           templateName: 'Recordatorio',
           statusSend: 'VISUALIZED',
-          dateSend: '2023-11-05',
+          dateSend: '2023-11-05 15:31',
         },
         {
           id: 5,
@@ -96,7 +101,7 @@ export class NotificationHistoricComponent implements OnInit {
           templateId: 2,
           templateName: 'Confirmación',
           statusSend: 'SENT',
-          dateSend: '2023-10-01',
+          dateSend: '2023-10-01 12:00',
         },
       );
       
@@ -238,5 +243,25 @@ export class NotificationHistoricComponent implements OnInit {
   changePage(page: number) {
     this.currentPage = page;
     this.loadNotifications();
+  }
+
+  // Modal handlers
+  showModal(title: string, message: string) {
+    this.modalTitle = title;
+    this.modalMessage = message;
+    this.isModalOpen = true;
+  }
+
+  showInfo() {
+    const message = `
+      <strong>Sistema de control de notificaciones</strong><br>
+      Aquí puedes visualizar todos las notificaciones del sistema.<br><br>
+
+      <strong>Iconografía:</strong><br>
+      Visto: <i class="bi bi-check2-circle text-success large-icon"></i><br>
+      No visto: <i class="bi bi-x-circle text-danger large-icon"></i>
+    `;
+
+    this.showModal('Información', message);
   }
 }
