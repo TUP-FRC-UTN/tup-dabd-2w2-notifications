@@ -8,6 +8,7 @@ import { EmailData, EmailDataApi } from '../models/emailData';
 import { EmailTemplate } from '../models/emailTemplates';
 import { EmailDataContact, EmailDataContactApi } from '../models/emailDataContact';
 import { environment } from '../../environments/environment';
+import { TemplatePreviewModel } from '../models/templatePreviewModel';
 @Injectable({
   providedIn: 'root',
 })
@@ -16,7 +17,7 @@ export class EmailServiceService {
 
   private readonly http = inject(HttpClient);
 
-  private apiUrl = environment.apis.contacts.url;
+  private apiUrl = environment.apis.notifications.url;
 
   base64Service: Base64Service = new Base64Service();
 
@@ -29,6 +30,13 @@ export class EmailServiceService {
       name: template.name,
       base64body: this.base64Service.encodeToBase64(template.body),
     });
+  }
+
+  getEmailTemplatesForPreview(){
+
+    const url = `${this.apiUrl}/email-templates`;
+    return this.http.get<TemplatePreviewModel[]>(url);
+
   }
 
   getEmailTemplates() {
@@ -68,7 +76,7 @@ export class EmailServiceService {
   private transformEmailDataApi(data: EmailData): EmailDataApi {
     return {
       recipient : data.recipient,
-      subject: data.recipient,
+      subject: data.subject,
       variables: data.variables,
       template_id: data.templateId
     }
