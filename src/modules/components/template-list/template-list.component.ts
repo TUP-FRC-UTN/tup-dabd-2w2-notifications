@@ -220,7 +220,7 @@ export class TemplateListComponent implements OnInit {
     this.templates = this.mocktemplates
     this.emailService.getEmailTemplates().subscribe({
       next: (data) => {
-        this.templates = this.templates.concat(data)
+        this.templates = [...this.templates, ...data]; //mezclo los mocks con lo de la api
       },
       error: () => {
         this.showModal('Error', 'Error al cargar las plantillas');
