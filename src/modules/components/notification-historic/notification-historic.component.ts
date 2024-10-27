@@ -172,10 +172,10 @@ export class NotificationHistoricComponent implements OnInit {
 
   exportToExcel(): void {
     const data = this.filteredNotifications.map((notification) => ({
-      Usuario: notification.recipient.split('@')[0] + '@...',
+      Usuario: notification.recipient,
       'Tipo de Notificación': notification.templateName,
       Fecha: notification.dateSend,
-      Estado: notification.statusSend,
+      Estado: notification.statusSend === "VISUALIZED" ? "VISTO" : "NO VISTO",
     }));
   
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
@@ -199,7 +199,7 @@ export class NotificationHistoricComponent implements OnInit {
         notification.recipient,
         notification.templateName,
         notification.dateSend,
-        notification.statusSend,
+        notification.statusSend === "VISUALIZED" ? "VISTO" : "NO VISTO",
       ]),
       columnStyles: {
         0: { cellWidth: 60 }, // Usuario
