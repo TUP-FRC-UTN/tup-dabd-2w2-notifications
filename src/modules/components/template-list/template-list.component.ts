@@ -236,8 +236,8 @@ export class TemplateListComponent implements OnInit {
 
   showInfo() {
     const message = `
-      <strong>Sistema de gestión de templateos</strong><br>
-      Aquí puedes administrar todos los templateos del sistema.<br><br>
+      <strong>Sistema de gestión de Plantillas</strong><br>
+      Aquí puedes administrar todos las plantillas para correos del sistema.<br><br>
 
       <strong>Iconografía:</strong><br>
       Activos: <i class="bi bi-check2-circle text-success large-icon"></i><br>
