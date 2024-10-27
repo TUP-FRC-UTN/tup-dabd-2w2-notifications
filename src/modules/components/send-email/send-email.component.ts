@@ -41,8 +41,8 @@ export class SendEmailComponent implements OnInit{
       this.templates = data;
 
       this.templates.forEach((x, index) => {
-        this.templates[index].base64body = this.base64Service.decodeFromBase64(
-          x.base64body
+        this.templates[index].body = this.base64Service.decodeFromBase64(
+          x.body
         );
       });
     });
@@ -77,7 +77,7 @@ export class SendEmailComponent implements OnInit{
       this.variables.push(newVariable)
       this.name = "";
       this.value = "";
-    }    
+    }
   }
   clean() {
     this.emailToSend = ""

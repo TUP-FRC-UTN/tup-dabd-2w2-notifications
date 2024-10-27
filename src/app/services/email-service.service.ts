@@ -44,7 +44,7 @@ export class EmailServiceService {
 
     return this.http.put<TemplateModelResponse>(url, {
       name: template.name,
-      base64body: this.base64Service.encodeToBase64(template.base64body),
+      base64body: this.base64Service.encodeToBase64(template.body),
 
     });
 
