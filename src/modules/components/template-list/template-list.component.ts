@@ -13,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { TemplateModelResponse } from '../../../app/models/templateModelResponse';
 import { Base64Service } from '../../../app/services/base64-service.service';
+import { TemplatePreviewModel } from '../../../app/models/templatePreviewModel';
 
 @Component({
   selector: 'app-template-list',
@@ -32,7 +33,7 @@ export class TemplateListComponent implements OnInit {
 
   base64Service: Base64Service = new Base64Service();
 
-  templates: TemplateModelResponse[] = [];
+  templates: TemplatePreviewModel[] = [];
   selectedIndex: number | null = null;
   showModalToRenderHTML: boolean = false;
 
@@ -41,14 +42,9 @@ export class TemplateListComponent implements OnInit {
   }
 
   getEmailTemplates() {
-    this.emailService.getEmailTemplates().subscribe((data) => {
+    this.emailService.getEmailTemplatesForPreview().subscribe((data) => {
       this.templates = data;
 
-      this.templates.forEach((x, index) => {
-        this.templates[index].base64body = this.base64Service.decodeFromBase64(
-          x.base64body
-        );
-      });
     });
   }
 
@@ -62,7 +58,7 @@ export class TemplateListComponent implements OnInit {
 
     setTimeout(() => {
       const iframe = this.iframePreview.nativeElement as HTMLIFrameElement;
-      iframe.srcdoc = this.templates[index].base64body;
+      iframe.srcdoc = this.templates[index].body;
 
       iframe.onload = () => {
         const iframeDocument =
