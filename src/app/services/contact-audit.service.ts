@@ -13,8 +13,13 @@ import { ContactType } from '../models/contacts/contactAudit';
 })
 export class ContactAuditService {
 
+  private apiUrl: string;
 
-  private mockApiUrl = 'https://my-json-server.typicode.com/114050-RODI-CARO-Nicolas/contact-audit-mock/audit_history'
+  constructor() {
+
+    this.apiUrl = environment.apis.contacts.url;
+
+  }
 
 
   private mapContactType(contactType: ContactType): string {
@@ -74,8 +79,8 @@ export class ContactAuditService {
 
   getContactAudits(): Observable<ContactAudit[]> {
 
-   // const url = `${environmentContacts.apiUrl + "api/contacts/audit"}`
-     const url = `${this.mockApiUrl}`
+
+     const url = `${this.apiUrl}/audit/contacts`
     return this.http.get<ContactAuditResponse[]>(url)
     .pipe(
       map(

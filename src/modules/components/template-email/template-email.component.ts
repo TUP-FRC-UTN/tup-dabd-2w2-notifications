@@ -1,4 +1,5 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, inject } from '@angular/core';
+import { ToastService } from 'ngx-dabd-grupo01';
 import { TemplateService } from '../../../app/services/template.service';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -29,6 +30,7 @@ export class TemplateEmailComponent {
   };
 
   templateService: TemplateService = new TemplateService();
+  toastService: ToastService = inject(ToastService);
 
   public async sendForm(form: NgForm) {
     if (form.valid) {
@@ -46,17 +48,11 @@ export class TemplateEmailComponent {
 
     this.templateService.sendTemplate(this.template).subscribe({
       next: (response) => {
-        this.openModal(
-          'Éxito',
-          'El template se ha guardado de manera correcta.'
-        );
+        this.toastService.sendSuccess("Plantilla guardada correctamente")
         this.resetForm();
       },
       error: (error: HttpErrorResponse) => {
-        this.openModal(
-          'Error',
-          'Hubo un problema al guardar el template. Por favor, intente nuevamente.'
-        );
+         this.toastService.sendError("Hubo un error guardando la plantilla");
         console.error('Error al enviar el template:', error);
       },
     });
