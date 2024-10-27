@@ -81,6 +81,7 @@ export class TemplateListComponent implements OnInit {
 
   // Estados de modales
   isModalOpen = false;
+  isPreviewModalOpen = false
   isEditModalOpen = false;
   isDeleteModalOpen = false;
   modalTitle = '';
@@ -90,8 +91,19 @@ export class TemplateListComponent implements OnInit {
 
   // Referencias
   @ViewChild('editForm') editForm!: NgForm;
-  templateToDelete: TemplateModel | null = null;
+  templateToDelete: TemplateModel = {
+    id: 0,
+    name: '',
+    body: '',
+    active: true
+  };
   editingtemplate: TemplateModel = this.getEmptytemplate();
+  templateToPreview: TemplateModel = {
+    id: 0,
+    name: '',
+    body: '',
+    active: true
+  };
 
   //Estado de filtors
   showInput: boolean = false;
@@ -123,7 +135,7 @@ export class TemplateListComponent implements OnInit {
     this.getEmailTemplates();
   }
   filterByName() {
-    this.templates = this.templates.filter(t => t.name === this.searchTerm)
+    this.templates = this.templates.filter(t => t.name.toUpperCase() === this.searchTerm.toUpperCase())
     /*this.emailService.getEmailTemplates().subscribe(data => {
       this.templates = data.filter(template => template.name === this.searchTerm)
     })*/
@@ -160,9 +172,30 @@ export class TemplateListComponent implements OnInit {
     this.isModalOpen = false;
   }
 
+  openPreviewModal(template: TemplateModel) {
+    console.log("preview tocada");
+    
+    this.templateToPreview = { ...template };
+    this.isPreviewModalOpen = true;
+    setTimeout(() => {
+      const iframe = this.iframePreview.nativeElement as HTMLIFrameElement
+      iframe.srcdoc = this.templateToPreview.body
+      iframe.onload = () => {
+        iframe.onload = () => {
+          const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
+          if (iframeDocument) {
+            const height = iframeDocument.documentElement.scrollHeight;
+            iframe.style.height = `${height}px`;
+          }
+        }
+      }}, 5)
+  }
   openEditModal(template: TemplateModel) {
     this.editingtemplate = { ...template };
     this.isEditModalOpen = true;
+  }
+  closePreviewModal() {
+    this.isPreviewModalOpen = false;
   }
 
   closeEditModal() {
@@ -196,14 +229,21 @@ export class TemplateListComponent implements OnInit {
 
   closeDeleteModal() {
     this.isDeleteModalOpen = false;
-    this.templateToDelete = null;
+    this.templateToDelete = {
+      id: 0,
+      name: '',
+      body: '',
+      active: true
+    };;
   }
 
   confirmDelete() {
     if (this.templateToDelete) {
       this.deleteTemplate(this.templateToDelete);
+      this.isDeleteModalOpen = false
     }
   }
+
   showTheInput(){
     this.showInput = true
   }
@@ -242,6 +282,7 @@ export class TemplateListComponent implements OnInit {
         this.templates[index].active = false
         this.templates.splice(index, 1); // Elimina el objeto en la posición 'index'
         this.showModal('Éxito', 'Template eliminado correctamente');
+        this.getEmailTemplates()
     } else {
         this.showModal('Error', 'Template no encontrado');
     }
@@ -374,8 +415,17 @@ export class TemplateListComponent implements OnInit {
       const index = this.templates.findIndex(t => t.id === this.editingtemplate.id);
       if (index !== -1) {
         this.templates[index] = { ...this.editingtemplate };
-        this.templateService.updateTemplate(this.templates[index])
-        this.showModal('Éxito', 'Template editado correctamente');
+        this.templateService.updateTemplate(this.templates[index]).subscribe({
+          next: () => {
+            this.showModal('Éxito', 'Template editado correctamente');
+          },
+          complete: () => {
+            this.showModal('Error', 'Error al editar plantilla')
+            console.log("error editar");
+            
+          }
+        })
+        
       }
       this.closeEditModal();
 
