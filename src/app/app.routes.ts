@@ -8,8 +8,7 @@ import { ContactAuditHistoryComponent } from '../modules/components/contact-audi
 import { ContactListComponent } from '../modules/components/contact-list/contact-list.component'
 import { ContactNewComponent } from '../modules/components/contact-new/contact-new.component'
 import { ContactModifySubsEmailComponent } from '../modules/components/contact-modify-subs-email/contact-modify-subs-email.component'
-
-
+import { NotificationHistoricComponent } from '../modules/components/notification-historic/notification-historic.component';
 export const routes: Routes = [
   {
     path: 'templates/new',
@@ -30,6 +29,10 @@ export const routes: Routes = [
   {
     path: 'send-email-contact',
     component: SendEmailContactComponent,
+  },
+  {
+    path: 'notifications-historic',
+    component: NotificationHistoricComponent,
   },
   {
     path: 'contact-audit', component: ContactAuditHistoryComponent
