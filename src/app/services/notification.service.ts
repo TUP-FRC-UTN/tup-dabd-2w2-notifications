@@ -1,14 +1,9 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { NotificationApi, NotificationFront } from '../models/notification';
-import { forkJoin, map, Observable, switchMap } from 'rxjs';
+import { NotificationApi } from '../models/notification';
+import { forkJoin, map, switchMap } from 'rxjs';
 
-interface EmailTemplate {
-  id: number;
-  name: string;
-  body: string;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -73,12 +68,6 @@ export class NotificationService {
       )
     );
   }
-  
-  private formatDate(date: Date | string): string {
-    if (typeof date === 'string') return date; // Si ya es cadena, no cambiar
-    return date.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
-  }
-
 
   getNotificationById(id: number) {
     const url = `${this.apiUrl}/notifications/${id}`;
@@ -103,64 +92,5 @@ export class NotificationService {
     const year = parseInt(parts[2], 10);
     return new Date(year, month, day);
   }
-  template: string = `<!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tarjeta con Imagen</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f4;
-                margin: 0;
-                padding: 20px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-            }
-
-            .tarjeta {
-                background-color: #fff;
-                border-radius: 10px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                overflow: hidden;
-                width: 300px; /* Ancho de la tarjeta */
-            }
-
-            .tarjeta img {
-                width: 100%; /* Ajusta la imagen al ancho de la tarjeta */
-                height: auto;
-            }
-
-            .contenido {
-                padding: 15px;
-            }
-
-            .contenido h2 {
-                margin: 0;
-                font-size: 1.5em;
-            }
-
-            .contenido p {
-                line-height: 1.5;
-                color: #555;
-            }
-        </style>
-    </head>
-    <body>
-
-    <div class="tarjeta">
-        <img src="https://via.placeholder.com/300x200" alt="Imagen de Ejemplo">
-        <div class="contenido">
-            <h2>Título de la Tarjeta</h2>
-            <p>Este es un texto descriptivo que acompaña la imagen en la tarjeta. Puedes agregar más información aquí.</p>
-        </div>
-    </div>
-
-    </body>
-    </html>
-    `
-
+  
 }

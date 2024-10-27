@@ -1,0 +1,151 @@
+<div class="container mt-5 custom-form" >
+<h2> Historial de Notificaciones</h2>
+    <div class="card-body">
+  
+  <!-- Botones de exportación -->
+<div class="col row d-flex justify-content-end mb-3">
+
+    <div class="col-auto">
+      <button class="btn" style="background-color: #239b56; color: white;" title="Descargar Excel">
+        <i class="bi bi-file-earmark-excel"></i>
+      </button>
+    </div>
+  
+    <div class="col-auto btn-export-pdf">
+      <button class="btn" style="background-color: red; color: white;" title="Descargar PDF">
+        <i class="bi bi-file-pdf"></i>
+      </button>
+    </div>
+  </div>
+  
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Grupo de botones izquierdo -->
+        <div class="btn-group me-5" role="group">
+          <div class="d-flex align-items-center">
+            <div class="btn-group me-2">
+                <button class="btn btn-outline-danger" (click)="clearFilters()">
+                <i class="bi bi-trash-fill"></i> Limpiar
+              </button>
+  
+              <button type="button" class="btn btn-outline-warning dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-funnel-fill"></i> Filtros
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <h6 class="dropdown-header">Tipo de Filtro</h6>
+                </li>
+                <li><a class="dropdown-item" (click)="onFilterChange('Todos')">Todos</a></li>
+                <li><a class="dropdown-item" (click)="onFilterChange('Estado')">Estado</a></li>
+                <li><a class="dropdown-item" (click)="onFilterChange('Fecha')">Fecha</a></li>
+                <li><a class="dropdown-item" (click)="onFilterChange('Usuario')">Usuario</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+  
+  
+      <!-- Inputs para filtrado -->
+       @if(currentFilter === 'Fecha'){
+        <div  class="mb-3">
+            <label for="dateFrom">Desde:</label>
+            <input type="date" id="dateFrom" [(ngModel)]="dateFrom" (ngModelChange)="filterNotifications()" class="form-control mb-2">
+            
+            <label for="dateUntil">Hasta:</label>
+            <input type="date" id="dateUntil" [(ngModel)]="dateUntil"  (ngModelChange)="filterNotifications()" class="form-control">
+          </div>
+       }
+     
+      @if(currentFilter === 'Estado'){
+      <div class="mb-3">
+        <label for="status">Estado:</label>
+            <select id="status" [(ngModel)]="status" (ngModelChange)="filterNotifications()" class="form-select">
+
+          <option value="">Seleccione Estado</option>
+          <option value="Enviado">Enviado</option>
+          <option value="Visualizado">Visualizado</option>
+        </select>
+      </div>
+    }
+    @if(currentFilter === 'Usuario'){
+        <div  class="mb-3">
+            <label for="userFilter">Usuario:</label>
+            <input type="text" id="userFilter" [(ngModel)]="emailFilter"
+            (ngModelChange)="filterNotifications()" class="form-control" placeholder="Ingresa el correo del usuario">
+          </div>
+      
+    }
+    
+      </div>
+  
+      <!-- Tabla -->
+      <div class="table-container">
+        <table class="table table-striped fixed-table" style="border: 1px solid rgba(0, 0, 0, 0.150); border-collapse: collapse;">
+          
+          @if (filteredNotifications.length === 0) {
+          <thead>
+            <tr>
+              <td colspan="5">
+                <div class="text-center p-2">
+                  <div class="alert alert-secondary text-center" role="alert">
+                    No hay notificaciones para mostrar
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </thead>
+          } @else {
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Tipo de Notificación</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(notification of filteredNotifications; track $index) {
+            <tr>
+                <td title="{{ notification.recipient }}">
+                    {{ notification.recipient.split('@')[0] }}&#64;...
+                  </td>
+              <td>{{notification.templateName}}</td>
+              <td>{{notification.dateSend | date}} </td>
+              <td>{{notification.statusSend}}</td>
+              <td>
+                @if (notification.statusSend === "VISUALIZADO") {
+                <p class="mb-0">
+                  <i class="bi bi-check2-circle text-success" style="font-size: 1.5rem;"></i>
+                </p>
+                } @else {
+                <p class="mb-0">
+                  <i class="bi bi-check2-circle text-warning" style="font-size: 1.5rem;"></i>
+                </p>
+                }
+              </td>
+             
+            </tr>
+            }
+          </tbody>
+          }
+        </table>
+      </div>
+  
+    </div>
+     <!-- Paginación e Info -->
+     <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="d-flex align-items-center">
+          <select class="form-select me-3" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()">
+            <option [value]="10">10 Elementos</option>
+            <option [value]="25">25 Elementos</option>
+            <option [value]="50">50 Elementos</option>
+          </select>
+        </div>
+  
+        <div class="d-flex align-items-center">
+          <ngb-pagination [(page)]="currentPage" [pageSize]="itemsPerPage" [collectionSize]="totalItems"
+            (pageChange)="changePage($event)" [maxSize]="5" [boundaryLinks]="false"></ngb-pagination>
+  
+        </div>
+      </div>
+  </div>
+  

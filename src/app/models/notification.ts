@@ -1,3 +1,14 @@
+
+export interface Notification {
+    id: number// 1
+    recipient: string//gabCollazo@hotmail.com
+    templateId: number // 1
+    templateName: string // cuentas
+    statusSend: string // enviado
+    dateSend:string   // 24/12/2002
+  }
+
+
 export interface NotificationApi {
     id: number;
     recipient: string;
@@ -5,10 +16,10 @@ export interface NotificationApi {
     subject: string;
     templateId: number;
     body : string;
-    dateSend: string; 
+    dateSend: string;
     isRead : boolean;
     statusSend : string;
-    dateNotification : string 
+    dateNotification : string
 }
 export interface NotificationFront {
     id: number;
@@ -17,8 +28,9 @@ export interface NotificationFront {
     subject: string;
     templateId: number;
     body : string;
-    dateSend: Date; 
+    dateSend: Date;
     isRead : boolean;
     statusSend : string;
     dateNotification : string
 }
+
