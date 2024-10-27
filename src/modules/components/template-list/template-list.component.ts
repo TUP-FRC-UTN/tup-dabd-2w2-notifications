@@ -81,7 +81,7 @@ export class TemplateListComponent implements OnInit {
 
   // Estados de modales
   isModalOpen = false;
-  isPreviewModalOpen = false
+  //isPreviewModalOpen = false
   isEditModalOpen = false;
   isDeleteModalOpen = false;
   modalTitle = '';
@@ -174,28 +174,13 @@ export class TemplateListComponent implements OnInit {
 
   openPreviewModal(template: TemplateModel) {
     console.log("preview tocada");
-    
     this.templateToPreview = { ...template };
-    this.isPreviewModalOpen = true;
-    setTimeout(() => {
-      const iframe = this.iframePreview.nativeElement as HTMLIFrameElement
-      iframe.srcdoc = this.templateToPreview.body
-      iframe.onload = () => {
-        iframe.onload = () => {
-          const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
-          if (iframeDocument) {
-            const height = iframeDocument.documentElement.scrollHeight;
-            iframe.style.height = `${height}px`;
-          }
-        }
-      }}, 5)
+    this.previewContent(template.id)
   }
+  
   openEditModal(template: TemplateModel) {
     this.editingtemplate = { ...template };
     this.isEditModalOpen = true;
-  }
-  closePreviewModal() {
-    this.isPreviewModalOpen = false;
   }
 
   closeEditModal() {
@@ -421,14 +406,11 @@ export class TemplateListComponent implements OnInit {
           },
           complete: () => {
             this.showModal('Error', 'Error al editar plantilla')
-            console.log("error editar");
-            
           }
         })
         
       }
       this.closeEditModal();
-
     }
   }
 
