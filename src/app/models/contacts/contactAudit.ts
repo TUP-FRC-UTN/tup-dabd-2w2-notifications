@@ -1,4 +1,5 @@
 export interface ContactAudit {
+  auditId: number;
   contactId: number;
   revisionDate: string;
   revisionId: number;
@@ -8,6 +9,7 @@ export interface ContactAudit {
 }
 
 export interface ContactAuditResponse {
+  audit_id: number;
   contact_id: number;
   value: string;
   contact_type: ContactType;
