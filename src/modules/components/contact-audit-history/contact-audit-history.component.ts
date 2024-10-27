@@ -94,7 +94,7 @@ export class ContactAuditHistoryComponent implements OnInit {
   }
 
   updatePagination() {
-    this.totalItems = this.contactAuditItems.length;
+    this.totalItems = this.filteredContactAuditItems.length;
   }
 
   onItemsPerPageChange() {
@@ -122,8 +122,10 @@ export class ContactAuditHistoryComponent implements OnInit {
       this.contactAuditService.getContactAudits().subscribe({
         next: (data : ContactAudit[]) => 
         {
-          console.log('Datos que llegan al componente: ', data)
+          //console.log('Datos que llegan al componente: ', data)
           this.contactAuditItems = data;
+          this.getFilteredContactAudits(); 
+          this.isLoading = false;
         }
          
       })
@@ -147,8 +149,9 @@ export class ContactAuditHistoryComponent implements OnInit {
   }
 
   filterByContactType(contactType: string): void {
-    //Implementar logica de filtrado por frontend
     this.showInput = true;
+    this.selectedContactType = contactType;
+    this.getFilteredContactAudits();
   }
 
   onSearchTextChange(searchTerm: string) {
@@ -158,8 +161,29 @@ export class ContactAuditHistoryComponent implements OnInit {
 
   
   getFilteredContactAudits(): void {
-    //Implementar lógica de filtrado para todos
+    this.filteredContactAuditItems = this.contactAuditItems.filter(item => {
+
+      //Transformar item.contactType de string legible a EMAIL - PHONE - etc para poder hacer la comp.
+     const itemContactTypeNonReadableFormat = this.contactAuditService.inverseMapContactType(item.contactType);
+
+      const matchesContactType = this.selectedContactType
+        ? itemContactTypeNonReadableFormat === this.selectedContactType
+        : true;
+  
+      const matchesSearchTerm = this.searchTerm
+        ? item.value.toLowerCase().includes(this.searchTerm.toLowerCase())
+        : true;
+  
+      return matchesContactType && matchesSearchTerm;
+    });
+  
+    // Actualizar la cantidad total de items para la paginación
+    this.updatePagination();
   }
+
+  
+
+  
 
 
 
