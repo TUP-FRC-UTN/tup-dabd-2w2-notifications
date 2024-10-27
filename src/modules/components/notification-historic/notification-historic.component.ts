@@ -51,17 +51,7 @@ export class NotificationHistoricComponent implements OnInit {
         this.filteredNotifications = [...this.notifications];  
         this.totalItems = this.filteredNotifications.length;
       });
-
-      this.notificationService.getAllNotifications().subscribe({
-        next: (response) => {
-          this.notifications = response;
-        },
-        error: (error) => {
-          console.error('Error al cargar las notificaciones', error);
-        }
-      });
-
-
+      
       this.notifications.push(
         {
           id: 1,
@@ -151,7 +141,6 @@ export class NotificationHistoricComponent implements OnInit {
       return matches;
     });
     this.totalItems = this.filteredNotifications.length;
-   
   }
   
 
@@ -250,6 +239,4 @@ export class NotificationHistoricComponent implements OnInit {
     this.currentPage = page;
     this.loadNotifications();
   }
-
-
 }
