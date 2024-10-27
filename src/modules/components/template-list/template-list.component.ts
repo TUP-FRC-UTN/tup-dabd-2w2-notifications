@@ -411,11 +411,10 @@ export class TemplateListComponent implements OnInit {
       this.closeEditModal();
     }
   }
-
-
-
-
-
-
-
+  //Pagination
+  get paginatedTemplates() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.templates.slice(startIndex, endIndex);
+  }
 }

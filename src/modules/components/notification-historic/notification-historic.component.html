@@ -101,7 +101,7 @@
             </tr>
           </thead>
           <tbody>
-            @for(notification of filteredNotifications; track $index) {
+            @for(notification of paginatedNotifications; track $index) {
             <tr>
                 <td title="{{ notification.recipient }}">
                     {{ notification.recipient.split('@')[0] }}&#64;...

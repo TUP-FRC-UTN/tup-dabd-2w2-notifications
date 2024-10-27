@@ -245,22 +245,10 @@ export class ContactAuditHistoryComponent implements OnInit {
       },
     });
   }
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  //Pagination
+  get paginatedContacts() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredContactAuditItems.slice(startIndex, endIndex);
+  }
 }
