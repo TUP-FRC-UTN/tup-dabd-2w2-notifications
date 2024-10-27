@@ -62,49 +62,54 @@ export class NotificationHistoricComponent implements OnInit {
       });
 
 
-      //  this.notifications =   [
-      //   {
-      //     id: 1,
-      //     recipient: 'gabrielacollazo@hotmail.com',
-      //     templateId: 1,
-      //     templateName: 'Promoción',
-      //     statusSend: 'ENVIADO',
-      //     dateSend: '2002-12-24',
-      //   },
-      //   {
-      //     id: 2,
-      //     recipient: 'jorge@example.com',
-      //     templateId: 2,
-      //     templateName: 'Cuenta',
-      //     statusSend: 'VISUALIZADO',
-      //     dateSend: '2024-05-15',
-      //   },
-      //   {
-      //     id: 3,
-      //     recipient: 'maria@example.com',
-      //     templateId: 1,
-      //     templateName: 'Comentarios',
-      //     statusSend: 'ENVIADO',
-      //     dateSend:'2024-01-30',
-      //   },
-      //   {
-      //     id: 4,
-      //     recipient: 'luisa@example.com',
-      //     templateId: 3,
-      //     templateName: 'Recordatorio',
-      //     statusSend: 'VISUALIZADO',
-      //     dateSend: '2023-11-05',
-      //   },
-      //   {
-      //     id: 5,
-      //     recipient: 'pablo@example.com',
-      //     templateId: 2,
-      //     templateName: 'Confirmación',
-      //     statusSend: 'ENVIADO',
-      //     dateSend: '2023-10-01',
-      //   },
-      // ];
-       
+      this.notifications.push(
+        {
+          id: 1,
+          subject: "Aprovecha esta PROMOCIÓN!",
+          recipient: 'gabrielacollazo@hotmail.com',
+          templateId: 1,
+          templateName: 'Promoción',
+          statusSend: 'SENT',
+          dateSend: '2002-12-24',
+        },
+        {
+          id: 2,
+          subject: "Pago de Epec rechazado",
+          recipient: 'jorge@example.com',
+          templateId: 2,
+          templateName: 'Cuenta',
+          statusSend: 'VISUALIZED',
+          dateSend: '2024-05-15',
+        },
+        {
+          id: 3,
+          recipient: 'maria@example.com',
+          subject: "Su comentario ha sido enviado",
+          templateId: 1,
+          templateName: 'Comentarios',
+          statusSend: 'SENT',
+          dateSend:'2024-01-30',
+        },
+        {
+          id: 4,
+          recipient: 'luisa@example.com',
+          subject: "Te recordamos el cumpleaños de ...",
+          templateId: 3,
+          templateName: 'Recordatorio',
+          statusSend: 'VISUALIZED',
+          dateSend: '2023-11-05',
+        },
+        {
+          id: 5,
+          recipient: 'pablo@example.com',
+          subject: "Confirmación de envío de producto",
+          templateId: 2,
+          templateName: 'Confirmación',
+          statusSend: 'SENT',
+          dateSend: '2023-10-01',
+        },
+      );
+      
       this.filteredNotifications = [...this.notifications];  
       this.totalItems = this.filteredNotifications.length;
   }
