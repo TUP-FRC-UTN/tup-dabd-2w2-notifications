@@ -339,7 +339,7 @@ export class ContactListComponent implements OnInit {
     });
   }
 
-  generatePDF() {
+  exportToPDF() {
     const doc = new jsPDF();
 
     doc.setFontSize(18);

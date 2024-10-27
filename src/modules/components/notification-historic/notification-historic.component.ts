@@ -5,6 +5,9 @@ import { Notification } from '../../../app/models/notification';
 import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { FormsModule } from '@angular/forms';
 import { NotificationsService } from '../../../app/services/notifications.service';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 @Component({
   selector: 'app-notification-historic',
   standalone: true,
@@ -159,11 +162,51 @@ export class NotificationHistoricComponent implements OnInit {
 
 
   exportToExcel(): void {
-   alert("Descargando excel")
+    const data = this.filteredNotifications.map((notification) => ({
+      Usuario: notification.recipient.split('@')[0] + '@...',
+      'Tipo de Notificación': notification.templateName,
+      Fecha: notification.dateSend,
+      Estado: notification.statusSend,
+    }));
+  
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Notificaciones');
+    const now = new Date();
+    const dateTime = `${now.toLocaleDateString().replace(/\//g, '-')}_${now.getHours()}-${now.getMinutes()}`;
+    const fileName = `Notificaciones-${dateTime}.xlsx`; // Nombre del archivo
+    XLSX.writeFile(wb, fileName);
   }
 
   exportToPDF(): void {
-    alert("Descargando PDF")
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text('Notificaciones', 14, 20);
+
+    autoTable(doc, {
+      startY: 30,
+      head: [['Usuario', 'Tipo de Notificación', 'Fecha', 'Estado']],
+      body: this.filteredNotifications.map((notification) => [
+        notification.recipient,
+        notification.templateName,
+        notification.dateSend,
+        notification.statusSend,
+      ]),
+      columnStyles: {
+        0: { cellWidth: 60 }, // Usuario
+        1: { cellWidth: 60 }, // Tipo de Notificación
+        2: { cellWidth: 40 }, // Fecha
+        3: { cellWidth: 30 }, // Estado
+      },
+      styles: { overflow: 'linebreak' },
+    });
+
+    const now = new Date();
+    const dateTime = `${now.toLocaleDateString().replace(/\//g, '-')}_${now.getHours()}-${now.getMinutes()}`;
+    const fileName = `Notificaciones-${dateTime}.pdf`;
+
+    doc.save(fileName);
+    console.log('PDF generado');
   }
 
   clearSearch(): void {

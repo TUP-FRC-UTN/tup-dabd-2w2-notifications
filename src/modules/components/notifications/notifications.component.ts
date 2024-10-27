@@ -24,7 +24,6 @@ export class NotificationsComponent implements OnInit {
     this.notificationService.getAllNotification().subscribe({
       next: (notification) => {
         this.notifications = notification;
-        console.log(notification);
       },
       error: (error) => {
         console.error('Error al cargar las notificaciones', error);

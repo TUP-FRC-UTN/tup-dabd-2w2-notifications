@@ -6,13 +6,13 @@
 <div class="col row d-flex justify-content-end mb-3">
 
     <div class="col-auto">
-      <button class="btn" style="background-color: #239b56; color: white;" title="Descargar Excel">
+      <button class="btn" (click)="exportToExcel()" style="background-color: #239b56; color: white;" title="Descargar Excel">
         <i class="bi bi-file-earmark-excel"></i>
       </button>
     </div>
   
     <div class="col-auto btn-export-pdf">
-      <button class="btn" style="background-color: red; color: white;" title="Descargar PDF">
+      <button class="btn"  (click)="exportToPDF()" style="background-color: red; color: white;" title="Descargar PDF">
         <i class="bi bi-file-pdf"></i>
       </button>
     </div>
