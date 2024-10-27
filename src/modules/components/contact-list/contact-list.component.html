@@ -161,45 +161,38 @@
 
 
 <!-- Modal de Edición -->
-<div [class.show]="isEditModalOpen" [style.display]="isEditModalOpen ? 'block' : 'none'" class="modal fade" tabindex="-1">
+<div [class.show]="isEditModalOpen" [style.display]="isEditModalOpen ? 'block' : 'none'" class="modal fade"
+  tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Editar Plantilla</h5>
+        <h5 class="modal-title">Editar Contacto</h5>
         <button type="button" class="btn-close" (click)="closeEditModal()"></button>
       </div>
       <div class="modal-body">
         <form #editForm="ngForm">
-          <!-- Nombre de la Plantilla -->
+          <!-- Tipo de Contacto -->
           <div class="mb-3">
-            <label for="templateName" class="form-label">Nombre de la Plantilla</label>
-            <input type="text"
-                   class="form-control"
-                   id="templateName"
-                   name="templateName"
-                   [(ngModel)]="editingtemplate.name"
-                   required>
+            <label for="contactType" class="form-label">Tipo de Contacto</label>
+            <select class="form-select" id="contactType" name="contactType" [(ngModel)]="editingContact.contactType"
+              required>
+              <option value="Email">Email</option>
+              <option value="Phone">Teléfono</option>
+            </select>
           </div>
 
-          <!-- Contenido de la Plantilla -->
+          <!-- Valor del Contacto -->
           <div class="mb-3">
-            <label for="templateBody" class="form-label">Contenido de la Plantilla</label>
-            <textarea class="form-control"
-                      id="templateBody"
-                      name="templateBody"
-                      [(ngModel)]="editingtemplate.body"
-                      rows="5"
-                      required></textarea>
+            <label for="contactValue" class="form-label">Valor del Contacto</label>
+            <input type="text" class="form-control" id="contactValue" name="contactValue"
+              [(ngModel)]="editingContact.contactValue" required>
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeEditModal()">Cancelar</button>
-        <button type="button"
-                class="btn btn-primary"
-                (click)="saveEditedTemplate()"
-                [disabled]="!editForm.form.valid">
-          Guardar
+        <button type="button" class="btn btn-primary" (click)="saveEditedContact()" [disabled]="!editForm.form.valid">
+          Aceptar
         </button>
       </div>
     </div>
