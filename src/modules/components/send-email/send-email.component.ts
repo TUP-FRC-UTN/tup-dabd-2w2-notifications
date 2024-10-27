@@ -48,39 +48,13 @@ export class SendEmailComponent implements OnInit {
 
     this.templateService.getAllTemplates().subscribe((data) => {
       this.templates = data;
+
+      this.templates.forEach((x, index) => {
+        this.templates[index].base64body = this.base64Service.decodeFromBase64(
+          x.base64body
+        );
+      });
     });
-  }
-
-
-
-
-
-  previewSelectedTemplate(): void {
-
-    const selectedTemplate = this.templates.find(t => t.id == parseInt(this.templateID));
-
-    if (selectedTemplate) {
-      this.showModalToRenderHTML = true;
-      console.log("selectedTemplate ", selectedTemplate);
-      console.log("showModalToRenderHTML ", this.showModalToRenderHTML)
-
-      // Colocamos el contenido HTML de la plantilla en el iframe
-      setTimeout(() => {
-        const iframe = this.iframePreview.nativeElement as HTMLIFrameElement;
-        iframe.srcdoc = selectedTemplate.body;
-        iframe.onload = () => {
-          const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
-          if (iframeDocument) {
-            const height = iframeDocument.documentElement.scrollHeight;
-            iframe.style.height = `${height}px`;
-          }
-        };
-      }, 5);
-    }
-  }
-
-  closeModalToRenderHTML() {
-    this.showModalToRenderHTML = false;
   }
 
 

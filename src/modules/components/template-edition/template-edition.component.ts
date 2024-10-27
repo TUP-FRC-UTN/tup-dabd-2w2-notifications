@@ -56,6 +56,10 @@
 //     this.template.id = this.templateId;
 //     this.template.name = templateName;
 //     this.template.base64body = templateBody;
+  // editEmailTemplate(templateName: string, templateBody: string) {
+  //   this.template.id = this.templateId;
+  //   this.template.name = templateName;
+  //   this.template.body = templateBody;
 
 //     this.emailService.editEmailTemplate(this.template).subscribe({
 //       next: (response) => {
