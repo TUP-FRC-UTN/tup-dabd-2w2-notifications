@@ -1,5 +1,4 @@
-export interface Contact {
-  
+export interface ContactModel {
   id: number
   subscriptions: string[]
   contactValue: string

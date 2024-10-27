@@ -4,7 +4,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ContactService } from '../../../app/services/contact.service';
-import { Contact } from '../../../app/models/contact';
+import { ContactModel } from '../../../app/models/contacts/contactModel';
 import { Router } from '@angular/router';
 import { NgbPagination, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { MainContainerComponent } from 'ngx-dabd-grupo01';
@@ -57,8 +57,8 @@ export class ContactListComponent implements OnInit {
   selectedContactType: string = '';
 
   // Datos y estados
-  contacts: Contact[] = [];
-  filteredContacts: Contact[] = [];
+  contacts: ContactModel[] = [];
+  filteredContacts: ContactModel[] = [];
 
   // Estados de modales
   isModalOpen = false;
@@ -67,15 +67,15 @@ export class ContactListComponent implements OnInit {
   modalTitle = '';
   modalMessage = '';
   isDetailModalOpen = false;
-  selectedContact: Contact | null = null;
+  selectedContact: ContactModel | null = null;
 
   //Estado de filtors
   showInput: boolean = false;
 
   // Referencias
   @ViewChild('editForm') editForm!: NgForm;
-  contactToDelete: Contact | null = null;
-  editingContact: Contact = this.getEmptyContact();
+  contactToDelete: ContactModel | null = null;
+  editingContact: ContactModel = this.getEmptyContact();
 
   constructor() {
     this.initializePagination();
@@ -86,7 +86,7 @@ export class ContactListComponent implements OnInit {
     this.getAllContacts();
   }
 
-  private getEmptyContact(): Contact {
+  private getEmptyContact(): ContactModel {
     return {
       id: 0,
       subscriptions: [],
@@ -153,7 +153,7 @@ export class ContactListComponent implements OnInit {
   }
 
   getAllContacts() {
-    this.contactService.getAllContacts().subscribe((data: Contact[]) => {
+    this.contactService.getAllContacts().subscribe((data: ContactModel[]) => {
 
       this.contacts = data;
 
@@ -196,7 +196,7 @@ export class ContactListComponent implements OnInit {
     this.router.navigate(['/contact/new']);
   }
 
-  editContact(contact: Contact) {
+  editContact(contact: ContactModel) {
     this.contactService.updateContact(contact).subscribe({
       next: (response) => {
         const index = this.contacts.findIndex(c => c.id === contact.id);
@@ -215,7 +215,7 @@ export class ContactListComponent implements OnInit {
     });
   }
 
-  deleteContact(contact: Contact) {
+  deleteContact(contact: ContactModel) {
     this.contactService.deleteContact(contact.id).subscribe({
       next: () => {
         this.contacts = this.contacts.filter(c => c.id !== contact.id);
@@ -243,7 +243,7 @@ export class ContactListComponent implements OnInit {
     this.isModalOpen = false;
   }
 
-  openEditModal(contact: Contact) {
+  openEditModal(contact: ContactModel) {
     this.editingContact = { ...contact }
     this.isEditModalOpen = true;
   }
@@ -273,7 +273,7 @@ export class ContactListComponent implements OnInit {
     }
   }
 
-  openDetailModal(contact: Contact) {
+  openDetailModal(contact: ContactModel) {
     if (contact) {
       this.selectedContact = { ...contact };
       this.isDetailModalOpen = true;
@@ -286,7 +286,7 @@ export class ContactListComponent implements OnInit {
   }
 
 
-  openDeleteModal(contact: Contact) {
+  openDeleteModal(contact: ContactModel) {
     this.contactToDelete = contact;
     this.isDeleteModalOpen = true;
   }

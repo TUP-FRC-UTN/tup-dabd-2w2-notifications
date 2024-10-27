@@ -7,13 +7,12 @@ import {
   inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { EmailServiceService } from '../../../app/services/email-service.service';
+import { TemplateService } from '../../../app/services/template.service';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { TemplateModelResponse } from '../../../app/models/templateModelResponse';
+import { TemplateModel } from '../../../app/models/templates/templateModel';
 import { Base64Service } from '../../../app/services/base64-service.service';
-import { TemplatePreviewModel } from '../../../app/models/templatePreviewModel';
 
 @Component({
   selector: 'app-template-list',
@@ -22,18 +21,18 @@ import { TemplatePreviewModel } from '../../../app/models/templatePreviewModel';
   templateUrl: './template-list.component.html',
   styleUrl: './template-list.component.css',
 })
-@Inject('EmailServiceService')
+@Inject('TemplateService')
 @Inject('Base64Service')
 export class TemplateListComponent implements OnInit {
   private readonly router = inject(Router);
 
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
 
-  emailService = new EmailServiceService();
+  templateService = new TemplateService();
 
   base64Service: Base64Service = new Base64Service();
 
-  templates: TemplatePreviewModel[] = [];
+  templates: TemplateModel[] = [];
   selectedIndex: number | null = null;
   showModalToRenderHTML: boolean = false;
 
@@ -42,7 +41,7 @@ export class TemplateListComponent implements OnInit {
   }
 
   getEmailTemplates() {
-    this.emailService.getEmailTemplatesForPreview().subscribe((data) => {
+    this.templateService.getAllTemplates().subscribe((data) => {
       this.templates = data;
 
     });

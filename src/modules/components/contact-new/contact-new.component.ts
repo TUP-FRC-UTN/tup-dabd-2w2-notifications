@@ -1,7 +1,7 @@
 import { Component, Inject,inject } from '@angular/core';
 import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Contact } from '../../../app/models/contact';
+import { ContactModel } from '../../../app/models/contacts/contactModel';
 import { ContactService } from '../../../app/services/contact.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from 'ngx-dabd-grupo01';
@@ -44,7 +44,7 @@ export class ContactNewComponent {
 
     if (form.valid) {
 
-      const contact: Contact = {
+      const contact: ContactModel = {
         id: 1,
         subscriptions: [
           'General',

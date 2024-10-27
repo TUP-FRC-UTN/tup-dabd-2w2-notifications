@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { Contact } from '../models/contact';
+import { ContactModel } from '../models/contacts/contactModel';
 import { environment } from '../../environments/environment';
 import { Observable, map } from 'rxjs';
-import {SubscriptionMod} from '../../app/models/subscription';
+import {SubscriptionMod} from '../models/suscriptions/subscription';
 import { ContactType } from '../models/contacts/contactAudit';
 
 @Injectable({
@@ -23,15 +23,15 @@ export class ContactService {
 
   }
 
-  getAllContacts(): Observable<Contact[]> {
+  getAllContacts(): Observable<ContactModel[]> {
     return this.http.get<any[]>(`${this.apiUrl + "/contacts"}`).pipe(
       map(contacts => contacts.map(contact => this.transformToContact(contact)))
     );
   }
 
-  getFilteredContactsFromBackend(active: boolean = true, searchText: string = '', contactType?: string): Observable<Contact[]> {
+  getFilteredContactsFromBackend(active: boolean = true, searchText: string = '', contactType?: string): Observable<ContactModel[]> {
     let url = `${this.apiUrl}/contacts?active=${active}`;
-  
+
     if (searchText) {
       url += `&search=${encodeURIComponent(searchText)}`;
     }
@@ -43,7 +43,7 @@ export class ContactService {
     );
   }
 
-  getAllContactsWithClientSideFilters(searchText: string = '', isActive?: boolean): Observable<Contact[]> {
+  getAllContactsWithClientSideFilters(searchText: string = '', isActive?: boolean): Observable<ContactModel[]> {
     return this.getAllContacts().pipe(
       map(contacts => {
 
@@ -65,16 +65,16 @@ export class ContactService {
 
 
 
-  
 
 
-  getContactById(id: number): Observable<Contact> {
+
+  getContactById(id: number): Observable<ContactModel> {
     return this.http.get<any>(`${this.apiUrl}/contacts/${id}`).pipe(
       map(contact => this.transformToContact(contact))
     );
   }
 
-  saveContact(contact: Contact): Observable<Contact> {
+  saveContact(contact: ContactModel): Observable<ContactModel> {
     const apiContact = this.transformToApiContact(contact);
     return this.http.post<any>(`${this.apiUrl}/contacts`, apiContact).pipe(
       map(response => this.transformToContact(response))
@@ -85,7 +85,7 @@ export class ContactService {
     return this.http.put<SubscriptionMod>(url, data)
   }
 
-  updateContact(contact: Contact): Observable<Contact> {
+  updateContact(contact: ContactModel): Observable<ContactModel> {
     const apiContact = this.transformToApiContact(contact);
     return this.http.put<any>(`${this.apiUrl}/contacts/${contact.id}`, apiContact).pipe(
       map(response => this.transformToContact(response))
@@ -96,7 +96,7 @@ export class ContactService {
     return this.http.delete<void>(`${this.apiUrl}/contacts/${id}`);
   }
 
-  private transformToContact(data: any): Contact {
+  private transformToContact(data: any): ContactModel {
     return {
       id: data.id,
       subscriptions: data.subscriptions,
@@ -107,7 +107,7 @@ export class ContactService {
     };
   };
 
-  private transformToApiContact(contact: Contact): any {
+  private transformToApiContact(contact: ContactModel): any {
     return {
       id: contact.id,
       subscriptions: contact.subscriptions,

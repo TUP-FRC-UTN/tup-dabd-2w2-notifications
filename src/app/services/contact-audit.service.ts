@@ -14,8 +14,6 @@ import { ContactType } from '../models/contacts/contactAudit';
 export class ContactAuditService {
 
 
-
-
   private mockApiUrl = 'https://my-json-server.typicode.com/114050-RODI-CARO-Nicolas/contact-audit-mock/audit_history'
 
 
