@@ -155,3 +155,105 @@
         </div>
     </div>
 </app-main-container>
+
+
+<!-- Modal de Edición del Template -->
+<div [class.show]="isEditModalOpen" [style.display]="isEditModalOpen ? 'block' : 'none'" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Template</h5>
+          <button type="button" class="btn-close" (click)="closeEditModal()"></button>
+        </div>
+        <div class="modal-body">
+          <form #editForm="ngForm">
+            <!-- Nombre del Template -->
+            <div class="mb-3">
+              <label for="templateName" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="templateName" name="name"
+                [(ngModel)]="editingtemplate.name" required>
+            </div>
+  
+            <!-- Cuerpo del Template -->
+            <div class="mb-3">
+              <label for="templateBody" class="form-label">Cuerpo</label>
+              <textarea class="form-control" id="templateBody" name="body"
+                [(ngModel)]="editingtemplate.body" rows="5" required></textarea>
+            </div>
+  
+            <!-- Estado del Template -->
+            <div class="mb-3">
+              <label for="templateStatus" class="form-label">Estado</label>
+              <select class="form-select" id="templateStatus" name="active" [(ngModel)]="editingtemplate.active" required>
+                <option [value]="true">Activo</option>
+                <option [value]="false">Inactivo</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeEditModal()">Cancelar</button>
+          <button type="button" class="btn btn-primary" (click)="saveEditedTemplate()" [disabled]="!editForm.form.valid">
+            Aceptar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal de Detalle del Template -->
+  <div [class.show]="isDetailModalOpen" [style.display]="isDetailModalOpen ? 'block' : 'none'" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Detalle del Template</h5>
+          <button type="button" class="btn-close" (click)="closeDetailModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div *ngIf="selectedTemplate">
+            <!-- Nombre del Template -->
+            <div class="mb-3">
+              <label for="templateNameDetail" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="templateNameDetail" [value]="selectedTemplate.name" readonly>
+            </div>
+  
+            <!-- Cuerpo del Template -->
+            <div class="mb-3">
+              <label for="templateBodyDetail" class="form-label">Cuerpo</label>
+              <textarea class="form-control" id="templateBodyDetail" [value]="selectedTemplate.body" readonly rows="5"></textarea>
+            </div>
+  
+            <!-- Estado del Template -->
+            <div class="mb-3">
+              <label for="templateStatusDetail" class="form-label">Estado</label>
+              <input type="text" class="form-control" id="templateStatusDetail"
+                [value]="selectedTemplate.active ? 'Activo' : 'Inactivo'" readonly>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeDetailModal()">Volver</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Información -->
+<div [class.show]="isModalOpen" [style.display]="isModalOpen ? 'block' : 'none'" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ modalTitle }}</h5>
+          <button type="button" class="btn-close" (click)="isModalOpen = false"></button>
+        </div>
+        <div class="modal-body">
+          <div [innerHTML]="modalMessage"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="isModalOpen = false">Volver</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+

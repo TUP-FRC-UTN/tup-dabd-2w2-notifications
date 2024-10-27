@@ -18,6 +18,8 @@ import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { ToastService } from 'ngx-dabd-grupo01';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { TemplateSendModel } from '../../../app/models/templateSendModel';
+import { TemplatePatchModel } from '../../../app/models/templatePatchModel';
 
 @Component({
   selector: 'app-template-list',
@@ -240,9 +242,27 @@ export class TemplateListComponent implements OnInit {
     }
 }
 
-  public async editEmailTemplate(index: number): Promise<void> {
-    this.router.navigate(['/template/change', this.templates[index].id]);
-  }
+/*
+
+    updateTemplate(template: TemplatePatchModel) {
+      this.emailService.editEmailTemplate(template).subscribe({
+        next: (response) => {
+          const index = this.templates.findIndex(t => t.id === template.id);
+          if (index !== -1) {
+            this.contacts[index] = { ...contact };
+          }
+          this.closeEditModal();
+          this.toastService.sendSuccess('Éxito El contacto ha sido actualizado correctamente')
+  
+        },
+        error: (error: HttpErrorResponse) => {
+          this.toastService.sendError('Error Ha ocurrido un error al intentar actualizar el contacto intente nuevamente...')
+          this.closeEditModal();
+          console.error('Error al editar el contacto:', error);
+        },
+      });
+    
+  } */
 
   saveEmailTemplate() {
     this.router.navigate(['/templates/new']);
@@ -288,5 +308,26 @@ export class TemplateListComponent implements OnInit {
 
     this.showInput = true;
   }
+
+
+  
+  saveEditedTemplate() {
+    if (this.editingtemplate) {
+      // Lógica para guardar los cambios del template
+      const index = this.templates.findIndex(t => t.id === this.editingtemplate.id);
+      if (index !== -1) {
+        this.templates[index] = { ...this.editingtemplate };
+        this.showModal('Éxito', 'Template editado correctamente');
+      }
+      this.closeEditModal();
+      
+    }
+  } 
+
+    
+  
+
+  
+  
 
 }
