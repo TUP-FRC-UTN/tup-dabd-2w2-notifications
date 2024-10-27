@@ -114,7 +114,7 @@ export class TemplateListComponent implements OnInit {
     /*this.emailService.getEmailTemplates().subscribe(data => {
       this.templates = data.filter(template => template.name === this.searchTerm)
     })*/
-   this.showInput = false
+    this.showInput = false
   }
 
   // Paginación
@@ -213,15 +213,21 @@ export class TemplateListComponent implements OnInit {
   getEmailTemplates() {
     this.emailService.getEmailTemplates().subscribe((data) => {
 
-      this.templates = [{ id: '0', name: 'template 1', body: `HOLA`, active: true }];
+      //this.templates = [{ id: '0', name: 'template 1', body: `HOLA`, active: true }];
 
     })
   }
 
   deleteTemplate(deleteTemplate: TemplateModelResponse) {
-
-
-  }
+    const index = this.templates.findIndex(template => template.id === deleteTemplate.id);
+    
+    if (index !== -1) { // Si se encuentra el índice
+        this.templates.splice(index, 1); // Elimina el objeto en la posición 'index'
+        this.showModal('Éxito', 'Template eliminado correctamente');
+    } else {
+        this.showModal('Error', 'Template no encontrado');
+    }
+}
 
   public async editEmailTemplate(index: number): Promise<void> {
     this.router.navigate(['/template/change', this.templates[index].id]);
