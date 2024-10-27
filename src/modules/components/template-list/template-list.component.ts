@@ -6,6 +6,11 @@ import {
   ElementRef,
   inject,
 } from '@angular/core';
+
+import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
 import { FormsModule, NgForm } from '@angular/forms';
 import { TemplateService } from '../../../app/services/template.service';
 import { CommonModule } from '@angular/common';
@@ -268,9 +273,61 @@ export class TemplateListComponent implements OnInit {
     this.router.navigate(['/templates/new']);
   }
 
-  exportToExcel() { }
+  exportToExcel() {
+    this.templateService.getAllTemplates().subscribe(templates => {
+      const data = templates.map(template => ({
+          'ID': template.id,
+          'Nombre': template.name,
+          'Cuerpo': template.body,
+          'Activo': template.active ? 'Activo' : 'Inactivo',
+      }));
 
-  exportToPDF() { }
+      const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+      const wb: XLSX.WorkBook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Templates');
+      const now = new Date();
+      const dateTime = `${now.toLocaleDateString().replace(/\//g, '-')}_${now.getHours()}-${now.getMinutes()}`;
+      const fileName = `Plantillas-Emails-${dateTime}.xlsx`; // Nombre del archivo
+      XLSX.writeFile(wb, fileName);
+  }, error => {
+      this.showModal('Error', 'Error al cargar las plantillas para exportar');
+  });
+  }
+
+  exportToPDF() { 
+    const doc = new jsPDF();
+    
+    doc.setFontSize(18);
+    doc.text('Plantillas de Email', 14, 20);
+    
+    this.templateService.getAllTemplates().subscribe(templates => {
+        autoTable(doc, {
+            startY: 30,
+            head: [['ID', 'Nombre', 'Cuerpo', 'Activo']],
+            body: templates.map(template => [
+                template.id,
+                template.name,
+                template.body,
+                template.active ? 'Activo' : 'Inactivo'
+            ]),
+            columnStyles: { //para que no se rompa por si el body es muy grande
+                0: { cellWidth: 15 }, // ID
+                1: { cellWidth: 40 }, // Nombre
+                2: { cellWidth: 100 }, // Body
+                3: { cellWidth: 20 }, // Activo
+            },
+            styles: { overflow: 'linebreak' }, 
+        });
+        const now = new Date();
+        const dateTime = `${now.toLocaleDateString().replace(/\//g, '-')}_${now.getHours()}-${now.getMinutes()}`;
+        const fileName = `Plantillas-Email-${dateTime}.pdf`; 
+        
+        doc.save(fileName);
+        console.log('PDF generado');
+    }, error => {
+        this.showModal('Error', 'Error al cargar las plantillas para generar el PDF');
+    });
+  }
 
   previewContent(index: number): void {
     this.showModalToRenderHTML = true;
@@ -317,6 +374,7 @@ export class TemplateListComponent implements OnInit {
       const index = this.templates.findIndex(t => t.id === this.editingtemplate.id);
       if (index !== -1) {
         this.templates[index] = { ...this.editingtemplate };
+        this.templateService.updateTemplate(this.templates[index])
         this.showModal('Éxito', 'Template editado correctamente');
       }
       this.closeEditModal();
