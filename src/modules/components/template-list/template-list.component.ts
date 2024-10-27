@@ -218,10 +218,13 @@ export class TemplateListComponent implements OnInit {
 
   getEmailTemplates() {
     this.templates = this.mocktemplates
-    this.emailService.getEmailTemplates().subscribe((data) => {
-
-      //this.templates = [{ id: '0', name: 'template 1', body: `HOLA`, active: true }];
-
+    this.emailService.getEmailTemplates().subscribe({
+      next: (data) => {
+        this.templates = this.templates.concat(data)
+      },
+      error: () => {
+        this.showModal('Error', 'Error al cargar las plantillas');
+      }
     })
   }
 
