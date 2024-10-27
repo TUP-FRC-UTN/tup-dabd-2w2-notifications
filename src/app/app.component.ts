@@ -3,7 +3,6 @@ import { RouterOutlet, RouterModule } from '@angular/router';
 import { NotificationsComponent } from '../modules/components/notifications/notifications.component';
 import { ToastsContainer } from 'ngx-dabd-grupo01';
 
-
 @Component({
   selector: 'app-root',
   standalone: true,

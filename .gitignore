@@ -42,4 +42,4 @@ testem.log
 Thumbs.db
 db.json
 dbModified.json
-templates/
+mockTemplates/

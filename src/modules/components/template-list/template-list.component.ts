@@ -6,20 +6,23 @@ import {
   ElementRef,
   inject,
 } from '@angular/core';
+
+import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
 import { FormsModule, NgForm } from '@angular/forms';
-import { EmailServiceService } from '../../../app/services/email-service.service';
+import { TemplateService } from '../../../app/services/template.service';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { TemplateModelResponse } from '../../../app/models/templateModelResponse';
+import {Router } from '@angular/router';
+import { TemplateModel } from '../../../app/models/templates/templateModel';
 import { Base64Service } from '../../../app/services/base64-service.service';
 import { NgbPagination, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { ToastService } from 'ngx-dabd-grupo01';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { TemplateSendModel } from '../../../app/models/templateSendModel';
-import { TemplatePatchModel } from '../../../app/models/templatePatchModel';
+
 
 @Component({
   selector: 'app-template-list',
@@ -33,7 +36,7 @@ import { TemplatePatchModel } from '../../../app/models/templatePatchModel';
   templateUrl: './template-list.component.html',
   styleUrl: './template-list.component.css',
 })
-@Inject('EmailServiceService')
+@Inject('TemplateService')
 @Inject('Base64Service')
 export class TemplateListComponent implements OnInit {
 
@@ -41,19 +44,21 @@ export class TemplateListComponent implements OnInit {
   private toastService = inject(ToastService);
 
 
-  emailService = new EmailServiceService();
+  templateService = new TemplateService();
 
   base64Service: Base64Service = new Base64Service();
+
 
 
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
 
 
-  templates: TemplateModelResponse[] = [];
-  mocktemplates : TemplateModelResponse[] = [
-    { id: '1', name: 'Multas', body: `HOLA`, active: true },
-    { id: '2', name: 'Deudas', body: `HOLA`, active: true },
-    { id: '3', name: 'Catastro 1', body: `HOLA`, active: true }
+  templates: TemplateModel[] = [];
+
+  mocktemplates : TemplateModel[] = [
+    { id: 1, name: 'Multas', body: `HOLA`, active: true },
+    { id: 2, name: 'Deudas', body: `HOLA`, active: true },
+    { id: 3, name: 'Catastro 1', body: `HOLA`, active: true }
   ];
   selectedIndex: number | null = null;
   showModalToRenderHTML: boolean = false;
@@ -81,12 +86,12 @@ export class TemplateListComponent implements OnInit {
   modalTitle = '';
   modalMessage = '';
   isDetailModalOpen = false;
-  selectedTemplate: TemplateModelResponse | null = null;
+  selectedTemplate: TemplateModel | null = null;
 
   // Referencias
   @ViewChild('editForm') editForm!: NgForm;
-  templateToDelete: TemplateModelResponse | null = null;
-  editingtemplate: TemplateModelResponse = this.getEmptytemplate();
+  templateToDelete: TemplateModel | null = null;
+  editingtemplate: TemplateModel = this.getEmptytemplate();
 
   //Estado de filtors
   showInput: boolean = false;
@@ -95,9 +100,9 @@ export class TemplateListComponent implements OnInit {
     this.initializePagination();
   }
 
-  private getEmptytemplate(): TemplateModelResponse {
+  private getEmptytemplate(): TemplateModel {
     return {
-      id: '',
+      id: 0,
       name: '',
       body: '',
       active: true,
@@ -155,7 +160,7 @@ export class TemplateListComponent implements OnInit {
     this.isModalOpen = false;
   }
 
-  openEditModal(template: TemplateModelResponse) {
+  openEditModal(template: TemplateModel) {
     this.editingtemplate = { ...template };
     this.isEditModalOpen = true;
   }
@@ -163,14 +168,14 @@ export class TemplateListComponent implements OnInit {
   closeEditModal() {
     this.isEditModalOpen = false;
     this.editingtemplate = {
-      id: '',
+      id: 0,
       name: '',
       body: '',
       active: true,
     };
   }
 
-  openDetailModal(template: TemplateModelResponse) {
+  openDetailModal(template: TemplateModel) {
     if (template) {
       this.selectedTemplate = { ...template };
       this.isDetailModalOpen = true;
@@ -183,7 +188,7 @@ export class TemplateListComponent implements OnInit {
   }
 
 
-  openDeleteModal(template: TemplateModelResponse) {
+  openDeleteModal(template: TemplateModel) {
     this.templateToDelete = template;
     this.isDeleteModalOpen = true;
   }
@@ -220,7 +225,7 @@ export class TemplateListComponent implements OnInit {
 
   getEmailTemplates() {
     this.templates = this.mocktemplates
-    this.emailService.getEmailTemplates().subscribe({
+    this.templateService.getAllTemplates().subscribe({
       next: (data) => {
         this.templates = [...this.templates, ...data]; //mezclo los mocks con lo de la api
       },
@@ -230,9 +235,9 @@ export class TemplateListComponent implements OnInit {
     })
   }
 
-  deleteTemplate(deleteTemplate: TemplateModelResponse) {
+  deleteTemplate(deleteTemplate: TemplateModel) {
     const index = this.templates.findIndex(template => template.id === deleteTemplate.id);
-    
+
     if (index !== -1) { // Si se encuentra el índice
         this.templates[index].active = false
         this.templates.splice(index, 1); // Elimina el objeto en la posición 'index'
@@ -253,7 +258,7 @@ export class TemplateListComponent implements OnInit {
           }
           this.closeEditModal();
           this.toastService.sendSuccess('Éxito El contacto ha sido actualizado correctamente')
-  
+
         },
         error: (error: HttpErrorResponse) => {
           this.toastService.sendError('Error Ha ocurrido un error al intentar actualizar el contacto intente nuevamente...')
@@ -261,16 +266,68 @@ export class TemplateListComponent implements OnInit {
           console.error('Error al editar el contacto:', error);
         },
       });
-    
+
   } */
 
   saveEmailTemplate() {
     this.router.navigate(['/templates/new']);
   }
 
-  exportToExcel() { }
+  exportToExcel() {
+    this.templateService.getAllTemplates().subscribe(templates => {
+      const data = templates.map(template => ({
+          'ID': template.id,
+          'Nombre': template.name,
+          'Cuerpo': template.body,
+          'Activo': template.active ? 'Activo' : 'Inactivo',
+      }));
 
-  exportToPDF() { }
+      const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+      const wb: XLSX.WorkBook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Templates');
+      const now = new Date();
+      const dateTime = `${now.toLocaleDateString().replace(/\//g, '-')}_${now.getHours()}-${now.getMinutes()}`;
+      const fileName = `Plantillas-Emails-${dateTime}.xlsx`; // Nombre del archivo
+      XLSX.writeFile(wb, fileName);
+  }, error => {
+      this.showModal('Error', 'Error al cargar las plantillas para exportar');
+  });
+  }
+
+  exportToPDF() { 
+    const doc = new jsPDF();
+    
+    doc.setFontSize(18);
+    doc.text('Plantillas de Email', 14, 20);
+    
+    this.templateService.getAllTemplates().subscribe(templates => {
+        autoTable(doc, {
+            startY: 30,
+            head: [['ID', 'Nombre', 'Cuerpo', 'Activo']],
+            body: templates.map(template => [
+                template.id,
+                template.name,
+                template.body,
+                template.active ? 'Activo' : 'Inactivo'
+            ]),
+            columnStyles: { //para que no se rompa por si el body es muy grande
+                0: { cellWidth: 15 }, // ID
+                1: { cellWidth: 40 }, // Nombre
+                2: { cellWidth: 100 }, // Body
+                3: { cellWidth: 20 }, // Activo
+            },
+            styles: { overflow: 'linebreak' }, 
+        });
+        const now = new Date();
+        const dateTime = `${now.toLocaleDateString().replace(/\//g, '-')}_${now.getHours()}-${now.getMinutes()}`;
+        const fileName = `Plantillas-Email-${dateTime}.pdf`; 
+        
+        doc.save(fileName);
+        console.log('PDF generado');
+    }, error => {
+        this.showModal('Error', 'Error al cargar las plantillas para generar el PDF');
+    });
+  }
 
   previewContent(index: number): void {
     this.showModalToRenderHTML = true;
@@ -310,24 +367,25 @@ export class TemplateListComponent implements OnInit {
   }
 
 
-  
+
   saveEditedTemplate() {
     if (this.editingtemplate) {
       // Lógica para guardar los cambios del template
       const index = this.templates.findIndex(t => t.id === this.editingtemplate.id);
       if (index !== -1) {
         this.templates[index] = { ...this.editingtemplate };
+        this.templateService.updateTemplate(this.templates[index])
         this.showModal('Éxito', 'Template editado correctamente');
       }
       this.closeEditModal();
-      
+
     }
-  } 
+  }
 
-    
-  
 
-  
-  
+
+
+
+
 
 }
