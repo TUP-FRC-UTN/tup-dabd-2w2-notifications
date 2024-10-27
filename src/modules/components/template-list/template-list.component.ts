@@ -56,9 +56,7 @@ export class TemplateListComponent implements OnInit {
   templates: TemplateModel[] = [];
 
   mocktemplates : TemplateModel[] = [
-    { id: 1, name: 'Multas', body: `HOLA`, active: true },
-    { id: 2, name: 'Deudas', body: `HOLA`, active: true },
-    { id: 3, name: 'Catastro 1', body: `HOLA`, active: true }
+
   ];
   selectedIndex: number | null = null;
   showModalToRenderHTML: boolean = false;
@@ -253,7 +251,9 @@ export class TemplateListComponent implements OnInit {
     this.templates = this.mocktemplates
     this.templateService.getAllTemplates().subscribe({
       next: (data) => {
+        data.map(d => d.active = true)
         this.templates = [...this.templates, ...data]; //mezclo los mocks con lo de la api
+        this.updatePagination();
       },
       error: () => {
         this.toastService.sendError("Error al cargar las plantillas")
