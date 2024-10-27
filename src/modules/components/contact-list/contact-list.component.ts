@@ -11,7 +11,7 @@ import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { ToastService } from 'ngx-dabd-grupo01';
 import { SubscriptionService } from '../../../app/services/subscription.service';
 import { map } from 'rxjs';
-
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-contact-list',
@@ -22,28 +22,24 @@ import { map } from 'rxjs';
     RouterModule,
     NgbPagination,
     NgbDropdownModule,
-    MainContainerComponent
+    MainContainerComponent,
   ],
   templateUrl: './contact-list.component.html',
-  styleUrls: ['./contact-list.component.css']
+  styleUrls: ['./contact-list.component.css'],
 })
-
 export class ContactListComponent implements OnInit {
-
-
   private router = inject(Router);
   private contactService = inject(ContactService);
-  toastService: ToastService = inject(ToastService)
+  toastService: ToastService = inject(ToastService);
   suscriptionService: SubscriptionService = inject(SubscriptionService);
 
-  availableSubscriptions: string[] = []
+  availableSubscriptions: string[] = [];
 
   getSuscriptions() {
-    this.suscriptionService.getAllSubscriptions().pipe(
-      map(x => x.map(y => this.availableSubscriptions.push(y.name)))
-    );
+    this.suscriptionService
+      .getAllSubscriptions()
+      .pipe(map((x) => x.map((y) => this.availableSubscriptions.push(y.name))));
   }
-
 
   // Paginación
   currentPage = 1;
@@ -93,13 +89,18 @@ export class ContactListComponent implements OnInit {
       contactValue: '',
       contactType: '',
       active: true,
-      showSubscriptions: false
+      showSubscriptions: false,
     };
   }
 
   getFilteredContacts(): void {
-    this.contactService.getFilteredContactsFromBackend(this.isActiveContactFilter, this.searchTerm, this.selectedContactType)
-      .subscribe(filteredContacts => {
+    this.contactService
+      .getFilteredContactsFromBackend(
+        this.isActiveContactFilter,
+        this.searchTerm,
+        this.selectedContactType
+      )
+      .subscribe((filteredContacts) => {
         this.contacts = filteredContacts;
       });
   }
@@ -107,11 +108,9 @@ export class ContactListComponent implements OnInit {
   filterByStatus(status: 'all' | 'active' | 'inactive') {
     if (status === 'all') {
       this.isActiveContactFilter = undefined;
-    }
-    else if (status === 'active') {
+    } else if (status === 'active') {
       this.isActiveContactFilter = true;
-    }
-    else if (status === 'inactive') {
+    } else if (status === 'inactive') {
       this.isActiveContactFilter = false;
     }
     this.getFilteredContacts();
@@ -122,10 +121,14 @@ export class ContactListComponent implements OnInit {
     this.getFilteredContacts();
   }
 
-
   filterByContactType(contactType: string): void {
-    this.contactService.getFilteredContactsFromBackend(this.isActiveContactFilter, this.searchTerm, contactType)
-      .subscribe(filteredContacts => {
+    this.contactService
+      .getFilteredContactsFromBackend(
+        this.isActiveContactFilter,
+        this.searchTerm,
+        contactType
+      )
+      .subscribe((filteredContacts) => {
         this.contacts = filteredContacts;
       });
     this.showInput = true;
@@ -148,20 +151,15 @@ export class ContactListComponent implements OnInit {
         error: (error) => {
           this.showModal('Error', 'Error al cargar los contactos');
           console.error('Error loading contacts:', error);
-        }
+        },
       });
   }
 
   getAllContacts() {
     this.contactService.getAllContacts().subscribe((data: ContactModel[]) => {
-
       this.contacts = data;
-
     });
   }
-
-
-
 
   clearSearch() {
     this.searchTerm = '';
@@ -170,8 +168,6 @@ export class ContactListComponent implements OnInit {
     this.showInput = false; // Ocultar input al limpiar
     this.loadContacts();
   }
-
-
 
   // Paginación
   initializePagination() {
@@ -199,16 +195,19 @@ export class ContactListComponent implements OnInit {
   editContact(contact: ContactModel) {
     this.contactService.updateContact(contact).subscribe({
       next: (response) => {
-        const index = this.contacts.findIndex(c => c.id === contact.id);
+        const index = this.contacts.findIndex((c) => c.id === contact.id);
         if (index !== -1) {
           this.contacts[index] = { ...contact };
         }
         this.closeEditModal();
-        this.toastService.sendSuccess('Éxito El contacto ha sido actualizado correctamente')
-
+        this.toastService.sendSuccess(
+          'Éxito El contacto ha sido actualizado correctamente'
+        );
       },
       error: (error: HttpErrorResponse) => {
-        this.toastService.sendError('Error Ha ocurrido un error al intentar actualizar el contacto intente nuevamente...');
+        this.toastService.sendError(
+          'Error Ha ocurrido un error al intentar actualizar el contacto intente nuevamente...'
+        );
         this.closeEditModal();
         console.error('Error al editar el contacto:', error);
       },
@@ -218,17 +217,21 @@ export class ContactListComponent implements OnInit {
   deleteContact(contact: ContactModel) {
     this.contactService.deleteContact(contact.id).subscribe({
       next: () => {
-        this.contacts = this.contacts.filter(c => c.id !== contact.id);
+        this.contacts = this.contacts.filter((c) => c.id !== contact.id);
         this.closeDeleteModal();
-        this.toastService.sendSuccess('Éxito El contacto ha sido eliminado correctamente')
+        this.toastService.sendSuccess(
+          'Éxito El contacto ha sido eliminado correctamente'
+        );
 
         this.initializePagination();
       },
       error: (error: HttpErrorResponse) => {
         this.closeDeleteModal();
-        this.toastService.sendError('Error Ha ocurrido un error al intentar eliminar el contacto intente nuevamente...');
+        this.toastService.sendError(
+          'Error Ha ocurrido un error al intentar eliminar el contacto intente nuevamente...'
+        );
         console.error('Error al eliminar el contacto:', error);
-      }
+      },
     });
   }
 
@@ -244,7 +247,7 @@ export class ContactListComponent implements OnInit {
   }
 
   openEditModal(contact: ContactModel) {
-    this.editingContact = { ...contact }
+    this.editingContact = { ...contact };
     this.isEditModalOpen = true;
   }
 
@@ -256,7 +259,7 @@ export class ContactListComponent implements OnInit {
       contactValue: '',
       contactType: '',
       active: true,
-      showSubscriptions: false
+      showSubscriptions: false,
     };
   }
 
@@ -285,12 +288,10 @@ export class ContactListComponent implements OnInit {
     this.selectedContact = null;
   }
 
-
   openDeleteModal(contact: ContactModel) {
     this.contactToDelete = contact;
     this.isDeleteModalOpen = true;
   }
-
 
   closeDeleteModal() {
     this.isDeleteModalOpen = false;
@@ -303,7 +304,6 @@ export class ContactListComponent implements OnInit {
     }
   }
 
-
   saveEditedContact() {
     if (this.editForm.form.valid) {
       this.editContact(this.editingContact);
@@ -312,14 +312,36 @@ export class ContactListComponent implements OnInit {
 
   exportToExcel() {
     // Implementar la lógica de exportación a Excel
-    console.log('Exportando a Excel...');
+    // Implementar la lógica de exportación a Excel
+    this.contactService.getAllContacts().subscribe(
+      (contacts) => {
+        const data = contacts.map((contact) => ({
+          ID: contact.id,
+          Tipo: contact.contactType,
+          Valor: contact.contactValue,
+          Activo: contact.active ? 'Activo' : 'Inactivo',
+        }));
+
+        const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+        const wb: XLSX.WorkBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Contacts');
+        const now = new Date();
+        const dateTime = `${now
+          .toLocaleDateString()
+          .replace(/\//g, '-')}_${now.getHours()}-${now.getMinutes()}`;
+        const fileName = `Contactos-${dateTime}.xlsx`; // Nombre del archivo
+        XLSX.writeFile(wb, fileName);
+      },
+      (error) => {
+        this.showModal('Error', 'Error al cargar los contactos para exportar');
+      }
+    );
   }
 
   exportToPDF() {
     // Implementar la lógica de exportación a PDF
     console.log('Exportando a PDF...');
   }
-
 
   showInfo() {
     const message = `
@@ -333,8 +355,4 @@ export class ContactListComponent implements OnInit {
 
     this.showModal('Información', message);
   }
-
-
-
-
 }
