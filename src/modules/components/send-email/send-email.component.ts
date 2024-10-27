@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, inject, OnInit, ViewChild, ElementRef, TemplateRef } from '@angular/core';
+import { Component, Inject, inject, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Form, FormsModule } from '@angular/forms';
 import { EmailService } from '../../../app/services/emailService';
 import { TemplateModel } from '../../../app/models/templates/templateModel';
@@ -22,7 +22,6 @@ import { TemplateService } from '../../../app/services/template.service';
 @Inject('Base64Service')
 @Inject('TemplateService')
 export class SendEmailComponent implements OnInit {
-
   toastService: ToastService = inject(ToastService)
 
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
@@ -48,13 +47,35 @@ export class SendEmailComponent implements OnInit {
 
     this.templateService.getAllTemplates().subscribe((data) => {
       this.templates = data;
-
-      this.templates.forEach((x, index) => {
-        this.templates[index].base64body = this.base64Service.decodeFromBase64(
-          x.base64body
-        );
-      });
     });
+  }
+
+
+  previewSelectedTemplate(): void {
+    const selectedTemplate = this.templates.find(t => t.id == parseInt(this.templateID));
+
+    if (selectedTemplate) {
+      this.showModalToRenderHTML = true;
+      console.log("selectedTemplate ", selectedTemplate);
+      console.log("showModalToRenderHTML ", this.showModalToRenderHTML)
+
+      // Colocamos el contenido HTML de la plantilla en el iframe
+      setTimeout(() => {
+        const iframe = this.iframePreview.nativeElement as HTMLIFrameElement;
+        iframe.srcdoc = selectedTemplate.body;
+        iframe.onload = () => {
+          const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
+          if (iframeDocument) {
+            const height = iframeDocument.documentElement.scrollHeight;
+            iframe.style.height = `${height}px`;
+          }
+        };
+      }, 5);
+    }
+  }
+
+  closeModalToRenderHTML() {
+    this.showModalToRenderHTML = false;
   }
 
 

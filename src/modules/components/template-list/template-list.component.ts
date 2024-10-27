@@ -6,7 +6,7 @@ import {
   ElementRef,
   inject,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { TemplateService } from '../../../app/services/template.service';
 import { CommonModule } from '@angular/common';
 import {Router } from '@angular/router';
