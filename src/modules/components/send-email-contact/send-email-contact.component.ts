@@ -46,7 +46,7 @@ export class SendEmailContactComponent implements OnInit {
     this.serviceContacts.getAllContacts().subscribe((data) => {
       data.forEach(contact => {
         if (contact.contactType === "EMAIL") {
-          this.allContacts.push(contact)
+          //this.allContacts.push(contact)
         }
       })
     })
