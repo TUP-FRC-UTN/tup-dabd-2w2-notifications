@@ -15,7 +15,7 @@ import { NotificationsService } from '../../../app/services/notifications.servic
 export class NotificationHistoricComponent implements OnInit {
   notifications: Notification[] = [];
   selectedNotification?: Notification;
-  filteredNotifications: Notification[] = []; 
+  filteredNotifications: Notification[] = [];
 
   // Paginación
   currentPage = 1;
@@ -35,7 +35,7 @@ export class NotificationHistoricComponent implements OnInit {
   ngOnInit(): void {
     this.loadNotifications();
   }
-  
+
   constructor() {
     this.initializePagination();
   }
@@ -44,8 +44,8 @@ export class NotificationHistoricComponent implements OnInit {
 
    /*    this.notificationService.getAllNotifications()
       .subscribe(response => {
-        this.notifications = response; 
-        this.filteredNotifications = [...this.notifications];  
+        this.notifications = response;
+        this.filteredNotifications = [...this.notifications];
         this.totalItems = this.filteredNotifications.length;
       });
  */
@@ -92,28 +92,28 @@ export class NotificationHistoricComponent implements OnInit {
           dateSend: '2023-10-01',
         },
       ];
-       
-      this.filteredNotifications = [...this.notifications];  
+
+      this.filteredNotifications = [...this.notifications];
       this.totalItems = this.filteredNotifications.length;
   }
 
   clearFilters(): void {
-    this.currentFilter = 'Todos'; 
-    this.dateFrom = '';       
-    this.dateUntil = '';      
-    this.status = '';             
-    this.emailFilter = '';        
-    this.searchTerm = '';   
-    
+    this.currentFilter = 'Todos';
+    this.dateFrom = '';
+    this.dateUntil = '';
+    this.status = '';
+    this.emailFilter = '';
+    this.searchTerm = '';
+
     this.filteredNotifications = [...this.notifications];
     this.totalItems = this.filteredNotifications.length; // Actualizar el total de items visibles
   }
 
   filterNotifications(): void {
-  
+
     this.filteredNotifications = this.notifications.filter(notification => {
       let matches = true;
-  
+
       if (this.status) {
         matches = matches && notification.statusSend === this.status.toUpperCase();
       }
@@ -126,17 +126,15 @@ export class NotificationHistoricComponent implements OnInit {
       }
 
       if (this.emailFilter) {
-        console.log(this.emailFilter)
-        console.log(notification.recipient)
         matches = matches && notification.recipient.includes(this.emailFilter);
       }
-  
+
       return matches;
     });
     this.totalItems = this.filteredNotifications.length;
-   
+
   }
-  
+
 
   onFilterChange(filter: string) {
     this.currentFilter = filter;
@@ -147,13 +145,13 @@ export class NotificationHistoricComponent implements OnInit {
       this.dateUntil = '';
     } else if (filter === 'Fecha') {
       this.status = '';
-      this.emailFilter = ''; 
+      this.emailFilter = '';
     } else if (filter === 'Estado') {
-      this.emailFilter = ''; 
+      this.emailFilter = '';
       this.dateFrom = '';
       this.dateUntil = '';
     }
-      
+
   this.filterNotifications();
   }
 

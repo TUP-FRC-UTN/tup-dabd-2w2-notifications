@@ -56,9 +56,6 @@ export class SendEmailComponent implements OnInit {
 
     if (selectedTemplate) {
       this.showModalToRenderHTML = true;
-      console.log("selectedTemplate ", selectedTemplate);
-      console.log("showModalToRenderHTML ", this.showModalToRenderHTML)
-
       // Colocamos el contenido HTML de la plantilla en el iframe
       setTimeout(() => {
         const iframe = this.iframePreview.nativeElement as HTMLIFrameElement;

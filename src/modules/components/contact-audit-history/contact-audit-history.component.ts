@@ -15,30 +15,23 @@ import { Subscription } from 'rxjs';
 export class ContactAuditHistoryComponent implements OnInit {
 
 
-    
-
-
-
   items: ContactAudit[] = [];
   columns: TableColumn[] = [];
   isLoading: boolean = true;
 
   private subscription = new Subscription()
 
-
   private readonly contactAuditService = inject(ContactAuditService)
-
 
   loadData():void {
     this.isLoading = true;
     this.subscription.add(
       this.contactAuditService.getContactAudits().subscribe({
-        next: (data : ContactAudit[]) => 
+        next: (data : ContactAudit[]) =>
         {
-          console.log('Datos que llegan al componente: ', data)
           this.items = data;
         }
-         
+
       })
     )
   }
@@ -51,7 +44,7 @@ export class ContactAuditHistoryComponent implements OnInit {
       { headerName: "Tipo de revision", accessorKey: "revisionType" },
       { headerName: "Tipo de contacto", accessorKey: "contactType" },
       { headerName: "Valor del contacto", accessorKey: "value" }
-     
+
     ];
     this.loadData();
   }
@@ -66,7 +59,7 @@ export class ContactAuditHistoryComponent implements OnInit {
 
 
 
-  
+
 
 
 }

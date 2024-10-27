@@ -60,7 +60,7 @@ export class ContactNewComponent {
           'Salida tardía del trabajador',
           'Inventario',
           'Gasto general'],
-        contactValue: this.selectedContactType === 'email' ? this.email : this.phone,
+        contactValue: this.selectedContactType === 'EMAIL' ? this.email : this.phone,
         contactType: this.selectedContactType,
         active: true,
         showSubscriptions: false
@@ -68,15 +68,15 @@ export class ContactNewComponent {
 
       this.contactService.saveContact(contact).subscribe({
         next: (response) => {
+
           this.toastService.sendSuccess('El contacto ha sido registrado correctamente');
-          // this.showModal('Éxito', 'El contacto ha sido registrado correctamente');
+
           this.resetForm(form);
         },
         error: (error: HttpErrorResponse) => {
 
-          this.toastService.sendError('Error Por favor complete todos los campos requeridos correctamente')
-          // this.showModal('Error', 'Por favor complete todos los campos requeridos correctamente');
-          console.error('Error al enviar el template:', error);
+          this.toastService.sendError('Error al crear contacto porfavor intente nuevamente ')
+          console.error('Error al crear contacto intentar nuevamente:', error);
         },
       });
 
