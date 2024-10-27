@@ -12,6 +12,8 @@ import { ToastService } from 'ngx-dabd-grupo01';
 import { SubscriptionService } from '../../../app/services/subscription.service';
 import { map } from 'rxjs';
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-contact-list',
@@ -312,9 +314,8 @@ export class ContactListComponent implements OnInit {
 
   exportToExcel() {
     // Implementar la lógica de exportación a Excel
-    // Implementar la lógica de exportación a Excel
-    this.contactService.getAllContacts().subscribe(
-      (contacts) => {
+    this.contactService.getAllContacts().subscribe({
+      next: (contacts) => {
         const data = contacts.map((contact) => ({
           ID: contact.id,
           Tipo: contact.contactType,
@@ -332,15 +333,54 @@ export class ContactListComponent implements OnInit {
         const fileName = `Contactos-${dateTime}.xlsx`; // Nombre del archivo
         XLSX.writeFile(wb, fileName);
       },
-      (error) => {
+      error: (error) => {
         this.showModal('Error', 'Error al cargar los contactos para exportar');
-      }
-    );
+      },
+    });
   }
 
-  exportToPDF() {
-    // Implementar la lógica de exportación a PDF
-    console.log('Exportando a PDF...');
+  generatePDF() {
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text('Contactos', 14, 20);
+
+    this.contactService.getAllContacts().subscribe({
+      next: (contacts) => {
+        autoTable(doc, {
+          startY: 30,
+          head: [['ID', 'Tipo', 'Valor', 'Activo']],
+          body: contacts.map((contact) => [
+            contact.id,
+            contact.contactType,
+            contact.contactValue,
+            contact.active ? 'Activo' : 'Inactivo',
+          ]),
+          columnStyles: {
+            // para que no se rompa por si el body es muy grande
+            0: { cellWidth: 15 }, // ID
+            1: { cellWidth: 40 }, // Tipo
+            2: { cellWidth: 100 }, // Valor
+            3: { cellWidth: 20 }, // Activo
+          },
+          styles: { overflow: 'linebreak' },
+        });
+        const now = new Date();
+        const dateTime = `${now
+          .toLocaleDateString()
+          .replace(/\//g, '-')}_${now.getHours()}-${now.getMinutes()}`;
+        const fileName = `Contactos-${dateTime}.pdf`;
+
+        doc.save(fileName);
+        console.log('PDF generado');
+      },
+      error: (error) => {
+        this.showModal(
+          'Error',
+          'Error al cargar los contactos para generar el PDF'
+        );
+      },
+    });
   }
 
   showInfo() {
