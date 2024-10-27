@@ -1,14 +1,16 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, inject, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { EmailServiceService } from '../../../app/services/email-service.service';
+import { TemplateService } from '../../../app/services/template.service';
 import { Variable } from '../../../app/models/variables';
-import { Contact } from '../../../app/models/contact';
+import { ContactModel } from '../../../app/models/contacts/contactModel';
 import { ContactService } from '../../../app/services/contact.service';
-import { EmailTemplate } from '../../../app/models/emailTemplates';
+import { TemplateModel } from '../../../app/models/templates/templateModel';
 import { Base64Service } from '../../../app/services/base64-service.service';
-import { EmailDataContact } from '../../../app/models/emailDataContact';
+import { EmailDataContact } from '../../../app/models/notifications/emailDataContact';
 import { CommonModule } from '@angular/common';
+import { ToastService } from 'ngx-dabd-grupo01';
+import { EmailService } from '../../../app/services/emailService';
 
 @Component({
   selector: 'app-send-email-contact',
@@ -17,43 +19,38 @@ import { CommonModule } from '@angular/common';
   templateUrl: './send-email-contact.component.html',
   styleUrl: './send-email-contact.component.css'
 })
-@Inject('EmailServiceService')
-@Inject('ContactsService')
+@Inject('TemplateService')
+@Inject('EmailService')
+@Inject('ContactService')
 @Inject('Base64Service')
-export class SendEmailContactComponent implements OnInit{
+export class SendEmailContactComponent implements OnInit {
 
-  subjectToSend : string = ""
-  variables : Variable[] = []
-  template_id : number = 0
-  contacts_id : number[] = []
+  subjectToSend: string = ""
+  variables: Variable[] = []
+  template_id: number = 0
+  contacts_id: number[] = []
 
-  serviceEmail = new EmailServiceService()
+  templateService = new TemplateService()
+  emailService = new EmailService();
   serviceContacts = new ContactService()
-  base64Service: Base64Service = new Base64Service();
+  base64Service: Base64Service = new Base64Service()
+  toastService: ToastService = inject(ToastService)
 
-  allContacts : Contact[] = []
-  allTemplates : EmailTemplate[] = []
-  selectedContactId : number = 0
-  variableName : string = ""
-  variableValue : string = ""
-
-  /*emailDataWithContact = new FormGroup({
-    subject : new FormControl(''),
-    variables : new FormControl(''),
-    template_id : new FormControl(''),
-    contact_id : new FormControl('')
-  })*/
-
+  allContacts: ContactModel[] = []
+  allTemplates: TemplateModel[] = []
+  selectedContactId: number = 0
+  variableName: string = ""
+  variableValue: string = ""
 
   ngOnInit(): void {
     this.serviceContacts.getAllContacts().subscribe((data) => {
       data.forEach(contact => {
         if (contact.contactType === "EMAIL") {
-          this.allContacts.push(contact)
+          //this.allContacts.push(contact)
         }
       })
     })
-    this.serviceEmail.getEmailTemplatesNew().subscribe((data) => {
+    this.templateService.getAllTemplates().subscribe((data) => {
       this.allTemplates = data
     })
   }
@@ -70,9 +67,9 @@ export class SendEmailContactComponent implements OnInit{
   addVariables() {
     if (this.variableName != null && this.variableName !== "" && this.variableValue != null && this.variableValue !== "") {
 
-      const newVariable : Variable = {
-        key : this.variableName,
-        value : this.variableValue
+      const newVariable: Variable = {
+        key: this.variableName,
+        value: this.variableValue
       }
 
       this.variables.push(newVariable)
@@ -81,20 +78,19 @@ export class SendEmailContactComponent implements OnInit{
     }
   }
   submit() {
-    const data : EmailDataContact = {
+    const data: EmailDataContact = {
       subject: this.subjectToSend,
       variables: this.variables,
       templateId: this.template_id,
       contactIds: this.contacts_id
     }
-    this.serviceEmail.sendEmailWithContacts(data).subscribe({
+    this.emailService.sendEmailWithContacts(data).subscribe({
       next: (response) => {
-        alert("Enviado con exito")
+        this.toastService.sendSuccess("Enviado con exito")
         this.clean()
       },
       error: (errr) => {
-        console.log(errr);
-        alert("Hubo un error al enviar el correo, pruebe más tarde")
+        this.toastService.sendError("Hubo un error al enviar el correo, pruebe más tarde")
       }
     })
   }

@@ -1,8 +1,8 @@
 import { Component, Inject } from '@angular/core';
-import { EmailServiceService } from '../../../app/services/email-service.service';
+import { TemplateService } from '../../../app/services/template.service';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { TemplateSendModel } from '../../../app/models/templateSendModel';
+import { TemplateModel } from '../../../app/models/templates/templateModel';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -12,7 +12,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './template-email.component.html',
   styleUrl: './template-email.component.css',
 })
-@Inject('EmailServiceService')
+@Inject('TemplateService')
 @Inject('HtmlValidationService')
 export class TemplateEmailComponent {
   templateName: string = '';
@@ -21,9 +21,14 @@ export class TemplateEmailComponent {
   modalMessage: string = '';
   isModalOpen = false;
 
-  template: TemplateSendModel = new TemplateSendModel();
+  template: TemplateModel = {
+    id: 0,
+    name: '',
+    body: '',
+    active: true
+  };
 
-  emailService: EmailServiceService = new EmailServiceService();
+  templateService: TemplateService = new TemplateService();
 
   public async sendForm(form: NgForm) {
     if (form.valid) {
@@ -35,11 +40,11 @@ export class TemplateEmailComponent {
   }
 
   async sendEmailTemplate(templateName: string, templateBody: string) {
-    
+
     this.template.name = templateName;
     this.template.body = templateBody;
 
-    this.emailService.sendEmailTemplate(this.template).subscribe({
+    this.templateService.sendTemplate(this.template).subscribe({
       next: (response) => {
         this.openModal(
           'Éxito',

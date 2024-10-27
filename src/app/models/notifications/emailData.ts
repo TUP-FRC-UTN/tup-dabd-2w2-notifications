@@ -1,4 +1,4 @@
-import { Variable } from "./variables";
+import { Variable } from "../variables";
 
 export interface EmailDataApi {
     recipient: string;

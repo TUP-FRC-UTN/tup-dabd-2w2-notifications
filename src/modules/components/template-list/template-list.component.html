@@ -1,56 +1,259 @@
-<div class="custom-form mt-5">
-    <h1>Listado de Plantillas</h1><br>
+<app-main-container title="Lista de Plantillas">
+    <div class="card-body">
+        <!-- Botones de exportación -->
+        <div class="col row d-flex justify-content-end mb-3">
+            <div class="col-auto me-1">
+                <button type="button" (click)="saveEmailTemplate()" class="btn btn-outline-primary"
+                    aria-expanded="false">
+                    Nuevo
+                </button>
+            </div>
+
+            <div class="col-auto">
+                <button class="btn" (click)="exportToExcel()" style="background-color: #239b56; color: white;">
+                    <i class="bi bi-file-earmark-excel"></i>
+                </button>
+            </div>
+
+            <div class="col-auto btn-export-pdf">
+                <button class="btn" (click)="exportToPDF()" style="background-color: red; color: white;">
+                    <i class="bi bi-file-pdf"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <!-- Grupo de botones izquierdo -->
+            <div class="btn-group me-5" role="group">
+                <div class="d-flex align-items-center">
+                    <div class="btn-group me-2" ngbDropdown>
+                        <button class="btn btn-outline-danger" (click)="clearSearch()">
+                            <i class="bi bi-trash-fill"></i> Limpiar
+                        </button>
+
+                        <button type="button" class="btn btn-outline-info" ngbDropdownToggle>
+                            <i class="bi bi-funnel-fill"></i> Filtros
+                        </button>
+
+                        <div ngbDropdownMenu>
+                            <button ngbDropdownItem (click)="showTheInput()">Nombre</button>
 
 
-    <div class="d-flex align-items-center mb-3">
-        <label for="search" class="text-orange me-2 fw-bold">Buscar</label>
-        <input type="text" class="form-control custom-input me-3" id="search" name="search">
-
-        <label for="status" class="text-orange me-2 fw-bold">Estado</label>
-        <input type="text" class="form-control custom-input me-3" id="status" name="status">
-
-        <button type="button" class="btn btn-danger me-2">PDF</button>
-
-        <button type="button" class="btn btn-success me-2">Excel</button>
-    </div>
 
 
-    <table class="table custom-input">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Previsualizar / Editar </th>
-            </tr>
-        </thead>
-        <tbody>
-            @for(x of templates; track $index){
-            <tr>
-                <td>{{ x.name }}</td>
-                <td class="template-body-cell" style="text-align: center;">
-                    <button type="button" class="btn btn-secondary me-2"
-                        (click)="previewContent($index)">Previsualizar</button>
+                        </div>
+                        <div class="input-group">
+                            @if (showInput) {
+                                <input type="text" class="form-control" [(ngModel)]="searchTerm"
+                                placeholder="Buscar...">
+                            <button class="btn btn-dark" (click)="filterByName()">Buscar</button>
+                            }
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                    <button type="button" class="btn btn-secondary me-2"
-                        (click)="editEmailTemplate($index)">Editar</button>
-                </td>
+            <!-- Botones de estado -->
+            <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" (change)="filterByStatus('active')"
+                    checked>
+                <label class="btn btn-outline-primary" for="btnradio1">Plantilas Activas</label>
 
-            </tr>
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio2"
+                    (change)="filterByStatus('inactive')">
+                <label class="btn btn-outline-primary" for="btnradio2">Plantillas Inactivas</label>
 
-            }
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" (change)="filterByStatus('all')">
+                <label class="btn btn-outline-primary" for="btnradio3">Todos</label>
+            </div>
+        </div>
 
-        </tbody>
+        <!-- Tabla -->
+        <div class="table-container">
+            <table class="table table-striped fixed-table"
+                style="border: 1px solid rgba(0, 0, 0, 0.150); border-collapse: collapse;">
+                @if (templates.length === 0) {
+                <thead>
+                    <tr>
+                        <td colspan="5">
+                            <div class="text-center p-2">
+                                <div class="alert alert-secondary text-center" role="alert">
+                                    No hay elementos para mostrar
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </thead>
+                } @else {
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for(template of templates; track template.id) {
+                    <tr>
+                        <td>{{template.name}}</td>
+                        <td>
+                            @if (template.active) {
+                            <p class="mb-0">
+                                <i class="bi bi-check2-circle text-success" style="font-size: 1.5rem;"></i>
+                            </p>
+                            } @else {
+                            <p class="mb-0">
+                                <i class="bi bi-x-circle text-danger" style="font-size: 1.5rem;"></i>
+                            </p>
+                            }
+                        </td>
+                        <td>
+                            <div class="btn-group" ngbDropdown role="group">
+                                <button type="button" class="btn btn-sm btn-secondary" ngbDropdownToggle>
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <div class="dropdown-menu" ngbDropdownMenu>
+                                    <button ngbDropdownItem (click)="openDetailModal(template)">
+                                        Previsualizar
+                                    </button>
+                                    <button ngbDropdownItem (click)="openEditModal(template)">
+                                        Editar
+                                    </button>
+                                    <button ngbDropdownItem (click)="openDeleteModal(template)">
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+                }
+            </table>
+        </div>
 
-    </table>
+        <!-- Paginación e Info -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="d-flex align-items-center">
+                <select class="form-select me-3" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()">
+                    <option [value]="10">10 Elementos</option>
+                    <option [value]="25">25 Elementos</option>
+                    <option [value]="50">50 Elementos</option>
+                </select>
+            </div>
 
+            <div class="d-flex align-items-center">
+                <ngb-pagination [(page)]="currentPage" [pageSize]="itemsPerPage" [collectionSize]="totalItems"
+                    (pageChange)="changePage($event)" [maxSize]="5" [boundaryLinks]="false">
+                </ngb-pagination>
 
-    <!-- Modal -->
-    <div class="modal" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
-        <div class="modal-content" (click)="$event.stopPropagation()">
-            <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
-            <iframe #iframePreview style="width: 100%; border: none;"></iframe>
-            <button type="button" class="btn btn-primary" (click)="closeModalToRenderHTML()">Aceptar</button>
+                <button class="btn btn-secondary ms-3 mb-3" (click)="showInfo()">
+                    <i class="bi bi-info-circle"></i>
+                </button>
+            </div>
         </div>
     </div>
+</app-main-container>
 
 
-</div>
+<!-- Modal de Edición del Template -->
+<div [class.show]="isEditModalOpen" [style.display]="isEditModalOpen ? 'block' : 'none'" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Template</h5>
+          <button type="button" class="btn-close" (click)="closeEditModal()"></button>
+        </div>
+        <div class="modal-body">
+          <form #editForm="ngForm">
+            <!-- Nombre del Template -->
+            <div class="mb-3">
+              <label for="templateName" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="templateName" name="name"
+                [(ngModel)]="editingtemplate.name" required>
+            </div>
+  
+            <!-- Cuerpo del Template -->
+            <div class="mb-3">
+              <label for="templateBody" class="form-label">Cuerpo</label>
+              <textarea class="form-control" id="templateBody" name="body"
+                [(ngModel)]="editingtemplate.body" rows="5" required></textarea>
+            </div>
+  
+            <!-- Estado del Template -->
+            <div class="mb-3">
+              <label for="templateStatus" class="form-label">Estado</label>
+              <select class="form-select" id="templateStatus" name="active" [(ngModel)]="editingtemplate.active" required>
+                <option [value]="true">Activo</option>
+                <option [value]="false">Inactivo</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeEditModal()">Cancelar</button>
+          <button type="button" class="btn btn-primary" (click)="saveEditedTemplate()" [disabled]="!editForm.form.valid">
+            Aceptar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal de Detalle del Template -->
+  <div [class.show]="isDetailModalOpen" [style.display]="isDetailModalOpen ? 'block' : 'none'" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Detalle del Template</h5>
+          <button type="button" class="btn-close" (click)="closeDetailModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div *ngIf="selectedTemplate">
+            <!-- Nombre del Template -->
+            <div class="mb-3">
+              <label for="templateNameDetail" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="templateNameDetail" [value]="selectedTemplate.name" readonly>
+            </div>
+  
+            <!-- Cuerpo del Template -->
+            <div class="mb-3">
+              <label for="templateBodyDetail" class="form-label">Cuerpo</label>
+              <textarea class="form-control" id="templateBodyDetail" [value]="selectedTemplate.body" readonly rows="5"></textarea>
+            </div>
+  
+            <!-- Estado del Template -->
+            <div class="mb-3">
+              <label for="templateStatusDetail" class="form-label">Estado</label>
+              <input type="text" class="form-control" id="templateStatusDetail"
+                [value]="selectedTemplate.active ? 'Activo' : 'Inactivo'" readonly>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeDetailModal()">Volver</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Información -->
+<div [class.show]="isModalOpen" [style.display]="isModalOpen ? 'block' : 'none'" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ modalTitle }}</h5>
+          <button type="button" class="btn-close" (click)="isModalOpen = false"></button>
+        </div>
+        <div class="modal-body">
+          <div [innerHTML]="modalMessage"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="isModalOpen = false">Volver</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
