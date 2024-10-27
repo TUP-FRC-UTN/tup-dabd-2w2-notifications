@@ -21,21 +21,22 @@ constructor() {
 }
 
 getAllNotifications(): Observable<Notification[]> {
-  return this.http.get<any[]>(`${this.apiUrl + "/notifications"}`).pipe(
+  return this.http.get<any[]>(`${this.apiUrl}/notifications`).pipe(
     map(notifications => notifications.map(notification => this.transformNotification(notification)))
   );
 }
 
 private transformNotification(data: any): Notification {
-  return {
+  const notification: Notification = {
     id: data.id,
     recipient: data.recipient,
-    templateId: data.template_id,
-    templateName:data.template_name,
-    statusSend: data.status_send,
-    dateSend:data.date_send,
+    subject: data.subject,
+    templateId: data.templateId,
+    templateName: data.templateName,
+    statusSend: data.statusSend,
+    dateSend: data.dateSend,
   };
-};
-
+  return notification;
 }
 
+}

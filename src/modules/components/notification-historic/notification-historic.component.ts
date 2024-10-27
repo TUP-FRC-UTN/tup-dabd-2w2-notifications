@@ -28,10 +28,10 @@ export class NotificationHistoricComponent implements OnInit {
 
 
    // Filtros
-   searchTerm = '';
-   status: string = '';
-   dateFrom: string = '';
-   dateUntil:string = '';
+  searchTerm = '';
+  status: string = '';
+  dateFrom: string = '';
+  dateUntil:string = '';
   emailFilter:string = '';
   currentFilter: string = 'status';
   private notificationService = inject(NotificationsService);
@@ -45,56 +45,65 @@ export class NotificationHistoricComponent implements OnInit {
 
   loadNotifications(): void {
 
-   /*    this.notificationService.getAllNotifications()
+      this.notificationService.getAllNotifications()
       .subscribe(response => {
         this.notifications = response; 
         this.filteredNotifications = [...this.notifications];  
         this.totalItems = this.filteredNotifications.length;
       });
- */
 
-       this.notifications =   [
-        {
-          id: 1,
-          recipient: 'gabrielacollazo@hotmail.com',
-          templateId: 1,
-          templateName: 'Promoción',
-          statusSend: 'ENVIADO',
-          dateSend: '2002-12-24',
+      this.notificationService.getAllNotifications().subscribe({
+        next: (response) => {
+          this.notifications = response;
         },
-        {
-          id: 2,
-          recipient: 'jorge@example.com',
-          templateId: 2,
-          templateName: 'Cuenta',
-          statusSend: 'VISUALIZADO',
-          dateSend: '2024-05-15',
-        },
-        {
-          id: 3,
-          recipient: 'maria@example.com',
-          templateId: 1,
-          templateName: 'Comentarios',
-          statusSend: 'ENVIADO',
-          dateSend:'2024-01-30',
-        },
-        {
-          id: 4,
-          recipient: 'luisa@example.com',
-          templateId: 3,
-          templateName: 'Recordatorio',
-          statusSend: 'VISUALIZADO',
-          dateSend: '2023-11-05',
-        },
-        {
-          id: 5,
-          recipient: 'pablo@example.com',
-          templateId: 2,
-          templateName: 'Confirmación',
-          statusSend: 'ENVIADO',
-          dateSend: '2023-10-01',
-        },
-      ];
+        error: (error) => {
+          console.error('Error al cargar las notificaciones', error);
+        }
+      });
+
+
+      //  this.notifications =   [
+      //   {
+      //     id: 1,
+      //     recipient: 'gabrielacollazo@hotmail.com',
+      //     templateId: 1,
+      //     templateName: 'Promoción',
+      //     statusSend: 'ENVIADO',
+      //     dateSend: '2002-12-24',
+      //   },
+      //   {
+      //     id: 2,
+      //     recipient: 'jorge@example.com',
+      //     templateId: 2,
+      //     templateName: 'Cuenta',
+      //     statusSend: 'VISUALIZADO',
+      //     dateSend: '2024-05-15',
+      //   },
+      //   {
+      //     id: 3,
+      //     recipient: 'maria@example.com',
+      //     templateId: 1,
+      //     templateName: 'Comentarios',
+      //     statusSend: 'ENVIADO',
+      //     dateSend:'2024-01-30',
+      //   },
+      //   {
+      //     id: 4,
+      //     recipient: 'luisa@example.com',
+      //     templateId: 3,
+      //     templateName: 'Recordatorio',
+      //     statusSend: 'VISUALIZADO',
+      //     dateSend: '2023-11-05',
+      //   },
+      //   {
+      //     id: 5,
+      //     recipient: 'pablo@example.com',
+      //     templateId: 2,
+      //     templateName: 'Confirmación',
+      //     statusSend: 'ENVIADO',
+      //     dateSend: '2023-10-01',
+      //   },
+      // ];
        
       this.filteredNotifications = [...this.notifications];  
       this.totalItems = this.filteredNotifications.length;
