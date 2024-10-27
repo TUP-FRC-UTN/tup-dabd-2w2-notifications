@@ -83,9 +83,9 @@
 }
 
 .modal-dialog {
-  max-width: 50%; /* Limita el ancho máximo para que no ocupe toda la pantalla */
-  width: auto;    /* Permite que el ancho se ajuste al contenido */
-  margin: 1rem auto; /* Espaciado superior e inferior */
+  max-width: 50%; 
+  width: auto;    
+  margin: 1rem auto; 
 }
 
 .modal-content {
