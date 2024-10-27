@@ -11,8 +11,8 @@
           [ngClass]="{'is-invalid': contactTypeSelect.invalid && (contactTypeSelect.dirty || contactTypeSelect.touched),
                            'is-valid': contactTypeSelect.valid && (contactTypeSelect.dirty || contactTypeSelect.touched)}">
           <option value="" disabled selected>Seleccione tipo de contacto</option>
-          <option value="email">Email</option>
-          <option value="phone">Teléfono</option>
+          <option value="EMAIL">Email</option>
+          <option value="PHONE">Teléfono</option>
         </select>
         <div class="invalid-feedback"
           *ngIf="contactTypeSelect.invalid && (contactTypeSelect.dirty || contactTypeSelect.touched)">
@@ -22,7 +22,7 @@
     </div>
 
     <!-- Campo Email -->
-    <div class="form-group row mb-2" *ngIf="selectedContactType === 'email'">
+    <div class="form-group row mb-2" *ngIf="selectedContactType === 'EMAIL'">
       <label for="email" class="col-md-2 col-form-label text-orange">Email</label>
       <div class="col-md-10">
         <input #emailInput="ngModel" type="email" class="form-control custom-input" id="email" name="email"
@@ -36,7 +36,7 @@
     </div>
 
     <!-- Campo Teléfono -->
-    <div class="form-group row mb-2" *ngIf="selectedContactType === 'phone'">
+    <div class="form-group row mb-2" *ngIf="selectedContactType === 'PHONE'">
       <label for="phone" class="col-md-2 col-form-label text-orange">Teléfono</label>
       <div class="col-md-10">
         <input #phoneInput="ngModel" type="tel" class="form-control custom-input" id="phone" name="phone"

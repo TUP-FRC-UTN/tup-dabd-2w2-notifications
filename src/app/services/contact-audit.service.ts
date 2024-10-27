@@ -20,7 +20,7 @@ export class ContactAuditService {
   private mapContactType(contactType: ContactType): string {
     switch (contactType) {
       case ContactType.EMAIL:
-        return 'Correo eléctronico';
+        return 'Correo electrónico';
       case ContactType.PHONE:
         return 'Teléfono';
       case ContactType.SOCIAL_MEDIA_LINK:
@@ -30,8 +30,24 @@ export class ContactAuditService {
     }
   }
 
+  public inverseMapContactType(readableContactType: string):string {
+    switch(readableContactType){
+      case 'Correo electrónico':
+        return 'EMAIL';
+      case 'Teléfono':
+        return 'PHONE';
+      case 'Red social':
+        return 'SOCIAL_MEDIA_LINK';
+      default:
+        throw new Error(`Unknown readable contact type: ${readableContactType}`);
+
+    }
+  }
+
+
   private transformResponseToContactAudit = (response: ContactAuditResponse): ContactAudit => {
     return {
+      auditId: response.audit_id,
       contactId: response.contact_id,
       value: response.value,
       contactType: this.mapContactType(response.contact_type),

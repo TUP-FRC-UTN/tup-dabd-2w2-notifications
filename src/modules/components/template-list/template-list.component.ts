@@ -177,7 +177,7 @@ export class TemplateListComponent implements OnInit {
     this.templateToPreview = { ...template };
     this.previewContent(template.id)
   }
-  
+
   openEditModal(template: TemplateModel) {
     this.editingtemplate = { ...template };
     this.isEditModalOpen = true;
@@ -320,12 +320,12 @@ export class TemplateListComponent implements OnInit {
   });
   }
 
-  exportToPDF() { 
+  exportToPDF() {
     const doc = new jsPDF();
-    
+
     doc.setFontSize(18);
     doc.text('Plantillas de Email', 14, 20);
-    
+
     this.templateService.getAllTemplates().subscribe(templates => {
         autoTable(doc, {
             startY: 30,
@@ -342,12 +342,12 @@ export class TemplateListComponent implements OnInit {
                 2: { cellWidth: 100 }, // Body
                 3: { cellWidth: 20 }, // Activo
             },
-            styles: { overflow: 'linebreak' }, 
+            styles: { overflow: 'linebreak' },
         });
         const now = new Date();
         const dateTime = `${now.toLocaleDateString().replace(/\//g, '-')}_${now.getHours()}-${now.getMinutes()}`;
-        const fileName = `Plantillas-Email-${dateTime}.pdf`; 
-        
+        const fileName = `Plantillas-Email-${dateTime}.pdf`;
+
         doc.save(fileName);
         console.log('PDF generado');
     }, error => {
@@ -408,7 +408,7 @@ export class TemplateListComponent implements OnInit {
             this.showModal('Error', 'Error al editar plantilla')
           }
         })
-        
+
       }
       this.closeEditModal();
     }
