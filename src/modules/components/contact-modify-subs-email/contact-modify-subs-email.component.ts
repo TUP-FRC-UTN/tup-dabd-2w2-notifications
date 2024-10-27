@@ -6,6 +6,8 @@ import { Contact } from '../../../app/models/contact';
 import { SubscriptionService } from '../../../app/services/subscription.service';
 import { Subscription, SubscriptionMod } from '../../../app/models/subscription';
 import { Observable } from 'rxjs';
+import { ToastService } from 'ngx-dabd-grupo01';
+
 
 @Component({
   selector: 'app-contact-modify-subs-email',
@@ -22,6 +24,7 @@ export class ContactModifySubsEmailComponent implements OnInit {
 
   serviceContact: ContactService = new ContactService()
   serviceSubs: SubscriptionService = new SubscriptionService()
+  toastService : ToastService = inject(ToastService)
 
   modification: FormGroup = new FormGroup({
     contactId: new FormControl('', Validators.required),
@@ -86,13 +89,11 @@ export class ContactModifySubsEmailComponent implements OnInit {
     }
     this.serviceContact.modifacateSubscription(modification).subscribe({
       next: (response) => {
-        alert("Suscripción anulada con éxito")
+        this.toastService.sendSuccess("Suscripción anulada con éxito")
         this.clean()
       },
       error: (error) => {
-        alert("Hubo un error al anular la suscripción")
-        console.log(error);
-
+        this.toastService.sendError("Hubo un error al anular la suscripción")
       }
     })
   }
