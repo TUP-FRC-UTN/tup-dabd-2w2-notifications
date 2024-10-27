@@ -3,7 +3,7 @@ import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { ContactModel } from '../models/contacts/contactModel';
 import { environment } from '../../environments/environment';
 import { Observable, map } from 'rxjs';
-import {SubscriptionMod} from '../models/suscriptions/subscription';
+import { SubscriptionMod } from '../models/suscriptions/subscription';
 import { ContactType } from '../models/contacts/contactAudit';
 
 @Injectable({
@@ -63,31 +63,26 @@ export class ContactService {
     );
   }
 
-
-
-
-
-
   getContactById(id: number): Observable<ContactModel> {
     return this.http.get<any>(`${this.apiUrl}/contacts/${id}`).pipe(
       map(contact => this.transformToContact(contact))
     );
   }
 
-  saveContact(contact: ContactModel): Observable<ContactModel> {
-    const apiContact = this.transformToApiContact(contact);
-    return this.http.post<any>(`${this.apiUrl}/contacts`, apiContact).pipe(
-      map(response => this.transformToContact(response))
+  saveContact(contact: ContactModel): Observable<ContactModel[]> {
+    const apiContact = this.transformToApiContactToPost(contact);
+    return this.http.post<any[]>(`${this.apiUrl}/contacts`, apiContact).pipe(
+      map(contacts => contacts.map(contact => this.transformToContact(contact)))
     );
   }
-  modifacateSubscription(data : SubscriptionMod) {
+  modifacateSubscription(data: SubscriptionMod) {
     const url = `${this.apiUrl}/contacts/subscription`
     return this.http.put<SubscriptionMod>(url, data)
   }
 
   updateContact(contact: ContactModel): Observable<ContactModel> {
-    const apiContact = this.transformToApiContact(contact);
-    return this.http.put<any>(`${this.apiUrl}/contacts/${contact.id}`, apiContact).pipe(
+    const apiContact = this.transformToApiContactToUpdate(contact);
+    return this.http.put<any>(`${this.apiUrl}/contacts`, apiContact).pipe(
       map(response => this.transformToContact(response))
     );
   }
@@ -99,7 +94,7 @@ export class ContactService {
   private transformToContact(data: any): ContactModel {
     return {
       id: data.id,
-      subscriptions: data.subscriptions,
+      subscriptions: data.subscriptions || [],
       contactValue: data.contact_value,
       contactType: this.mapContactType(data.contact_type),
       active: data.active,
@@ -107,13 +102,17 @@ export class ContactService {
     };
   };
 
-  private transformToApiContact(contact: ContactModel): any {
-    return {
-      id: contact.id,
-      subscriptions: contact.subscriptions,
+  private transformToApiContactToPost(contact: ContactModel): any {
+    return [{
       contact_value: contact.contactValue,
       contact_type: contact.contactType,
-      active: contact.active
+    }];
+  }
+
+  private transformToApiContactToUpdate(contact: ContactModel): any {
+    return {
+      id: contact.id,
+      value: contact.contactValue,
     };
   }
 
