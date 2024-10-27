@@ -82,7 +82,7 @@ export class TemplateListComponent implements OnInit {
   editingtemplate: TemplateModelResponse = this.getEmptytemplate();
 
   //Estado de filtors
-  showInput: boolean = true;
+  showInput: boolean = false;
 
   constructor() {
     this.initializePagination();
@@ -108,6 +108,13 @@ export class TemplateListComponent implements OnInit {
       this.isActivetemplateFilter = false;
     }
     this.getEmailTemplates();
+  }
+  filterByName() {
+    this.templates = this.templates.filter(t => t.name === this.searchTerm)
+    /*this.emailService.getEmailTemplates().subscribe(data => {
+      this.templates = data.filter(template => template.name === this.searchTerm)
+    })*/
+   this.showInput = false
   }
 
   // Paginación
@@ -184,6 +191,9 @@ export class TemplateListComponent implements OnInit {
       this.deleteTemplate(this.templateToDelete);
     }
   }
+  showTheInput(){
+    this.showInput = true
+  }
 
   showInfo() {
     const message = `
@@ -253,7 +263,7 @@ export class TemplateListComponent implements OnInit {
     this.searchTerm = '';
     // this.selectedContactType = '';
     // this.isActiveContactFilter = true;
-    this.showInput = true; // Ocultar input al limpiar
+    this.showInput = false; // Ocultar input al limpiar
     this.getEmailTemplates();
   }
 

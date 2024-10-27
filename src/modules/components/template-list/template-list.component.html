@@ -1,152 +1,157 @@
 <app-main-container title="Lista de Plantillas">
-  <div class="card-body">
-    <!-- Botones de exportación -->
-    <div class="col row d-flex justify-content-end mb-3">
-      <div class="col-auto me-1">
-        <button type="button" (click)="saveEmailTemplate()" class="btn btn-outline-primary" aria-expanded="false">
-          Nuevo
-        </button>
-      </div>
-
-      <div class="col-auto">
-        <button class="btn" (click)="exportToExcel()" style="background-color: #239b56; color: white;">
-          <i class="bi bi-file-earmark-excel"></i>
-        </button>
-      </div>
-
-      <div class="col-auto btn-export-pdf">
-        <button class="btn" (click)="exportToPDF()" style="background-color: red; color: white;">
-          <i class="bi bi-file-pdf"></i>
-        </button>
-      </div>
-    </div>
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <!-- Grupo de botones izquierdo -->
-      <div class="btn-group me-5" role="group">
-        <div class="d-flex align-items-center">
-          <div class="btn-group me-2" ngbDropdown>
-            <button class="btn btn-outline-danger" (click)="clearSearch()">
-              <i class="bi bi-trash-fill"></i> Limpiar
-            </button>
-
-            <button type="button" class="btn btn-outline-info" ngbDropdownToggle>
-              <i class="bi bi-funnel-fill"></i> Filtros
-            </button>
-
-            <div ngbDropdownMenu>
-              <button ngbDropdownItem>Nombre Plantilla</button>
-
-
-
-
-            </div>
-            <div class="input-group">
-              <input type="text" class="form-control" [(ngModel)]="searchTerm" (input)="onSearchTextChange()"
-                placeholder="Buscar...">
-              <button class="btn btn-dark">Buscar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Botones de estado -->
-      <div class="btn-group" role="group">
-        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" (change)="filterByStatus('active')"
-          checked>
-        <label class="btn btn-outline-primary" for="btnradio1">Plantilas Activas</label>
-
-        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" (change)="filterByStatus('inactive')">
-        <label class="btn btn-outline-primary" for="btnradio2">Plantillas Inactivas</label>
-
-        <input type="radio" class="btn-check" name="btnradio" id="btnradio3" (change)="filterByStatus('all')">
-        <label class="btn btn-outline-primary" for="btnradio3">Todos</label>
-      </div>
-    </div>
-
-    <!-- Tabla -->
-    <div class="table-container">
-      <table class="table table-striped fixed-table"
-        style="border: 1px solid rgba(0, 0, 0, 0.150); border-collapse: collapse;">
-        @if (templates.length === 0) {
-        <thead>
-          <tr>
-            <td colspan="5">
-              <div class="text-center p-2">
-                <div class="alert alert-secondary text-center" role="alert">
-                  No hay elementos para mostrar
-                </div>
-              </div>
-            </td>
-          </tr>
-        </thead>
-        } @else {
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for(template of templates; track template.id) {
-          <tr>
-            <td>{{template.name}}</td>
-            <td>
-              @if (template.active) {
-              <p class="mb-0">
-                <i class="bi bi-check2-circle text-success" style="font-size: 1.5rem;"></i>
-              </p>
-              } @else {
-              <p class="mb-0">
-                <i class="bi bi-x-circle text-danger" style="font-size: 1.5rem;"></i>
-              </p>
-              }
-            </td>
-            <td>
-              <div class="btn-group" ngbDropdown role="group">
-                <button type="button" class="btn btn-sm btn-secondary" ngbDropdownToggle>
-                  <i class="bi bi-three-dots-vertical"></i>
+    <div class="card-body">
+        <!-- Botones de exportación -->
+        <div class="col row d-flex justify-content-end mb-3">
+            <div class="col-auto me-1">
+                <button type="button" (click)="saveEmailTemplate()" class="btn btn-outline-primary"
+                    aria-expanded="false">
+                    Nuevo
                 </button>
-                <div class="dropdown-menu" ngbDropdownMenu>
-                  <button ngbDropdownItem (click)="openDetailModal(template)">
-                    Ver Detalle
-                  </button>
-                  <button ngbDropdownItem (click)="openEditModal(template)">
-                    Editar
-                  </button>
-                  <button ngbDropdownItem (click)="openDeleteModal(template)">
-                    Eliminar
-                  </button>
+            </div>
+
+            <div class="col-auto">
+                <button class="btn" (click)="exportToExcel()" style="background-color: #239b56; color: white;">
+                    <i class="bi bi-file-earmark-excel"></i>
+                </button>
+            </div>
+
+            <div class="col-auto btn-export-pdf">
+                <button class="btn" (click)="exportToPDF()" style="background-color: red; color: white;">
+                    <i class="bi bi-file-pdf"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <!-- Grupo de botones izquierdo -->
+            <div class="btn-group me-5" role="group">
+                <div class="d-flex align-items-center">
+                    <div class="btn-group me-2" ngbDropdown>
+                        <button class="btn btn-outline-danger" (click)="clearSearch()">
+                            <i class="bi bi-trash-fill"></i> Limpiar
+                        </button>
+
+                        <button type="button" class="btn btn-outline-info" ngbDropdownToggle>
+                            <i class="bi bi-funnel-fill"></i> Filtros
+                        </button>
+
+                        <div ngbDropdownMenu>
+                            <button ngbDropdownItem (click)="showTheInput()">Nombre</button>
+
+
+
+
+                        </div>
+                        <div class="input-group">
+                            @if (showInput) {
+                                <input type="text" class="form-control" [(ngModel)]="searchTerm"
+                                placeholder="Buscar...">
+                            <button class="btn btn-dark" (click)="filterByName()">Buscar</button>
+                            }
+                            
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </td>
-          </tr>
-          }
-        </tbody>
-        }
-      </table>
+            </div>
+
+            <!-- Botones de estado -->
+            <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" (change)="filterByStatus('active')"
+                    checked>
+                <label class="btn btn-outline-primary" for="btnradio1">Plantilas Activas</label>
+
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio2"
+                    (change)="filterByStatus('inactive')">
+                <label class="btn btn-outline-primary" for="btnradio2">Plantillas Inactivas</label>
+
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" (change)="filterByStatus('all')">
+                <label class="btn btn-outline-primary" for="btnradio3">Todos</label>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-container">
+            <table class="table table-striped fixed-table"
+                style="border: 1px solid rgba(0, 0, 0, 0.150); border-collapse: collapse;">
+                @if (templates.length === 0) {
+                <thead>
+                    <tr>
+                        <td colspan="5">
+                            <div class="text-center p-2">
+                                <div class="alert alert-secondary text-center" role="alert">
+                                    No hay elementos para mostrar
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </thead>
+                } @else {
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for(template of templates; track template.id) {
+                    <tr>
+                        <td>{{template.name}}</td>
+                        <td>
+                            @if (template.active) {
+                            <p class="mb-0">
+                                <i class="bi bi-check2-circle text-success" style="font-size: 1.5rem;"></i>
+                            </p>
+                            } @else {
+                            <p class="mb-0">
+                                <i class="bi bi-x-circle text-danger" style="font-size: 1.5rem;"></i>
+                            </p>
+                            }
+                        </td>
+                        <td>
+                            <div class="btn-group" ngbDropdown role="group">
+                                <button type="button" class="btn btn-sm btn-secondary" ngbDropdownToggle>
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <div class="dropdown-menu" ngbDropdownMenu>
+                                    <button ngbDropdownItem (click)="openDetailModal(template)">
+                                        Ver Detalle
+                                    </button>
+                                    <button ngbDropdownItem (click)="openEditModal(template)">
+                                        Editar
+                                    </button>
+                                    <button ngbDropdownItem (click)="openDeleteModal(template)">
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+                }
+            </table>
+        </div>
+
+        <!-- Paginación e Info -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="d-flex align-items-center">
+                <select class="form-select me-3" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()">
+                    <option [value]="10">10 Elementos</option>
+                    <option [value]="25">25 Elementos</option>
+                    <option [value]="50">50 Elementos</option>
+                </select>
+            </div>
+
+            <div class="d-flex align-items-center">
+                <ngb-pagination [(page)]="currentPage" [pageSize]="itemsPerPage" [collectionSize]="totalItems"
+                    (pageChange)="changePage($event)" [maxSize]="5" [boundaryLinks]="false">
+                </ngb-pagination>
+
+                <button class="btn btn-secondary ms-3 mb-3" (click)="showInfo()">
+                    <i class="bi bi-info-circle"></i>
+                </button>
+            </div>
+        </div>
     </div>
-
-    <!-- Paginación e Info -->
-    <div class="d-flex justify-content-between align-items-center mt-3">
-      <div class="d-flex align-items-center">
-        <select class="form-select me-3" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()">
-          <option [value]="10">10 Elementos</option>
-          <option [value]="25">25 Elementos</option>
-          <option [value]="50">50 Elementos</option>
-        </select>
-      </div>
-
-      <div class="d-flex align-items-center">
-        <ngb-pagination [(page)]="currentPage" [pageSize]="itemsPerPage" [collectionSize]="totalItems"
-          (pageChange)="changePage($event)" [maxSize]="5" [boundaryLinks]="false">
-        </ngb-pagination>
-
-        <button class="btn btn-secondary ms-3 mb-3" (click)="showInfo()">
-          <i class="bi bi-info-circle"></i>
-        </button>
-      </div>
-    </div>
-  </div>
 </app-main-container>
