@@ -173,9 +173,8 @@ export class TemplateListComponent implements OnInit {
   }
 
   openPreviewModal(template: TemplateModel) {
-    console.log("preview tocada");
     this.templateToPreview = { ...template };
-    this.previewContent(template.id)
+    this.previewContent(this.templateToPreview)
   }
 
   openEditModal(template: TemplateModel) {
@@ -261,6 +260,7 @@ export class TemplateListComponent implements OnInit {
   }
 
   deleteTemplate(deleteTemplate: TemplateModel) {
+
     const index = this.templates.findIndex(template => template.id === deleteTemplate.id);
 
     if (index !== -1) { // Si se encuentra el índice
@@ -355,13 +355,14 @@ export class TemplateListComponent implements OnInit {
     });
   }
 
-  previewContent(index: number): void {
+  previewContent(template: TemplateModel): void {
+
     this.showModalToRenderHTML = true;
-    this.selectedIndex = index;
+    // this.selectedIndex = templa;
 
     setTimeout(() => {
       const iframe = this.iframePreview.nativeElement as HTMLIFrameElement;
-      iframe.srcdoc = this.templates[index].body;
+      iframe.srcdoc = template.body;
 
       iframe.onload = () => {
         const iframeDocument =

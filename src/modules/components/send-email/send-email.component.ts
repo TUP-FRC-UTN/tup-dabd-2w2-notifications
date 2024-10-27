@@ -52,6 +52,7 @@ export class SendEmailComponent implements OnInit {
 
 
   previewSelectedTemplate(): void {
+
     const selectedTemplate = this.templates.find(t => t.id == parseInt(this.templateID));
 
     if (selectedTemplate) {
