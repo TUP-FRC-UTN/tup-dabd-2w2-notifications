@@ -128,9 +128,11 @@ export class TemplateListComponent implements OnInit {
     }
     else if (status === 'active') {
       this.isActivetemplateFilter = true;
+      this.templates = this.templates.filter(t => t.active == true)
     }
     else if (status === 'inactive') {
       this.isActivetemplateFilter = false;
+      this.templates = this.templates.filter(t => t.active == false)
     }
     this.getEmailTemplates();
   }
@@ -254,7 +256,7 @@ export class TemplateListComponent implements OnInit {
         this.templates = [...this.templates, ...data]; //mezclo los mocks con lo de la api
       },
       error: () => {
-        this.showModal('Error', 'Error al cargar las plantillas');
+        this.toastService.sendError("Error al cargar las plantillas")
       }
     })
   }
@@ -266,10 +268,10 @@ export class TemplateListComponent implements OnInit {
     if (index !== -1) { // Si se encuentra el índice
         this.templates[index].active = false
         this.templates.splice(index, 1); // Elimina el objeto en la posición 'index'
-        this.showModal('Éxito', 'Template eliminado correctamente');
-        this.getEmailTemplates()
+        this.toastService.sendSuccess("Plantilla eliminada correctamente")
+        //this.getEmailTemplates()
     } else {
-        this.showModal('Error', 'Template no encontrado');
+        this.toastService.sendError("Plantilla no encontrada")
     }
 }
 
@@ -316,7 +318,7 @@ export class TemplateListComponent implements OnInit {
       const fileName = `Plantillas-Emails-${dateTime}.xlsx`; // Nombre del archivo
       XLSX.writeFile(wb, fileName);
   }, error => {
-      this.showModal('Error', 'Error al cargar las plantillas para exportar');
+      this.toastService.sendError("Error al cargar las plantillas para generar el Excel")
   });
   }
 
@@ -351,19 +353,16 @@ export class TemplateListComponent implements OnInit {
         doc.save(fileName);
         console.log('PDF generado');
     }, error => {
-        this.showModal('Error', 'Error al cargar las plantillas para generar el PDF');
+        this.toastService.sendError("Error al cargar las plantillas para generar el PDF")
     });
   }
 
   previewContent(template: TemplateModel): void {
 
     this.showModalToRenderHTML = true;
-    // this.selectedIndex = templa;
-
     setTimeout(() => {
       const iframe = this.iframePreview.nativeElement as HTMLIFrameElement;
       iframe.srcdoc = template.body;
-
       iframe.onload = () => {
         const iframeDocument =
           iframe.contentDocument || iframe.contentWindow?.document;
@@ -382,8 +381,6 @@ export class TemplateListComponent implements OnInit {
 
   clearSearch() {
     this.searchTerm = '';
-    // this.selectedContactType = '';
-    // this.isActiveContactFilter = true;
     this.showInput = false; // Ocultar input al limpiar
     this.getEmailTemplates();
   }
@@ -401,15 +398,15 @@ export class TemplateListComponent implements OnInit {
       const index = this.templates.findIndex(t => t.id === this.editingtemplate.id);
       if (index !== -1) {
         this.templates[index] = { ...this.editingtemplate };
+
         this.templateService.updateTemplate(this.templates[index]).subscribe({
           next: () => {
-            this.showModal('Éxito', 'Template editado correctamente');
+            this.toastService.sendSuccess("Plantilla editada correctamente")
           },
           complete: () => {
-            this.showModal('Error', 'Error al editar plantilla')
+            this.toastService.sendError("Error al editar plantilla")
           }
         })
-
       }
       this.closeEditModal();
     }
