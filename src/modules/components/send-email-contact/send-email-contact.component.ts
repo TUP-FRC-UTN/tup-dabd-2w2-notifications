@@ -1,4 +1,4 @@
-import { Component, inject, Inject, OnInit } from '@angular/core';
+import { Component, inject, Inject, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TemplateService } from '../../../app/services/template.service';
@@ -27,7 +27,7 @@ export class SendEmailContactComponent implements OnInit {
 
   subjectToSend: string = ""
   variables: Variable[] = []
-  template_id: number = 0
+  template_id: string = '';
   contacts_id: number[] = []
 
   templateService = new TemplateService()
@@ -42,11 +42,19 @@ export class SendEmailContactComponent implements OnInit {
   variableName: string = ""
   variableValue: string = ""
 
+  //Estado para modal de preview template
+  showModalToRenderHTML: boolean = false;
+
+  //ViewChild para preview de template
+  @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
+
+
+
   ngOnInit(): void {
     this.serviceContacts.getAllContacts().subscribe((data) => {
       data.forEach(contact => {
-        if (contact.contactType === "EMAIL") {
-          //this.allContacts.push(contact)
+        if (contact.contactType === "Correo eléctronico") {
+          this.allContacts.push(contact)
         }
       })
     })
@@ -81,7 +89,7 @@ export class SendEmailContactComponent implements OnInit {
     const data: EmailDataContact = {
       subject: this.subjectToSend,
       variables: this.variables,
-      templateId: this.template_id,
+      templateId: Number(this.template_id),
       contactIds: this.contacts_id
     }
     this.emailService.sendEmailWithContacts(data).subscribe({
@@ -97,7 +105,36 @@ export class SendEmailContactComponent implements OnInit {
   clean() {
     this.subjectToSend = ""
     this.variables = []
-    this.template_id = 0
+    this.template_id = ''
     this.contacts_id = []
   }
+
+  //Previsualizacion de template
+
+  previewSelectedTemplate(): void {
+    const selectedTemplate = this.allTemplates.find(t => t.id == parseInt(this.template_id));
+    console.log('selectedTemplate: ', selectedTemplate)
+
+    if (selectedTemplate) {
+      this.showModalToRenderHTML = true;
+      // Colocamos el contenido HTML de la plantilla en el iframe
+      setTimeout(() => {
+        const iframe = this.iframePreview.nativeElement as HTMLIFrameElement;
+        iframe.srcdoc = selectedTemplate.body;
+        iframe.onload = () => {
+          const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
+          if (iframeDocument) {
+            const height = iframeDocument.documentElement.scrollHeight;
+            iframe.style.height = `${height}px`;
+          }
+        };
+      }, 5);
+    }
+  }
+
+  closeModalToRenderHTML() {
+    this.showModalToRenderHTML = false;
+  }
+
+
 }
