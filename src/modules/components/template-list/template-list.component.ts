@@ -222,6 +222,7 @@ export class TemplateListComponent implements OnInit {
     const index = this.templates.findIndex(template => template.id === deleteTemplate.id);
     
     if (index !== -1) { // Si se encuentra el índice
+        this.templates[index].active = false
         this.templates.splice(index, 1); // Elimina el objeto en la posición 'index'
         this.showModal('Éxito', 'Template eliminado correctamente');
     } else {
