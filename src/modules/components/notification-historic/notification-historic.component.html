@@ -129,7 +129,7 @@
                 }
               </td>
               <td>
-                <button class="btn btn-outline-info" (click)="verNotification(notification)">
+                <button class="btn btn-outline-info" (click)="previewContent(notification)">
                   <i class="bi bi-eye" style="font-size: 1.3rem; color:info"></i>
                 </button>
               </td>
@@ -220,18 +220,10 @@
   <!-- </div> -->
 </div>
 <!-- Modal Notificación -->
-<div [class.show]="isModalOpenNoti" [style.display]="isModalOpenNoti ? 'block' : 'none'" class="modal fade" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">{{selectedNotification?.subject}}</h5>
-        <button type="button" class="btn-close" (click)="closeModal()"></button>
-      </div>
-      <p class="notification-time-modal">{{ selectedNotification?.dateSend | date: "short"  }}</p>
-      <div class="modal-body" [innerHTML]="selectedNotification?.body"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cerrar</button>
-      </div>
-    </div>
+<div class="modal" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+      <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
+      <iframe #iframePreview style="width: 100%; border: none;"></iframe>
+      <button type="button" class="btn btn-primary" (click)="closeModalToRenderHTML()">Aceptar</button>
   </div>
 </div>
