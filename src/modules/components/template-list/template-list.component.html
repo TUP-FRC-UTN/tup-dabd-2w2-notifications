@@ -156,12 +156,14 @@
 </app-main-container>
 
 
-<!-- Modal de Preview del Template -->
+<!-- Modal Notificación -->
 <div class="modal" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
   <div class="modal-content" (click)="$event.stopPropagation()">
       <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
       <iframe #iframePreview style="width: 100%; border: none;"></iframe>
-      <button type="button" class="btn btn-primary" (click)="closeModalToRenderHTML()">Aceptar</button>
+      <div class="mt-3 text-end">
+        <button type="button" class="btn btn-secondary" (click)="closeModalToRenderHTML()">Volver</button>
+      </div>
   </div>
 </div>
 

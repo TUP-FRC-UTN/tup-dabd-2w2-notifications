@@ -4,13 +4,13 @@ import { CommonModule } from '@angular/common';
 import { ContactModel } from '../../../app/models/contacts/contactModel';
 import { ContactService } from '../../../app/services/contact.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ToastService } from 'ngx-dabd-grupo01';
+import { MainContainerComponent, ToastService } from 'ngx-dabd-grupo01';
 
 
 @Component({
   selector: 'app-contact-new',
   standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule],
+  imports: [FormsModule, CommonModule, ReactiveFormsModule, MainContainerComponent],
   templateUrl: './contact-new.component.html',
   styleUrl: './contact-new.component.css'
 })

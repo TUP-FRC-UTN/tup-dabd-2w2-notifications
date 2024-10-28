@@ -129,7 +129,7 @@
                 }
               </td>
               <td>
-                <button class="btn btn-outline-info" (click)="previewContent(notification)">
+                <button class="btn btn-primary" (click)="previewContent(notification)">
                   <i class="bi bi-eye" style="font-size: 1.3rem; color:info"></i>
                 </button>
               </td>
@@ -224,6 +224,8 @@
   <div class="modal-content" (click)="$event.stopPropagation()">
       <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
       <iframe #iframePreview style="width: 100%; border: none;"></iframe>
-      <button type="button" class="btn btn-primary" (click)="closeModalToRenderHTML()">Aceptar</button>
+      <div class="mt-3 text-end">
+        <button type="button" class="btn btn-secondary" (click)="closeModalToRenderHTML()">Volver</button>
+      </div>
   </div>
 </div>
