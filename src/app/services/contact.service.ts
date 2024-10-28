@@ -24,8 +24,13 @@ export class ContactService {
   }
 
   getAllContacts(): Observable<ContactModel[]> {
-    return this.http.get<any[]>(`${this.apiUrl + "/contacts"}`).pipe(
-      map(contacts => contacts.map(contact => this.transformToContact(contact)))
+    return this.http.get<ContactModel[]>(`${this.apiUrl}/contacts`).pipe(
+      map(contacts => contacts.map(contact => ({
+        ...this.transformToContact(contact),
+        subscriptions: contact.subscriptions.map(subscription =>
+          this.getSubscriptionNameInSpanish(subscription)
+        )
+      })))
     );
   }
 
@@ -128,5 +133,26 @@ export class ContactService {
         throw new Error(`Unknown contact type: ${contactType}`);
     }
   }
+
+  getSubscriptionNameInSpanish(englishName: string): string {
+    const translations: { [key: string]: string } = {
+      'GENERAL': 'General',
+      'MODERATION': 'Moderación',
+      'CONSTRUCTION': 'Construcción',
+      'EMPLOYEE_PAYMENT': 'Pago de Empleados',
+      'EXPENSES_EXPIRATION': 'Vencimiento de Gastos',
+      'DEBT': 'Deuda',
+      'GENERAL_BILL': 'Factura General',
+      'PAYMENT': 'Pago',
+      'USER': 'Usuario',
+      'ASSOCIATED_USER_CREATED': 'Usuario Asociado Creado',
+      'WORKER_LATE_DEPARTURE': 'Salida Tardía de Trabajador',
+      'INVENTORY': 'Inventario',
+      'GENERAL_EXPENSE': 'Gasto General'
+    };
+
+    return translations[englishName] || englishName;
+  }
+
 }
 

@@ -201,10 +201,23 @@ export class ContactListComponent implements OnInit {
         if (index !== -1) {
           this.contacts[index] = { ...contact };
         }
+
+        this.suscriptionService.updateContactSubscriptions(contact).subscribe({
+          next: (response) => {
+
+          },
+          error: (error: HttpErrorResponse) => {
+
+            console.error('Error al actualizar las suscripciones del contacto intente nuevamente:', error);
+          },
+        });
+
         this.closeEditModal();
+
         this.toastService.sendSuccess(
           'Éxito El contacto ha sido actualizado correctamente'
         );
+
       },
       error: (error: HttpErrorResponse) => {
         this.toastService.sendError(
@@ -249,8 +262,13 @@ export class ContactListComponent implements OnInit {
   }
 
   openEditModal(contact: ContactModel) {
-    this.editingContact = { ...contact };
+    this.editingContact = { ...contact }; // Copia el contacto a editar
     this.isEditModalOpen = true;
+
+    // Cargar las suscripciones disponibles si aún no se han cargado
+    if (this.availableSubscriptions.length === 0) {
+      this.loadSubscriptions();
+    }
   }
 
   closeEditModal() {
@@ -266,16 +284,37 @@ export class ContactListComponent implements OnInit {
   }
 
   isSubscribed(subscription: string): boolean {
-    return this.editingContact.subscriptions.includes(subscription);
+    return this.editingContact.subscriptions?.includes(subscription) || false;
   }
 
   toggleSubscription(subscription: string) {
+    if (!this.editingContact.subscriptions) {
+      this.editingContact.subscriptions = [];
+    }
+
     const index = this.editingContact.subscriptions.indexOf(subscription);
     if (index !== -1) {
       this.editingContact.subscriptions.splice(index, 1);
     } else {
       this.editingContact.subscriptions.push(subscription);
     }
+  }
+
+
+  loadSubscriptions() {
+    this.suscriptionService.getAllSubscriptions()
+      .pipe(
+        map(subscriptions => subscriptions.map(sub => sub.name))
+      )
+      .subscribe({
+        next: (subscriptionNames) => {
+          this.availableSubscriptions = subscriptionNames;
+        },
+        error: (error) => {
+          console.error('Error al cargar suscripciones:', error);
+          this.toastService.sendError('Error al cargar las suscripciones');
+        }
+      });
   }
 
   openDetailModal(contact: ContactModel) {
