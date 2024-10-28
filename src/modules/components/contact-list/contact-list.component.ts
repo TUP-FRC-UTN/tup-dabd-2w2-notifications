@@ -159,7 +159,9 @@ export class ContactListComponent implements OnInit {
 
   getAllContacts() {
     this.contactService.getAllContacts().subscribe((data: ContactModel[]) => {
-      this.contacts = data;
+      this.contacts = data.sort((a, b) =>
+        a.contactValue.toLowerCase().localeCompare(b.contactValue.toLowerCase())
+      );
     });
   }
 

@@ -248,54 +248,33 @@ export class TemplateListComponent implements OnInit {
 
 
   getEmailTemplates() {
-    this.templates = this.mocktemplates
+    this.templates = this.mocktemplates;
     this.templateService.getAllTemplates().subscribe({
       next: (data) => {
-        data.map(d => d.active = true)
-        this.templates = [...this.templates, ...data]; //mezclo los mocks con lo de la api
+        data.map(d => d.active = true);
+        this.templates = [...this.templates, ...data].sort((a, b) =>
+          a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
         this.updatePagination();
       },
       error: () => {
-        this.toastService.sendError("Error al cargar las plantillas")
+        this.toastService.sendError("Error al cargar las plantillas");
       }
-    })
+    });
   }
-
   deleteTemplate(deleteTemplate: TemplateModel) {
 
     const index = this.templates.findIndex(template => template.id === deleteTemplate.id);
 
-    if (index !== -1) { // Si se encuentra el índice
+    if (index !== -1) { 
         this.templates[index].active = false
-        this.templates.splice(index, 1); // Elimina el objeto en la posición 'index'
+        this.templates.splice(index, 1);
         this.toastService.sendSuccess("Plantilla eliminada correctamente")
-        //this.getEmailTemplates()
     } else {
         this.toastService.sendError("Plantilla no encontrada")
     }
 }
 
-/*
-
-    updateTemplate(template: TemplatePatchModel) {
-      this.emailService.editEmailTemplate(template).subscribe({
-        next: (response) => {
-          const index = this.templates.findIndex(t => t.id === template.id);
-          if (index !== -1) {
-            this.contacts[index] = { ...contact };
-          }
-          this.closeEditModal();
-          this.toastService.sendSuccess('Éxito El contacto ha sido actualizado correctamente')
-
-        },
-        error: (error: HttpErrorResponse) => {
-          this.toastService.sendError('Error Ha ocurrido un error al intentar actualizar el contacto intente nuevamente...')
-          this.closeEditModal();
-          console.error('Error al editar el contacto:', error);
-        },
-      });
-
-  } */
 
   saveEmailTemplate() {
     this.router.navigate(['/templates/new']);

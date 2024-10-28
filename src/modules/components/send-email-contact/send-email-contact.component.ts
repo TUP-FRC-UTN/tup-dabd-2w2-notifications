@@ -52,12 +52,10 @@ export class SendEmailContactComponent implements OnInit {
 
   ngOnInit(): void {
     this.serviceContacts.getAllContacts().subscribe((data) => {
-      data.forEach(contact => {
-        if (contact.contactType === "Correo eléctronico") {
-          this.allContacts.push(contact)
-        }
-      })
-    })
+      this.allContacts = data
+        .filter(contact => contact.contactType === "Correo eléctronico")
+        .sort((a, b) => a.contactValue.localeCompare(b.contactValue));
+    });
     this.templateService.getAllTemplates().subscribe((data) => {
       this.allTemplates = data
     })
