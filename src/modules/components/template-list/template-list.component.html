@@ -48,7 +48,7 @@
                                 placeholder="Buscar...">
                             <button class="btn btn-dark" (click)="filterByName()">Buscar</button>
                             }
-                            
+
                         </div>
                     </div>
                 </div>
@@ -165,7 +165,7 @@
   </div>
 </div>
 
-  
+
   <!-- Modal de Editar el Template -->
 <div [class.show]="isEditModalOpen" [style.display]="isEditModalOpen ? 'block' : 'none'" class="modal fade"
 tabindex="-1">
@@ -190,7 +190,7 @@ tabindex="-1">
             [(ngModel)]="editingtemplate.body" required>
         </div>
 
-        <!-- Suscripciones 
+        <!-- Suscripciones
         <div class="mb-3">
           <label class="form-label">Suscripciones</label>
           <div *ngFor="let subscription of availableSubscriptions; let i = index">
@@ -237,7 +237,7 @@ tabindex="-1">
             @for(subscription of contactToDelete.subscriptions; track $index){
             <li><i class="bi bi-dot"></i> {{subscription}}</li>
             }
-          </ul> 
+          </ul>
           } -->
         </div>
         } @else {
