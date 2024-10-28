@@ -1,5 +1,7 @@
+
+<app-main-container title="Registrar Contacto">
+
 <div class="container mt-5 custom-form">
-  <h1 class="text-orange">Registrar Contacto</h1><br>
 
   <form #form="ngForm" (ngSubmit)="sendForm(form)" class="row g-3 container">
     <!-- Selector de tipo de contacto -->
@@ -52,7 +54,7 @@
     <!-- Botones de Acción -->
     <div class="d-flex justify-content-end mb-3">
       <button type="button" class="btn btn-danger me-2" (click)="resetForm(form)">Cancelar</button>
-      <button type="submit" class="btn btn-primary" [disabled]="!form.valid">Aceptar</button>
+      <button type="submit" class="btn btn-primary" [disabled]="!form.valid">Guardar</button>
     </div>
   </form>
 </div>
@@ -78,3 +80,4 @@
 
 <!-- Backdrop para la modal -->
 <div *ngIf="isModalOpen" class="modal-backdrop fade show"></div>
+</app-main-container>
