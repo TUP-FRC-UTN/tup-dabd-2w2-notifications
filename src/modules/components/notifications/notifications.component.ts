@@ -22,10 +22,11 @@ export class NotificationsComponent implements OnInit {
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
 
   ngOnInit() {
-
     this.notificationService.getAllNotification().subscribe({
-      next: (notification) => {
-        this.notifications = notification;
+      next: (notifications) => {
+        this.notifications = notifications.sort((a, b) => {
+          return Number(a.isRead) - Number(b.isRead);
+        });
       },
       error: (error) => {
         console.error('Error al cargar las notificaciones', error);
