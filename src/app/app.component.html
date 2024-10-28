@@ -1,0 +1,70 @@
+<nav class="navbar navbar-dark bg-dark fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand">
+      <img src="../assets/images/villa-condor.png" alt="Villa del Condor - Casas & Club de Montaña"
+        class="navbar-logo" />
+    </a>
+    <div class="d-flex align-items-center">
+      <app-notifications class="text-white me-5"></app-notifications>
+      <button class="btn btn-danger d-flex align-items-center">
+        <i class="bi bi-box-arrow-right me-2"></i>
+        Logout
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="row flex-nowrap mt-5">
+  <!-- Sidebar -->
+  <div class="bg-dark col-auto col-md-4 col-lg-3 min-vh-100">
+    <div class="bg-dark p-2">
+      <ul class="nav nav-pills flex-column mt-2">
+        <!-- Templates -->
+        <li class="nav-item">
+          <a href="#" class="nav-link text-white" data-bs-toggle="collapse" data-bs-target="#templatesMenu"
+            aria-expanded="false">
+            <span class="fs-5">Plantillas</span>
+          </a>
+          <ul class="collapse nav flex-column" id="templatesMenu">
+            <li><a routerLink="/templates" class="nav-link text-white">Listar Plantillas</a></li>
+            <li><a routerLink="/templates/new" class="nav-link text-white">Registrar Plantillas</a></li>
+          </ul>
+        </li>
+
+        <!-- Contactos -->
+        <li class="nav-item">
+          <a href="#" class="nav-link text-white" data-bs-toggle="collapse" data-bs-target="#contactosMenu"
+            aria-expanded="false">
+            <span class="fs-5">Contactos</span>
+          </a>
+          <ul class="collapse nav flex-column" id="contactosMenu">
+            <li><a routerLink="/contacts" class="nav-link text-white">Listar Contactos</a></li>
+            <li><a routerLink="/contact/new" class="nav-link text-white">Registrar Contacto</a></li>
+            <li><a routerLink="/contact-audit" class="nav-link text-white">Auditoría de Contactos</a>
+          </ul>
+        </li>
+
+        <!-- Notificaciones -->
+        <li class="nav-item">
+          <a href="#" class="nav-link text-white" data-bs-toggle="collapse" data-bs-target="#notificacionesMenu"
+            aria-expanded="false">
+            <span class="fs-5">Notificaciones</span>
+          </a>
+          <ul class="collapse nav flex-column" id="notificacionesMenu">
+            <li><a routerLink="/send-email" class="nav-link text-white">Enviar Notificación</a></li>
+            <li><a routerLink="/send-email-contact" class="nav-link text-white">Notificación a varios contactos</a>
+            <li><a routerLink="/notifications-historic" class="nav-link text-white">Historico de Notificaciones</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="col content-wrapper">
+    <div class="content">
+      <router-outlet></router-outlet>
+      <app-toasts aria-live="polite" aria-atomic="true"></app-toasts>
+    </div>
+  </div>
