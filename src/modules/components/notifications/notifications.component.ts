@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../app/services/notification.service';
 import { NotificationApi, NotificationFront } from '../../../app/models/notification';
@@ -16,8 +16,10 @@ export class NotificationsComponent implements OnInit {
   showNotifications = false;
   showModal = false;
 
+  showModalToRenderHTML: boolean = false;
 
   notificationService = new NotificationService();
+  @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
 
   ngOnInit() {
 
@@ -44,13 +46,13 @@ export class NotificationsComponent implements OnInit {
 
 
   showNotificationDetails(notification: NotificationFront) {
-    this.selectedNotification = notification;
-    console.log(notification, this.selectedNotification)
-    this.showModal = true;
+    // Marca la notificación como leída
     notification.isRead = true;
     this.notificationService.isRead(notification.id).subscribe({
       next: () => {
         notification.isRead = true;
+        // Llama a previewContent para mostrar el contenido en el iframe
+        this.previewContent(notification);
       },
       error: (error) => {
         console.error('Error al actualizar la notificación como leída', error);
@@ -70,5 +72,24 @@ export class NotificationsComponent implements OnInit {
     if (!notificationsWrapper?.contains(target)) {
       this.showNotifications = false;
     }
+  }
+
+  closeModalToRenderHTML(): void {
+    this.showModalToRenderHTML = false;
+  }
+
+  previewContent(notification: NotificationFront): void {
+    this.showModalToRenderHTML = true;
+    setTimeout(() => {
+      const iframe = this.iframePreview.nativeElement as HTMLIFrameElement;
+      iframe.srcdoc = notification.body; // Usa el body de la notificación como contenido del iframe
+      iframe.onload = () => {
+        const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
+        if (iframeDocument) {
+          const height = iframeDocument.documentElement.scrollHeight;
+          iframe.style.height = `${height}px`; // Ajusta la altura del iframe
+        }
+      };
+    }, 5);
   }
 }
