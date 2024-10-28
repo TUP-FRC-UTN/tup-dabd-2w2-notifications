@@ -79,7 +79,7 @@
             </tr>
           </thead>
           <tbody>
-            @for(auditItem of filteredContactAuditItems; track auditItem.auditId) {
+            @for(auditItem of paginatedContacts; track auditItem.auditId) {
             <tr>
               <td>{{auditItem.contactId}}</td>
               <td>{{auditItem.revisionDate}}</td>

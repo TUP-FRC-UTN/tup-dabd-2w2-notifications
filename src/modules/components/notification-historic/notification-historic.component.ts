@@ -284,4 +284,11 @@ export class NotificationHistoricComponent implements OnInit {
     this.isModalOpenNoti = false;
     this.selectedNotification = undefined;
   }
+
+  //Pagination
+  get paginatedNotifications() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredNotifications.slice(startIndex, endIndex);
+  }
 }

@@ -6,6 +6,10 @@ import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import {  ContactAudit } from '../../../app/models/contacts/contactAudit';
 import { ContactAuditService } from '../../../app/services/contact-audit.service';
 import { Subscription } from 'rxjs';
+import { ToastService } from 'ngx-dabd-grupo01';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 
 @Component({
@@ -23,6 +27,8 @@ import { Subscription } from 'rxjs';
 })
 export class ContactAuditHistoryComponent implements OnInit {
 
+
+  toastService: ToastService = inject(ToastService);
 
   isLoading: boolean = true;
 
@@ -63,25 +69,13 @@ export class ContactAuditHistoryComponent implements OnInit {
   }
 
 
-  exportToExcel() {
-    // Implementar la lógica de exportación a Excel
-    console.log('Exportando a Excel...');
-  }
-
-  exportToPDF() {
-    // Implementar la lógica de exportación a PDF
-    console.log('Exportando a PDF...');
-  }
 
 
   showInfo() {
     const message = `
       <strong>Sistema de gestión de contactos</strong><br>
-      Aquí puedes administrar todos los contactos del sistema.<br><br>
+      Visualización de auditoría de contactos.<br><br>
 
-      <strong>Iconografía:</strong><br>
-      Activos: <i class="bi bi-check2-circle text-success large-icon"></i><br>
-      Inactivos: <i class="bi bi-x-circle text-danger large-icon"></i>
     `;
 
     this.showInformationModal('Información', message);
@@ -182,17 +176,79 @@ export class ContactAuditHistoryComponent implements OnInit {
   }
 
 
+  
+  exportToPDF() {
+    const doc = new jsPDF();
 
+    doc.setFontSize(18);
+    doc.text('Auditoría de Contactos', 14, 20);
 
+    this.contactAuditService.getContactAudits().subscribe({
+      next: (audits) => {
+        autoTable(doc, {
+          startY: 30,
+          head: [['Fecha', 'ID revisión', 'Tipo revisión', 'Tipo contacto', 'Valor']],
+          body: audits.map((audit) => [
+            audit.revisionDate,
+            audit.revisionId,
+            audit.revisionType,
+            audit.contactType,
+            audit.value
+          ]),
+          columnStyles: {
+            0: { cellWidth: 30 },  // Fecha del cambio - mantiene el ancho para las fechas
+            1: { cellWidth: 25 },  // ID de revisión - números cortos
+            2: { cellWidth: 20 },  // Tipo de revisión - palabras como "Adición"/"Modificación"
+            3: { cellWidth: 35 },  // Tipo de contacto - "Correo electrónico"
+            4: { cellWidth: 60 }   // Valor - emails largos como nicolasgeronimrodigoku@gmail.com
+          },
+          styles: { overflow: 'linebreak' },
+        });
+        const now = new Date();
+        const dateTime = `${now
+          .toLocaleDateString()
+          .replace(/\//g, '-')}_${now.getHours()}-${now.getMinutes()}`;
+        const fileName = `AuditoriaContactos-${dateTime}.pdf`;
 
+        doc.save(fileName);
+      },
+      error: (error) => {
+        this.toastService.sendError("Hubo un error generando el archivo PDF");
+      },
+    });
+  }
 
+  exportToExcel() {
+    // Implementar la lógica de exportación a Excel
+    this.contactAuditService.getContactAudits().subscribe({
+      next: (audits) => {
+        const data = audits.map((audit) => ({
+          Fecha: audit.revisionDate,
+          ID_revision: audit.revisionId,
+          Tipo_revision: audit.revisionType,
+          Tipo_contacto: audit.contactType,
+          Valor: audit.value
+        }));
 
-
-
-
-
-
-
-
-
+        const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+        const wb: XLSX.WorkBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Contacts');
+        const now = new Date();
+        const dateTime = `${now
+          .toLocaleDateString()
+          .replace(/\//g, '-')}_${now.getHours()}-${now.getMinutes()}`;
+        const fileName = `AuditoríaContactos-${dateTime}.xlsx`; // Nombre del archivo
+        XLSX.writeFile(wb, fileName);
+      },
+      error: (error) => {
+        this.toastService.sendError("Hubo un error generando el archivo Excel");
+      },
+    });
+  }
+  //Pagination
+  get paginatedContacts() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredContactAuditItems.slice(startIndex, endIndex);
+  }
 }

@@ -92,7 +92,7 @@
           </tr>
         </thead>
         <tbody>
-          @for(contact of contacts; track contact.id) {
+          @for(contact of paginatedContacts; track contact.id) {
           <tr>
             <td>{{contact.contactValue}}</td>
             <td>{{contact.contactType}}</td>

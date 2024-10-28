@@ -94,7 +94,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for(template of templates; track template.id) {
+                    @for(template of paginatedTemplates; track template.id) {
                     <tr>
                         <td>{{template.name}}</td>
                         <td>
@@ -144,9 +144,8 @@
             </div>
 
             <div class="d-flex align-items-center">
-                <ngb-pagination [(page)]="currentPage" [pageSize]="itemsPerPage" [collectionSize]="totalItems"
-                    (pageChange)="changePage($event)" [maxSize]="5" [boundaryLinks]="false">
-                </ngb-pagination>
+              <ngb-pagination [(page)]="currentPage" [pageSize]="itemsPerPage" [collectionSize]="totalItems"
+              (pageChange)="changePage($event)" [maxSize]="5" [boundaryLinks]="false"></ngb-pagination>
 
                 <button class="btn btn-secondary ms-3 mb-3" (click)="showInfo()">
                     <i class="bi bi-info-circle"></i>

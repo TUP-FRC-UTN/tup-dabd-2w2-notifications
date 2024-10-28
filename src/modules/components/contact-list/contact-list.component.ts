@@ -395,4 +395,10 @@ export class ContactListComponent implements OnInit {
 
     this.showModal('Información', message);
   }
+  //Pagination
+  get paginatedContacts() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.contacts.slice(startIndex, endIndex);
+  }
 }

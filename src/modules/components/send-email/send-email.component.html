@@ -68,15 +68,16 @@
 
         </form>
     </div>
-
-            <!-- Modal de previsualización -->
-                <!-- Modal -->
-                <div class="modal" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
-                    <div class="modal-content" (click)="$event.stopPropagation()">
-                        <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
-                        <iframe #iframePreview style="width: 100%; border: none;"></iframe>
-                        <button type="button" class="btn btn-primary" (click)="closeModalToRenderHTML()">Aceptar</button>
-                    </div>
-                </div>
 </div>
+
+
+<!-- Modal de previsualización -->
+    <!-- Modal -->
+    <div class="modal" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
+            <iframe #iframePreview style="width: 100%; border: none;"></iframe>
+            <button type="button" class="btn btn-primary" (click)="closeModalToRenderHTML()">Aceptar</button>
+        </div>
+    </div>
 

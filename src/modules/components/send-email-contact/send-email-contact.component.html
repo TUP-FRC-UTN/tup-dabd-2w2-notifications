@@ -74,7 +74,7 @@
                 [ngClass]="{'is-invalid': plantillas.invalid && (plantillas.dirty || plantillas.touched), 'is-valid': plantillas.valid && (plantillas.dirty || plantillas.touched)}">
 
                 @for (item of allTemplates; track $index) {
-                    <option [value]="item.id"> {{item.name}} </option>
+                    <option [value]=item.id> {{item.name}} </option>
                 }
                 </select>
                 @if (plantillas.invalid && (plantillas.dirty || plantillas.touched)) {
@@ -82,7 +82,7 @@
                         <div class="text-danger"> Campo Obligatorio </div>
                     }
                 }
-
+            <button type="button" class="btn btn-secondary mt-3" (click)="previewSelectedTemplate()">Previsualizar</button>
             <!-- Si encuentran otra forma de hacerlo, haganlo-->
             <div class="row">
                 <div class="col-1"></div>
@@ -100,4 +100,16 @@
             </div>
         </form>
     </div>
+    
 </div>
+
+
+<!-- Modal de previsualización -->
+    <!-- Modal -->
+    <div class="modal" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
+            <iframe #iframePreview style="width: 100%; border: none;"></iframe>
+            <button type="button" class="btn btn-primary" (click)="closeModalToRenderHTML()">Aceptar</button>
+        </div>
+    </div>
