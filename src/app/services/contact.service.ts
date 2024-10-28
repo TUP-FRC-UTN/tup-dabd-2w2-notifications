@@ -33,7 +33,6 @@ export class ContactService {
       })))
     );
   }
-
   getFilteredContactsFromBackend(active: boolean = true, searchText: string = '', contactType?: string): Observable<ContactModel[]> {
     let url = `${this.apiUrl}/contacts?active=${active}`;
 
@@ -43,8 +42,14 @@ export class ContactService {
     if (contactType !== undefined && contactType !== '') {
       url += `&contactType=${contactType}`;
     }
-    return this.http.get<any[]>(url).pipe(
-      map(contacts => contacts.map(contact => this.transformToContact(contact)))
+
+    return this.http.get<ContactModel[]>(url).pipe(
+      map(contacts => contacts.map(contact => ({
+        ...this.transformToContact(contact),
+        subscriptions: contact.subscriptions.map(subscription =>
+          this.getSubscriptionNameInSpanish(subscription)
+        )
+      })))
     );
   }
 
