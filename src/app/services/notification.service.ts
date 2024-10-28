@@ -74,10 +74,6 @@ export class NotificationService {
     return this.http.get<NotificationApi>(url);
   }
 
-  // getTemplateById(id: number) {
-  //   const url = `${this.apiUrl}/email-templates/${id}`;
-  //   return this.http.get<EmailTemplate>(url);
-  // }
 
   isRead(id: number) {
     const url = `${this.apiUrl}/notifications/${id}`

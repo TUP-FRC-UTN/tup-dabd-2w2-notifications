@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, Inject } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../app/services/notification.service';
 import { NotificationApi, NotificationFront } from '../../../app/models/notification';
@@ -10,12 +10,12 @@ import { NotificationApi, NotificationFront } from '../../../app/models/notifica
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.css']
 })
-@Inject("NotificationService")
 export class NotificationsComponent implements OnInit {
   notifications: NotificationFront[] = [];
   selectedNotification: NotificationFront | null = null;
   showNotifications = false;
   showModal = false;
+
 
   notificationService = new NotificationService();
 

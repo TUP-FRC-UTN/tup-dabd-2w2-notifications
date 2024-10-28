@@ -98,6 +98,7 @@
               <th>Asunto</th>
               <th>Fecha</th>
               <th>Visualizado</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -107,7 +108,7 @@
                     {{ notification.recipient.split('@')[0] }}&#64;...
                   </td>
               <td>{{notification.subject}}</td>
-              <td>{{notification.dateSend }} </td>
+              <td>{{notification.dateSend | date: "short"}} </td>
               <!-- <td>
                 @if(notification.statusSend === 'VISUALIZED'){
                   Visto
@@ -127,7 +128,11 @@
                 </p>
                 }
               </td>
-            
+              <td>
+                <button class="btn btn-outline-info" (click)="verNotification(notification)">
+                  <i class="bi bi-eye" style="font-size: 1.3rem; color:info"></i>
+                </button>
+              </td>
             </tr>
             }
           </tbody>
@@ -173,6 +178,59 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="isModalOpen = false">Volver</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Notificacion -->
+<div [class.show]="isModalOpenNoti" [style.display]="isModalOpenNoti ? 'block' : 'none'" class="modal fade" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ modalTitle }}</h5>
+        <button type="button" class="btn-close" (click)="isModalOpen = false"></button>
+      </div>
+      <div class="modal-body">
+        <div [innerHTML]="modalMessage"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="isModalOpen = false">Volver</button>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="modal" >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{selectedNotification?.subject }}</h5>
+          <button type="button" class="btn-close"  data-bs-dismiss="modal" (click)="closeModal()"></button>
+        </div>
+        <p class="notification-time-modal">{{ selectedNotification?.dateSend | date:'short' }}</p>
+        <div class="modal-body" [innerHTML]="selectedNotification?.body">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+    Esto hace que si tocas cualquier parte de la pantalla cuando esta el modal se cierre, pero hace que se vea borroso -->
+    <!-- @if(showModal){
+    <div class="modal-backdrop" (click)="closeModal()"></div>} -->
+  <!-- </div> -->
+</div>
+<!-- Modal Notificación -->
+<div [class.show]="isModalOpenNoti" [style.display]="isModalOpenNoti ? 'block' : 'none'" class="modal fade" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{selectedNotification?.subject}}</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <p class="notification-time-modal">{{ selectedNotification?.dateSend | date: "short"  }}</p>
+      <div class="modal-body" [innerHTML]="selectedNotification?.body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cerrar</button>
       </div>
     </div>
   </div>

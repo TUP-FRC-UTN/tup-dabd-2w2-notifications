@@ -61,3 +61,44 @@
   }
   
   
+.notification-time-modal {
+  font-size: 0.8em;       
+  color: #6c757d;        
+  margin-left: auto;      
+  align-self: center;    
+  margin-right: 3%;
+  margin-top: 3%;
+}
+
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: black;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color:  rgba(0, 0, 0, 0.5);
+}
+.modal-body {
+  max-width: 100%;
+  width: auto;
+  height: auto;
+}
+
+.modal-dialog {
+  max-width: 50%; 
+  width: auto;    
+  margin: 1rem auto; 
+}
+
+.modal-content {
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  padding: 1rem;
+}
+

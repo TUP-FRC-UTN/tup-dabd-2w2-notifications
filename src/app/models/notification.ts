@@ -6,7 +6,8 @@ export interface Notification {
     templateId: number // 1
     templateName: string // cuentas
     statusSend: string // enviado
-    dateSend:string   // 24/12/2002
+    dateSend:string,   // 24/12/2002
+    body : string 
 }
 
 
