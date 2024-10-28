@@ -56,14 +56,13 @@
 
       <!-- Botones de estado -->
       <div class="btn-group" role="group">
-        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" (change)="filterByStatus('active')"
-          checked>
+        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" (change)="filterByStatus('active')">
         <label class="btn btn-outline-primary" for="btnradio1">Contactos Activos</label>
 
         <input type="radio" class="btn-check" name="btnradio" id="btnradio2" (change)="filterByStatus('inactive')">
         <label class="btn btn-outline-primary" for="btnradio2">Contactos Inactivos</label>
 
-        <input type="radio" class="btn-check" name="btnradio" id="btnradio3" (change)="filterByStatus('all')">
+        <input type="radio" class="btn-check" name="btnradio" id="btnradio3" (change)="filterByStatus('all')" checked>
         <label class="btn btn-outline-primary" for="btnradio3">Todos</label>
       </div>
     </div>

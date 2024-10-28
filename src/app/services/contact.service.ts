@@ -33,8 +33,11 @@ export class ContactService {
       })))
     );
   }
-  getFilteredContactsFromBackend(active: boolean = true, searchText: string = '', contactType?: string): Observable<ContactModel[]> {
+  getFilteredContactsFromBackend(active: boolean  | undefined, searchText: string = '', contactType?: string): Observable<ContactModel[]> {
+
     let url = `${this.apiUrl}/contacts?active=${active}`;
+
+    active != undefined ? url : url = `${this.apiUrl}/contacts`;
 
     if (searchText) {
       url += `&search=${encodeURIComponent(searchText)}`;
