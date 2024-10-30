@@ -264,15 +264,23 @@ export class TemplateListComponent implements OnInit {
   }
   deleteTemplate(deleteTemplate: TemplateModel) {
 
-    const index = this.templates.findIndex(template => template.id === deleteTemplate.id);
+    // const index = this.templates.findIndex(template => template.id === deleteTemplate.id);
 
-    if (index !== -1) { 
-        this.templates[index].active = false
-        this.templates.splice(index, 1);
+    // if (index !== -1) { 
+    //     this.templates[index].active = false
+    //     this.templates.splice(index, 1);
+    //     this.toastService.sendSuccess("Plantilla eliminada correctamente")
+    // } else {
+    //     this.toastService.sendError("Plantilla no encontrada")
+    // }
+    this.templateService.deleteTemplate(deleteTemplate.id).subscribe({
+      next: (response) => {
         this.toastService.sendSuccess("Plantilla eliminada correctamente")
-    } else {
-        this.toastService.sendError("Plantilla no encontrada")
-    }
+      },
+      error: (error) => {
+        this.toastService.sendError("Error al eliminar plantila")
+      }
+    })
 }
 
 
@@ -364,9 +372,14 @@ export class TemplateListComponent implements OnInit {
     this.getEmailTemplates();
   }
 
-  onSearchTextChange(){
-
-    this.showInput = true;
+  onSearchTextChange(searchTerms: string){
+    //TODO SEGUIR ACA
+    this.searchTerm = searchTerms
+    this.templateService.getAllTemplates().subscribe((data) => {
+      this.templates = data.filter(t => 
+          t.name.toUpperCase().includes(searchTerms.toUpperCase())
+      );
+    })
   }
 
 

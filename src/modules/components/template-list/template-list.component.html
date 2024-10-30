@@ -45,8 +45,9 @@
                         <div class="input-group">
                             @if (showInput) {
                                 <input type="text" class="form-control" [(ngModel)]="searchTerm"
+                                (input)="onSearchTextChange(searchTerm)"
                                 placeholder="Buscar...">
-                            <button class="btn btn-dark" (click)="filterByName()">Buscar</button>
+                            <!-- <button class="btn btn-dark" (click)="filterByName()">Buscar</button> -->
                             }
 
                         </div>
