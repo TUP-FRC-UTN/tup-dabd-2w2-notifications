@@ -38,11 +38,18 @@ export class ContactService {
 
 
   getPaginatedContacts(page: number, size: number, active?: boolean, search?: string, contactType?: string) : Observable<PaginatedContacts>{
-    let params = new HttpParams().set('page', page).set('size', size);
+  //  let params = new HttpParams().set('page', page).set('size', size);
+
+  let params = new HttpParams();
+
+
+
 
     if(active !== undefined) params = params.set('active', active.toString());
     if(search) params = params.set('search', search);
     if(contactType) params = params.set('contactType', contactType);
+
+    params = params.set('page', page).set('size', size);
 
     return this.http.get<PaginatedContacts>(`${this.apiUrl}/contacts/pageable`, {params}).pipe(
       map(response => ({

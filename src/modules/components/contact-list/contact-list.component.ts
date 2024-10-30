@@ -45,10 +45,9 @@ export class ContactListComponent implements OnInit {
   }
 
   // Paginación
-  currentPage = 0;
+  currentPage = 1;
   pageSize = 10;
   totalItems = 0;
-  
   totalPages = 0;
   sizeOptions: number[] = [10, 25, 50];
 
@@ -98,7 +97,17 @@ export class ContactListComponent implements OnInit {
   }
 
   filterByContactType(contactType: string): void {
-    this.loadContacts(this.isActiveContactFilter, this.searchTerm, this.selectedContactType)
+    this.selectedContactType = contactType;
+    this.applyFilters();
+  }
+
+  private applyFilters() {
+    this.currentPage = 1; // Resetear a la primera página al filtrar
+    this.loadContacts(
+      this.isActiveContactFilter, 
+      this.searchTerm, 
+      this.selectedContactType
+    );
   }
 
 
@@ -111,17 +120,12 @@ export class ContactListComponent implements OnInit {
     } else if (status === 'inactive') {
       this.isActiveContactFilter = false;
     }
-    this.loadContacts();
+    this.applyFilters();
   }
 
   onSearchTextChange(searchTerm: string) {
     this.searchTerm = searchTerm;
-    this.loadContacts();
-  }
-
-  filterContacts(){
-    this.currentPage = 0;
-    this.loadContacts(this.isActiveContactFilter, this.searchTerm, this.selectedContactType)
+    this.applyFilters();
   }
 
 
@@ -138,9 +142,6 @@ export class ContactListComponent implements OnInit {
         console.error('Error fetching contacts:', error);
       }
     );
-    
-    
-
   }
 
   nextPage() {
