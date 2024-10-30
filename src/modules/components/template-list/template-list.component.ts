@@ -279,7 +279,6 @@ export class TemplateListComponent implements OnInit {
   exportToExcel() {
     this.templateService.getAllTemplates().subscribe(templates => {
       const data = templates.map(template => ({
-          'ID': template.id,
           'Nombre': template.name,
           'Cuerpo': template.body,
           'Activo': template.active ? 'Activo' : 'Inactivo',
