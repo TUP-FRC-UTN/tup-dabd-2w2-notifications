@@ -42,8 +42,8 @@ export class TemplateService {
     );
   }
 
-  deleteTemplate(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/email-templates/${id}`);
+  deleteTemplate(id: number): Observable<TemplateModel> {
+    return this.http.delete<TemplateModel>(`${this.apiUrl}/email-templates/${id}`);
   }
 
   private transformToTemplate(data: any): TemplateModel {

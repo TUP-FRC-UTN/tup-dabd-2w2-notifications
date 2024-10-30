@@ -45,8 +45,9 @@
                         <div class="input-group">
                             @if (showInput) {
                                 <input type="text" class="form-control" [(ngModel)]="searchTerm"
+                                (input)="onSearchTextChange(searchTerm)"
                                 placeholder="Buscar...">
-                            <button class="btn btn-dark" (click)="filterByName()">Buscar</button>
+                            <!-- <button class="btn btn-dark" (click)="filterByName()">Buscar</button> -->
                             }
 
                         </div>
@@ -64,7 +65,7 @@
                     (change)="filterByStatus('inactive')">
                 <label class="btn btn-outline-primary" for="btnradio2">Plantillas Inactivas</label>
 
-                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" (change)="filterByStatus('all')">
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" (change)="filterByStatus('all')" checked>
                 <label class="btn btn-outline-primary" for="btnradio3">Todos</label>
             </div>
         </div>

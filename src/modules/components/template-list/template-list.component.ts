@@ -122,24 +122,21 @@ export class TemplateListComponent implements OnInit {
   filterByStatus(status: 'all' | 'active' | 'inactive') {
     if (status === 'all') {
       this.isActivetemplateFilter = undefined;
-      this.templates = this.mocktemplates
+      this.getEmailTemplates()
     }
     else if (status === 'active') {
       this.isActivetemplateFilter = true;
-      this.templates = this.templates.filter(t => t.active == true)
+      this.templateService.getAllTemplates().subscribe(data => {
+        this.templates = data.filter(t => t.active == true)
+      })
     }
     else if (status === 'inactive') {
       this.isActivetemplateFilter = false;
-      this.templates = this.templates.filter(t => t.active == false)
+      this.templateService.getAllTemplates().subscribe(data => {
+        this.templates = data.filter(t => t.active == false)
+      })
     }
-    this.getEmailTemplates();
-  }
-  filterByName() {
-    this.templates = this.templates.filter(t => t.name.toUpperCase() === this.searchTerm.toUpperCase())
-    /*this.emailService.getEmailTemplates().subscribe(data => {
-      this.templates = data.filter(template => template.name === this.searchTerm)
-    })*/
-    this.showInput = false
+    
   }
 
   // Paginación
@@ -251,7 +248,7 @@ export class TemplateListComponent implements OnInit {
     this.templates = this.mocktemplates;
     this.templateService.getAllTemplates().subscribe({
       next: (data) => {
-        data.map(d => d.active = true);
+        //data.map(d => d.active = true);
         this.templates = [...this.templates, ...data].sort((a, b) =>
           a.name.toLowerCase().localeCompare(b.name.toLowerCase())
         );
@@ -264,15 +261,14 @@ export class TemplateListComponent implements OnInit {
   }
   deleteTemplate(deleteTemplate: TemplateModel) {
 
-    const index = this.templates.findIndex(template => template.id === deleteTemplate.id);
-
-    if (index !== -1) { 
-        this.templates[index].active = false
-        this.templates.splice(index, 1);
+    this.templateService.deleteTemplate(deleteTemplate.id).subscribe({
+      next: (response) => {
         this.toastService.sendSuccess("Plantilla eliminada correctamente")
-    } else {
-        this.toastService.sendError("Plantilla no encontrada")
-    }
+      },
+      error: (error) => {
+        this.toastService.sendError("Error al eliminar plantila")
+      }
+    })
 }
 
 
@@ -283,7 +279,6 @@ export class TemplateListComponent implements OnInit {
   exportToExcel() {
     this.templateService.getAllTemplates().subscribe(templates => {
       const data = templates.map(template => ({
-          'ID': template.id,
           'Nombre': template.name,
           'Cuerpo': template.body,
           'Activo': template.active ? 'Activo' : 'Inactivo',
@@ -310,18 +305,16 @@ export class TemplateListComponent implements OnInit {
     this.templateService.getAllTemplates().subscribe(templates => {
         autoTable(doc, {
             startY: 30,
-            head: [['ID', 'Nombre', 'Cuerpo', 'Activo']],
+            head: [['Nombre', 'Cuerpo', 'Activo']],
             body: templates.map(template => [
-                template.id,
                 template.name,
                 template.body,
                 template.active ? 'Activo' : 'Inactivo'
             ]),
             columnStyles: { //para que no se rompa por si el body es muy grande
-                0: { cellWidth: 15 }, // ID
-                1: { cellWidth: 40 }, // Nombre
-                2: { cellWidth: 100 }, // Body
-                3: { cellWidth: 20 }, // Activo
+                0: { cellWidth: 40 }, // Nombre
+                1: { cellWidth: 100 }, // Body
+                2: { cellWidth: 20 }, // Activo
             },
             styles: { overflow: 'linebreak' },
         });
@@ -364,9 +357,35 @@ export class TemplateListComponent implements OnInit {
     this.getEmailTemplates();
   }
 
-  onSearchTextChange(){
+  onSearchTextChange(searchTerms: string){
 
-    this.showInput = true;
+    this.searchTerm = searchTerms
+    switch(this.isActivetemplateFilter){
+      case undefined: {
+        this.templateService.getAllTemplates().subscribe((data) => {
+          this.templates = data.filter(t => 
+              t.name.toUpperCase().includes(searchTerms.toUpperCase())
+          );
+        })
+        break
+      }
+      case true: {
+        this.templateService.getAllTemplates().subscribe((data) => {
+          this.templates = data.filter(t => 
+              t.name.toUpperCase().includes(searchTerms.toUpperCase()) && t.active == true
+          );
+        })
+        break
+      }
+      case false: {
+        this.templateService.getAllTemplates().subscribe((data) => {
+          this.templates = data.filter(t => 
+              t.name.toUpperCase().includes(searchTerms.toUpperCase()) && t.active == false
+          );
+        })
+        break
+      }
+    }
   }
 
 

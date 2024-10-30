@@ -14,6 +14,7 @@ import { map } from 'rxjs';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { PaginatedContacts } from '../../../app/models/contacts/paginated/PaginatedContact';
 
 @Component({
   selector: 'app-contact-list',
@@ -45,8 +46,9 @@ export class ContactListComponent implements OnInit {
 
   // Paginación
   currentPage = 1;
-  itemsPerPage = 10;
+  pageSize = 10;
   totalItems = 0;
+  totalPages = 0;
   sizeOptions: number[] = [10, 25, 50];
 
   // Filtros
@@ -56,7 +58,7 @@ export class ContactListComponent implements OnInit {
 
   // Datos y estados
   contacts: ContactModel[] = [];
-  filteredContacts: ContactModel[] = [];
+
 
   // Estados de modales
   isModalOpen = false;
@@ -81,7 +83,6 @@ export class ContactListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadContacts();
-    this.getAllContacts();
   }
 
   private getEmptyContact(): ContactModel {
@@ -95,19 +96,28 @@ export class ContactListComponent implements OnInit {
     };
   }
 
-  getFilteredContacts(): void {
-    this.contactService
-      .getFilteredContactsFromBackend(
-        this.isActiveContactFilter,
-        this.searchTerm,
-        this.selectedContactType
-      )
-      .subscribe((filteredContacts) => {
-        this.contacts = filteredContacts;
-      });
+  filterByContactType(contactType: string): void {
+
+    console.log('contactType ', contactType)
+    this.selectedContactType = contactType;
+    this.showInput = true;
+    this.applyFilters();
   }
 
+  private applyFilters() {
+    this.currentPage = 1; // Resetear a la primera página al filtrar
+    this.loadContacts(
+      this.isActiveContactFilter, 
+      this.searchTerm, 
+      this.selectedContactType
+    );
+  }
+
+
+
   filterByStatus(status: 'all' | 'active' | 'inactive') {
+
+    console.log('status ', status)
     if (status === 'all') {
       this.isActiveContactFilter = undefined;
     } else if (status === 'active') {
@@ -115,55 +125,45 @@ export class ContactListComponent implements OnInit {
     } else if (status === 'inactive') {
       this.isActiveContactFilter = false;
     }
-    this.getFilteredContacts();
+    this.applyFilters();
   }
 
   onSearchTextChange(searchTerm: string) {
     this.searchTerm = searchTerm;
-    this.getFilteredContacts();
+    this.applyFilters();
   }
 
-  filterByContactType(contactType: string): void {
-    this.contactService
-      .getFilteredContactsFromBackend(
-        this.isActiveContactFilter,
-        this.searchTerm,
-        contactType
-      )
-      .subscribe((filteredContacts) => {
-        this.contacts = filteredContacts;
-      });
-    this.showInput = true;
-  }
+
 
   // Carga de datos
-  loadContacts() {
-    this.contactService
-      .getFilteredContactsFromBackend(
-        this.isActiveContactFilter,
-        this.searchTerm,
-        this.selectedContactType
-      )
-      .subscribe({
-        next: (contacts) => {
-          this.contacts = contacts;
-          this.filteredContacts = [...this.contacts];
-          this.updatePagination();
-        },
-        error: (error) => {
-          this.showModal('Error', 'Error al cargar los contactos');
-          console.error('Error loading contacts:', error);
-        },
-      });
+  loadContacts(active?: boolean, searchText?: string, contactType?: string) {
+    this.contactService.getPaginatedContacts(this.currentPage, this.pageSize, active, searchText, contactType).subscribe(
+      (response: PaginatedContacts) => {
+        this.contacts = response.content; // Asigna los contactos paginados
+        this.totalItems = response.totalElements; // Total de elementos
+        this.totalPages = response.totalPages; // Total de páginas
+      },
+      error => {
+        console.error('Error fetching contacts:', error);
+      }
+    );
   }
 
-  getAllContacts() {
-    this.contactService.getAllContacts().subscribe((data: ContactModel[]) => {
-      this.contacts = data.sort((a, b) =>
-        a.contactValue.toLowerCase().localeCompare(b.contactValue.toLowerCase())
-      );
-    });
+  nextPage() {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+      this.loadContacts(this.isActiveContactFilter, this.searchTerm, this.selectedContactType);
+    }
   }
+  
+  previousPage() {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.loadContacts(this.isActiveContactFilter, this.searchTerm, this.selectedContactType);
+    }
+  }
+
+
 
   clearSearch() {
     this.searchTerm = '';
@@ -191,6 +191,8 @@ export class ContactListComponent implements OnInit {
     this.currentPage = page;
     this.loadContacts();
   }
+
+  
 
   saveContact() {
     this.router.navigate(['/contact/new']);
@@ -358,7 +360,6 @@ export class ContactListComponent implements OnInit {
     this.contactService.getAllContacts().subscribe({
       next: (contacts) => {
         const data = contacts.map((contact) => ({
-          ID: contact.id,
           Tipo: contact.contactType,
           Valor: contact.contactValue,
           Activo: contact.active ? 'Activo' : 'Inactivo',
@@ -390,19 +391,17 @@ export class ContactListComponent implements OnInit {
       next: (contacts) => {
         autoTable(doc, {
           startY: 30,
-          head: [['ID', 'Tipo', 'Valor', 'Activo']],
+          head: [['Tipo', 'Valor', 'Activo']],
           body: contacts.map((contact) => [
-            contact.id,
             contact.contactType,
             contact.contactValue,
             contact.active ? 'Activo' : 'Inactivo',
           ]),
           columnStyles: {
             // para que no se rompa por si el body es muy grande
-            0: { cellWidth: 15 }, // ID
-            1: { cellWidth: 40 }, // Tipo
-            2: { cellWidth: 100 }, // Valor
-            3: { cellWidth: 20 }, // Activo
+            0: { cellWidth: 40 }, // Tipo
+            1: { cellWidth: 100 }, // Valor
+            2: { cellWidth: 20 }, // Activo
           },
           styles: { overflow: 'linebreak' },
         });
@@ -436,10 +435,5 @@ export class ContactListComponent implements OnInit {
 
     this.showModal('Información', message);
   }
-  //Pagination
-  get paginatedContacts() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    return this.contacts.slice(startIndex, endIndex);
-  }
+
 }
