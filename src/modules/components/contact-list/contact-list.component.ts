@@ -358,7 +358,6 @@ export class ContactListComponent implements OnInit {
     this.contactService.getAllContacts().subscribe({
       next: (contacts) => {
         const data = contacts.map((contact) => ({
-          ID: contact.id,
           Tipo: contact.contactType,
           Valor: contact.contactValue,
           Activo: contact.active ? 'Activo' : 'Inactivo',
