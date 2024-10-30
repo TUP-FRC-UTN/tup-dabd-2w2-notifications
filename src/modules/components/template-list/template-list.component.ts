@@ -122,25 +122,32 @@ export class TemplateListComponent implements OnInit {
   filterByStatus(status: 'all' | 'active' | 'inactive') {
     if (status === 'all') {
       this.isActivetemplateFilter = undefined;
-      this.templates = this.mocktemplates
+      //this.templates = this.mocktemplates
+      this.getEmailTemplates()
     }
     else if (status === 'active') {
       this.isActivetemplateFilter = true;
-      this.templates = this.templates.filter(t => t.active == true)
+      //this.templates = this.templates.filter(t => t.active == true)
+      this.templateService.getAllTemplates().subscribe(data => {
+        this.templates = data.filter(t => t.active == true)
+      })
     }
     else if (status === 'inactive') {
       this.isActivetemplateFilter = false;
-      this.templates = this.templates.filter(t => t.active == false)
+      //this.templates = this.templates.filter(t => t.active == false)
+      this.templateService.getAllTemplates().subscribe(data => {
+        this.templates = data.filter(t => t.active == false)
+      })
     }
-    this.getEmailTemplates();
+    
   }
-  filterByName() {
-    this.templates = this.templates.filter(t => t.name.toUpperCase() === this.searchTerm.toUpperCase())
-    /*this.emailService.getEmailTemplates().subscribe(data => {
-      this.templates = data.filter(template => template.name === this.searchTerm)
-    })*/
-    this.showInput = false
-  }
+  // filterByName() {
+  //   this.templates = this.templates.filter(t => t.name.toUpperCase() === this.searchTerm.toUpperCase())
+  //   /*this.emailService.getEmailTemplates().subscribe(data => {
+  //     this.templates = data.filter(template => template.name === this.searchTerm)
+  //   })*/
+  //   this.showInput = false
+  // }
 
   // Paginación
   initializePagination() {
@@ -251,7 +258,7 @@ export class TemplateListComponent implements OnInit {
     this.templates = this.mocktemplates;
     this.templateService.getAllTemplates().subscribe({
       next: (data) => {
-        data.map(d => d.active = true);
+        //data.map(d => d.active = true);
         this.templates = [...this.templates, ...data].sort((a, b) =>
           a.name.toLowerCase().localeCompare(b.name.toLowerCase())
         );
