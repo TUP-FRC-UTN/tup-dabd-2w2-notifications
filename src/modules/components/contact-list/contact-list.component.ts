@@ -97,7 +97,10 @@ export class ContactListComponent implements OnInit {
   }
 
   filterByContactType(contactType: string): void {
+
+    console.log('contactType ', contactType)
     this.selectedContactType = contactType;
+    this.showInput = true;
     this.applyFilters();
   }
 
@@ -113,6 +116,8 @@ export class ContactListComponent implements OnInit {
 
 
   filterByStatus(status: 'all' | 'active' | 'inactive') {
+
+    console.log('status ', status)
     if (status === 'all') {
       this.isActiveContactFilter = undefined;
     } else if (status === 'active') {

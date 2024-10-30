@@ -37,7 +37,7 @@ export class ContactService {
   };
 
 
-  getPaginatedContacts(page: number, size: number, active?: boolean, search?: string, contactType?: string) : Observable<PaginatedContacts>{
+  getPaginatedContacts(page: number, size: number, active?: boolean, search_term?: string, contact_type?: string) : Observable<PaginatedContacts>{
   //  let params = new HttpParams().set('page', page).set('size', size);
 
   let params = new HttpParams();
@@ -46,8 +46,8 @@ export class ContactService {
 
 
     if(active !== undefined) params = params.set('active', active.toString());
-    if(search) params = params.set('search', search);
-    if(contactType) params = params.set('contactType', contactType);
+    if(search_term) params = params.set('search_term', search_term);
+    if(contact_type) params = params.set('contact_type', contact_type);
 
     params = params.set('page', page).set('size', size);
 
