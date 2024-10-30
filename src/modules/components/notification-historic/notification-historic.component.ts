@@ -4,10 +4,10 @@
   import { Notification } from '../../../app/models/notification';
   import { MainContainerComponent } from 'ngx-dabd-grupo01';
   import { FormsModule } from '@angular/forms';
-  import { NotificationsService } from '../../../app/services/notifications.service';
   import * as XLSX from 'xlsx';
   import jsPDF from 'jspdf';
   import autoTable from 'jspdf-autotable';
+import { NotificationService } from '../../../app/services/notification.service';
 
   @Component({
     selector: 'app-notification-historic',
@@ -46,64 +46,64 @@
     emailFilter: string = '';
     currentFilter: string = 'status';
 
-    private notificationService = inject(NotificationsService);
+    private notificationService = inject(NotificationService);
     @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
 
     ngOnInit(): void {
       
       this.loadNotifications();
 
-      this.notifications.push(
-        {
-          id: 1,
-          subject: "Aprovecha esta PROMOCIÓN!",
-          recipient: 'gabrielacollazo@hotmail.com',
-          templateId: 1,
-          templateName: 'Promoción',
-          statusSend: 'SENT',
-          body : "",
-          dateSend: '2002-12-24 17:12',
-        },
-        {
-          id: 2,
-          subject: "Pago de Epec rechazado",
-          recipient: 'jorge@example.com',
-          templateId: 2,
-          body : "",
-          templateName: 'Cuenta',
-          statusSend: 'VISUALIZED',
-          dateSend: '2024-05-15 03:16',
-        },
-        {
-          id: 3,
-          recipient: 'maria@example.com',
-          subject: "Su comentario ha sido enviado",
-          templateId: 1,
-          body : "",
-          templateName: 'Comentarios',
-          statusSend: 'SENT',
-          dateSend:'2024-01-30 19:46',
-        },
-        {
-          id: 4,
-          recipient: 'luisa@example.com',
-          subject: "Te recordamos el cumpleaños de ...",
-          templateId: 3,
-          body : "",
-          templateName: 'Recordatorio',
-          statusSend: 'VISUALIZED',
-          dateSend: '2023-11-05 15:31',
-        },
-        {
-          id: 5,
-          recipient: 'pablo@example.com',
-          subject: "Confirmación de envío de producto",
-          templateId: 2,
-          body : "",
-          templateName: 'Confirmación',
-          statusSend: 'SENT',
-          dateSend: '2023-10-01 12:00',
-        },)
+      // this.notifications.push(
+      //   {
+      //     id: 1,
+      //     subject: "Aprovecha esta PROMOCIÓN!",
+      //     recipient: 'gabrielacollazo@hotmail.com',
+      //     templateId: 1,
+      //     templateName: 'Promoción',
+      //     statusSend: 'SENT',
+      //     body : "",
+      //     dateSend: '2002-12-24 17:12',
+      //   },
+      //   {
+      //     id: 2,
+      //     subject: "Pago de Epec rechazado",
+      //     recipient: 'jorge@example.com',
+      //     templateId: 2,
+      //     body : "",
+      //     templateName: 'Cuenta',
+      //     statusSend: 'VISUALIZED',
+      //     dateSend: '2024-05-15 03:16',
+      //   },
+      //   {
+      //     id: 3,
+      //     recipient: 'maria@example.com',
+      //     subject: "Su comentario ha sido enviado",
+      //     templateId: 1,
+      //     body : "",
+      //     templateName: 'Comentarios',
+      //     statusSend: 'SENT',
+      //     dateSend:'2024-01-30 19:46',
+      //   },
+      //   {
+      //     id: 4,
+      //     recipient: 'luisa@example.com',
+      //     subject: "Te recordamos el cumpleaños de ...",
+      //     templateId: 3,
+      //     body : "",
+      //     templateName: 'Recordatorio',
+      //     statusSend: 'VISUALIZED',
+      //     dateSend: '2023-11-05 15:31',
+      //   },
+      //   {
+      //     id: 5,
+      //     recipient: 'pablo@example.com',
+      //     subject: "Confirmación de envío de producto",
+      //     templateId: 2,
+      //     body : "",
+      //     templateName: 'Confirmación',
+      //     statusSend: 'SENT',
+      //     dateSend: '2023-10-01 12:00',
+      //   },)
 
     }
 
@@ -112,7 +112,7 @@
     }
 
     loadNotifications(): void {
-      this.notificationService.getAllNotifications()
+      this.notificationService.getAllNotification()
         .subscribe(response => {
           this.notifications = response;
           this.filteredNotifications = [...this.notifications];
@@ -173,9 +173,9 @@
     exportToExcel(): void {
       const data = this.filteredNotifications.map((notification) => ({
         Usuario: notification.recipient,
-        'Tipo de Notificación': notification.templateName,
+        'Asunto': notification.templateName,
         Fecha: notification.dateSend,
-        Estado: notification.statusSend === "VISUALIZED" ? "VISTO" : "NO VISTO",
+        Estado: notification.statusSend === "VISUALIZED" ? "VISTO" : "PENDIENTE",
       }));
       const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
       const wb: XLSX.WorkBook = XLSX.utils.book_new();
@@ -185,6 +185,8 @@
       const fileName = `Notificaciones-${dateTime}.xlsx`;
       XLSX.writeFile(wb, fileName);
     }
+    
+
 
     exportToPDF(): void {
       const doc = new jsPDF();
@@ -192,12 +194,12 @@
       doc.text('Notificaciones', 14, 20);
       autoTable(doc, {
         startY: 30,
-        head: [['Usuario', 'Tipo de Notificación', 'Fecha', 'Estado']],
+        head: [['Usuario', 'Asunto', 'Fecha', 'Estado']],
         body: this.filteredNotifications.map((notification) => [
           notification.recipient,
           notification.templateName,
           new Date(notification.dateSend).toLocaleDateString() + ' ' + new Date(notification.dateSend).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          notification.statusSend === "VISUALIZED" ? "VISTO" : "NO VISTO",
+          notification.statusSend === "VISUALIZED" ? "VISTO" : "PENDIENTE",
         ]),
         columnStyles: {
           0: { cellWidth: 60 },
@@ -209,8 +211,9 @@
       });
       const now = new Date();
       const dateTime = `${now.toLocaleDateString().replace(/\//g, '-')}_${now.getHours()}-${now.getMinutes()}`;
-      const fileName = `Notificaciones-${dateTime}.pdf`;
-      doc.save(fileName);
+      //seteamos nombre pdf
+      const fileName = `Notificaciones-${dateTime}`;
+      doc.save(fileName+".pdf");
     }
 
     clearSearch(): void {
@@ -282,6 +285,7 @@
 
     previewContent(notification: Notification): void {
       this.showModalToRenderHTML = true;
+      this.selectedNotification = notification;
       setTimeout(() => {
         const iframe = this.iframePreview.nativeElement as HTMLIFrameElement;
         iframe.srcdoc = notification.body; // Usa el body de la notificación como contenido del iframe
