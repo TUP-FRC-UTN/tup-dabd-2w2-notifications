@@ -38,7 +38,7 @@ export class SendEmailContactComponent implements OnInit {
 
   allContacts: ContactModel[] = []
   allTemplates: TemplateModel[] = []
-  selectedContactId: number = 0
+  selectedContactId: number | null = null
   variableName: string = ""
   variableValue: string = ""
 
@@ -60,11 +60,11 @@ export class SendEmailContactComponent implements OnInit {
       this.allTemplates = data
     })
   }
-  addContact() {
-    if (this.selectedContactId != 0) {
+  addContact() { //CAMBIOS
+    if (this.selectedContactId) {
       this.contacts_id.push(this.selectedContactId)
     }
-    this.selectedContactId = 0
+    this.selectedContactId = null
   }
   showContactById(id: number): string {
     const contact = this.allContacts.find(contact => contact.id == id);
