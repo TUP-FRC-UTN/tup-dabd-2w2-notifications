@@ -306,18 +306,16 @@ export class TemplateListComponent implements OnInit {
     this.templateService.getAllTemplates().subscribe(templates => {
         autoTable(doc, {
             startY: 30,
-            head: [['ID', 'Nombre', 'Cuerpo', 'Activo']],
+            head: [['Nombre', 'Cuerpo', 'Activo']],
             body: templates.map(template => [
-                template.id,
                 template.name,
                 template.body,
                 template.active ? 'Activo' : 'Inactivo'
             ]),
             columnStyles: { //para que no se rompa por si el body es muy grande
-                0: { cellWidth: 15 }, // ID
-                1: { cellWidth: 40 }, // Nombre
-                2: { cellWidth: 100 }, // Body
-                3: { cellWidth: 20 }, // Activo
+                0: { cellWidth: 40 }, // Nombre
+                1: { cellWidth: 100 }, // Body
+                2: { cellWidth: 20 }, // Activo
             },
             styles: { overflow: 'linebreak' },
         });
