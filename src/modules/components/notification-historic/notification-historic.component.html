@@ -1,21 +1,43 @@
 <app-main-container title="Historial de Notificaciones">
 <div class="card-body">
 
-  <!-- Botones de exportación -->
-<div class="col row d-flex justify-content-end mb-3">
+  <div class="row align-items-center mb-3">
+    <div class="col-sm-12 col-md-8 col-xl-8" id="general-search">
+      <div class="input-group" style="max-width: 280px">
+        <span class="input-group-text" id="search-icon">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+        [(ngModel)]="searchTerm"
+          type="text"
+          class="form-control"
+          id="filter-text-box"
+          (input)="onSearchTextChange(searchTerm)"
+        />
+      </div>
+    </div>
+
+      <!-- Botones de exportación -->
+    <div class="col row d-flex justify-content-end mb-3">
 
     <div class="col-auto">
       <button class="btn" (click)="exportToExcel()" style="background-color: #239b56; color: white;" title="Descargar Excel">
         <i class="bi bi-file-earmark-excel"></i>
       </button>
     </div>
-  
+
     <div class="col-auto btn-export-pdf">
       <button class="btn"  (click)="exportToPDF()" style="background-color: red; color: white;" title="Descargar PDF">
         <i class="bi bi-file-pdf"></i>
       </button>
     </div>
-  </div>
+    </div>
+
+    </div>
+
+
+
+
   
       <div class="d-flex justify-content-between align-items-center mb-3">
         <!-- Grupo de botones izquierdo -->
