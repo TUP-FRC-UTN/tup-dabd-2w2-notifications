@@ -382,11 +382,37 @@ export class TemplateListComponent implements OnInit {
   onSearchTextChange(searchTerms: string){
     //TODO SEGUIR ACA
     this.searchTerm = searchTerms
-    this.templateService.getAllTemplates().subscribe((data) => {
-      this.templates = data.filter(t => 
-          t.name.toUpperCase().includes(searchTerms.toUpperCase())
-      );
-    })
+    switch(this.isActivetemplateFilter){
+      case undefined: {
+        this.templateService.getAllTemplates().subscribe((data) => {
+          this.templates = data.filter(t => 
+              t.name.toUpperCase().includes(searchTerms.toUpperCase())
+          );
+        })
+        break
+      }
+      case true: {
+        this.templateService.getAllTemplates().subscribe((data) => {
+          this.templates = data.filter(t => 
+              t.name.toUpperCase().includes(searchTerms.toUpperCase()) && t.active == true
+          );
+        })
+        break
+      }
+      case false: {
+        this.templateService.getAllTemplates().subscribe((data) => {
+          this.templates = data.filter(t => 
+              t.name.toUpperCase().includes(searchTerms.toUpperCase()) && t.active == false
+          );
+        })
+        break
+      }
+    }
+    // this.templateService.getAllTemplates().subscribe((data) => {
+    //   this.templates = data.filter(t => 
+    //       t.name.toUpperCase().includes(searchTerms.toUpperCase())
+    //   );
+    // })
   }
 
 
