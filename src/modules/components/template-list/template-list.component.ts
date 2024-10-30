@@ -122,32 +122,22 @@ export class TemplateListComponent implements OnInit {
   filterByStatus(status: 'all' | 'active' | 'inactive') {
     if (status === 'all') {
       this.isActivetemplateFilter = undefined;
-      //this.templates = this.mocktemplates
       this.getEmailTemplates()
     }
     else if (status === 'active') {
       this.isActivetemplateFilter = true;
-      //this.templates = this.templates.filter(t => t.active == true)
       this.templateService.getAllTemplates().subscribe(data => {
         this.templates = data.filter(t => t.active == true)
       })
     }
     else if (status === 'inactive') {
       this.isActivetemplateFilter = false;
-      //this.templates = this.templates.filter(t => t.active == false)
       this.templateService.getAllTemplates().subscribe(data => {
         this.templates = data.filter(t => t.active == false)
       })
     }
     
   }
-  // filterByName() {
-  //   this.templates = this.templates.filter(t => t.name.toUpperCase() === this.searchTerm.toUpperCase())
-  //   /*this.emailService.getEmailTemplates().subscribe(data => {
-  //     this.templates = data.filter(template => template.name === this.searchTerm)
-  //   })*/
-  //   this.showInput = false
-  // }
 
   // Paginación
   initializePagination() {
@@ -271,15 +261,6 @@ export class TemplateListComponent implements OnInit {
   }
   deleteTemplate(deleteTemplate: TemplateModel) {
 
-    // const index = this.templates.findIndex(template => template.id === deleteTemplate.id);
-
-    // if (index !== -1) { 
-    //     this.templates[index].active = false
-    //     this.templates.splice(index, 1);
-    //     this.toastService.sendSuccess("Plantilla eliminada correctamente")
-    // } else {
-    //     this.toastService.sendError("Plantilla no encontrada")
-    // }
     this.templateService.deleteTemplate(deleteTemplate.id).subscribe({
       next: (response) => {
         this.toastService.sendSuccess("Plantilla eliminada correctamente")
@@ -380,7 +361,7 @@ export class TemplateListComponent implements OnInit {
   }
 
   onSearchTextChange(searchTerms: string){
-    //TODO SEGUIR ACA
+
     this.searchTerm = searchTerms
     switch(this.isActivetemplateFilter){
       case undefined: {
@@ -408,11 +389,6 @@ export class TemplateListComponent implements OnInit {
         break
       }
     }
-    // this.templateService.getAllTemplates().subscribe((data) => {
-    //   this.templates = data.filter(t => 
-    //       t.name.toUpperCase().includes(searchTerms.toUpperCase())
-    //   );
-    // })
   }
 
 
