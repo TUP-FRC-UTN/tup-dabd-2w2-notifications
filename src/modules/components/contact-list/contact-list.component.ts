@@ -14,6 +14,7 @@ import { map } from 'rxjs';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { PaginatedContacts } from '../../../app/models/contacts/paginated/PaginatedContact';
 
 @Component({
   selector: 'app-contact-list',
@@ -44,9 +45,11 @@ export class ContactListComponent implements OnInit {
   }
 
   // Paginación
-  currentPage = 1;
-  itemsPerPage = 10;
+  currentPage = 0;
+  pageSize = 10;
   totalItems = 0;
+  
+  totalPages = 0;
   sizeOptions: number[] = [10, 25, 50];
 
   // Filtros
@@ -56,7 +59,7 @@ export class ContactListComponent implements OnInit {
 
   // Datos y estados
   contacts: ContactModel[] = [];
-  filteredContacts: ContactModel[] = [];
+
 
   // Estados de modales
   isModalOpen = false;
@@ -81,7 +84,6 @@ export class ContactListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadContacts();
-    this.getAllContacts();
   }
 
   private getEmptyContact(): ContactModel {
@@ -95,17 +97,11 @@ export class ContactListComponent implements OnInit {
     };
   }
 
-  getFilteredContacts(): void {
-    this.contactService
-      .getFilteredContactsFromBackend(
-        this.isActiveContactFilter,
-        this.searchTerm,
-        this.selectedContactType
-      )
-      .subscribe((filteredContacts) => {
-        this.contacts = filteredContacts;
-      });
+  filterByContactType(contactType: string): void {
+    this.loadContacts(this.isActiveContactFilter, this.searchTerm, this.selectedContactType)
   }
+
+
 
   filterByStatus(status: 'all' | 'active' | 'inactive') {
     if (status === 'all') {
@@ -115,55 +111,53 @@ export class ContactListComponent implements OnInit {
     } else if (status === 'inactive') {
       this.isActiveContactFilter = false;
     }
-    this.getFilteredContacts();
+    this.loadContacts();
   }
 
   onSearchTextChange(searchTerm: string) {
     this.searchTerm = searchTerm;
-    this.getFilteredContacts();
+    this.loadContacts();
   }
 
-  filterByContactType(contactType: string): void {
-    this.contactService
-      .getFilteredContactsFromBackend(
-        this.isActiveContactFilter,
-        this.searchTerm,
-        contactType
-      )
-      .subscribe((filteredContacts) => {
-        this.contacts = filteredContacts;
-      });
-    this.showInput = true;
+  filterContacts(){
+    this.currentPage = 0;
+    this.loadContacts(this.isActiveContactFilter, this.searchTerm, this.selectedContactType)
   }
+
+
 
   // Carga de datos
-  loadContacts() {
-    this.contactService
-      .getFilteredContactsFromBackend(
-        this.isActiveContactFilter,
-        this.searchTerm,
-        this.selectedContactType
-      )
-      .subscribe({
-        next: (contacts) => {
-          this.contacts = contacts;
-          this.filteredContacts = [...this.contacts];
-          this.updatePagination();
-        },
-        error: (error) => {
-          this.showModal('Error', 'Error al cargar los contactos');
-          console.error('Error loading contacts:', error);
-        },
-      });
+  loadContacts(active?: boolean, searchText?: string, contactType?: string) {
+    this.contactService.getPaginatedContacts(this.currentPage, this.pageSize, active, searchText, contactType).subscribe(
+      (response: PaginatedContacts) => {
+        this.contacts = response.content; // Asigna los contactos paginados
+        this.totalItems = response.totalElements; // Total de elementos
+        this.totalPages = response.totalPages; // Total de páginas
+      },
+      error => {
+        console.error('Error fetching contacts:', error);
+      }
+    );
+    
+    
+
   }
 
-  getAllContacts() {
-    this.contactService.getAllContacts().subscribe((data: ContactModel[]) => {
-      this.contacts = data.sort((a, b) =>
-        a.contactValue.toLowerCase().localeCompare(b.contactValue.toLowerCase())
-      );
-    });
+  nextPage() {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+      this.loadContacts(this.isActiveContactFilter, this.searchTerm, this.selectedContactType);
+    }
   }
+  
+  previousPage() {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.loadContacts(this.isActiveContactFilter, this.searchTerm, this.selectedContactType);
+    }
+  }
+
+
 
   clearSearch() {
     this.searchTerm = '';
@@ -191,6 +185,8 @@ export class ContactListComponent implements OnInit {
     this.currentPage = page;
     this.loadContacts();
   }
+
+  
 
   saveContact() {
     this.router.navigate(['/contact/new']);
@@ -433,10 +429,5 @@ export class ContactListComponent implements OnInit {
 
     this.showModal('Información', message);
   }
-  //Pagination
-  get paginatedContacts() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    return this.contacts.slice(startIndex, endIndex);
-  }
+
 }

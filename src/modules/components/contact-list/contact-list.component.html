@@ -112,7 +112,7 @@
           </tr>
         </thead>
         <tbody>
-          @for(contact of paginatedContacts; track contact.id) {
+          @for(contact of contacts; track contact.id) {
           <tr>
             <td>{{contact.contactValue}}</td>
             <td>{{contact.contactType}}</td>
@@ -156,7 +156,7 @@
     <!-- Paginación e Info -->
     <div class="d-flex justify-content-between align-items-center mt-3">
       <div class="d-flex align-items-center">
-        <select class="form-select me-3" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()">
+        <select class="form-select me-3" [(ngModel)]="pageSize" (change)="onItemsPerPageChange()">
           <option [value]="10">10 Elementos</option>
           <option [value]="25">25 Elementos</option>
           <option [value]="50">50 Elementos</option>
@@ -164,7 +164,7 @@
       </div>
 
       <div class="d-flex align-items-center">
-        <ngb-pagination [(page)]="currentPage" [pageSize]="itemsPerPage" [collectionSize]="totalItems"
+        <ngb-pagination [(page)]="currentPage" [pageSize]="pageSize" [collectionSize]="totalItems"
           (pageChange)="changePage($event)" [maxSize]="5" [boundaryLinks]="false"></ngb-pagination>
 
         <button class="btn btn-secondary ms-3 mb-3" (click)="showInfo()">
