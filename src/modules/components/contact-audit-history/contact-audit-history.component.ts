@@ -187,20 +187,19 @@ export class ContactAuditHistoryComponent implements OnInit {
       next: (audits) => {
         autoTable(doc, {
           startY: 30,
-          head: [['Fecha', 'ID revisión', 'Tipo revisión', 'Tipo contacto', 'Valor']],
+          head: [['Fecha','Tipo revisión', 'Tipo contacto', 'Valor']],
           body: audits.map((audit) => [
             audit.revisionDate,
-            audit.revisionId,
             audit.revisionType,
             audit.contactType,
             audit.value
           ]),
           columnStyles: {
-            0: { cellWidth: 30 },  // Fecha del cambio - mantiene el ancho para las fechas
-            1: { cellWidth: 25 },  // ID de revisión - números cortos
-            2: { cellWidth: 20 },  // Tipo de revisión - palabras como "Adición"/"Modificación"
-            3: { cellWidth: 35 },  // Tipo de contacto - "Correo electrónico"
-            4: { cellWidth: 60 }   // Valor - emails largos como nicolasgeronimrodigoku@gmail.com
+            0: { cellWidth: 45 },  // Fecha del cambio - mantiene el ancho para las fechas
+            //1: { cellWidth: 25 },  // ID de revisión - números cortos
+            1: { cellWidth: 30 },  // Tipo de revisión - palabras como "Adición"/"Modificación"
+            2: { cellWidth: 35 },  // Tipo de contacto - "Correo electrónico"
+            3: { cellWidth: 60 }   // Valor - emails largos como nicolasgeronimrodigoku@gmail.com
           },
           styles: { overflow: 'linebreak' },
         });
@@ -224,7 +223,6 @@ export class ContactAuditHistoryComponent implements OnInit {
       next: (audits) => {
         const data = audits.map((audit) => ({
           Fecha: audit.revisionDate,
-          ID_revision: audit.revisionId,
           Tipo_revision: audit.revisionType,
           Tipo_contacto: audit.contactType,
           Valor: audit.value
