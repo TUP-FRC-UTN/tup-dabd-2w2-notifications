@@ -223,7 +223,6 @@ export class ContactAuditHistoryComponent implements OnInit {
       next: (audits) => {
         const data = audits.map((audit) => ({
           Fecha: audit.revisionDate,
-          ID_revision: audit.revisionId,
           Tipo_revision: audit.revisionType,
           Tipo_contacto: audit.contactType,
           Valor: audit.value
