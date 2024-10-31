@@ -9,11 +9,11 @@
             <i class="bi bi-search"></i>
           </span>
           <input
-          [(ngModel)]="searchTerm"
+          [(ngModel)]="globalSearchTerm"
             type="text"
             class="form-control"
             id="filter-text-box"
-            (input)="onSearchTextChange(searchTerm)"
+            (input)="onGlobalSearchTextChange(globalSearchTerm)"
           />
         </div>
       </div>
@@ -77,8 +77,8 @@
               <li><a class="dropdown-item" (click)="filterByContactType('SOCIAL_MEDIA_LINK')">Redes Sociales</a></li>
             </ul>
             <div class="input-group" *ngIf="showInput">
-              <input type="text" class="form-control rounded-start" [(ngModel)]="searchTerm"
-                (input)="onSearchTextChange(searchTerm)" placeholder="Buscar...">
+              <input type="text" class="form-control rounded-start" [(ngModel)]="filteredSearchTerm"
+                (input)="onFilteredSearchTextChange(filteredSearchTerm)" placeholder="Buscar...">
               <button class="btn btn-dark rounded-start ms-2">Buscar</button>
             </div>
           </div>

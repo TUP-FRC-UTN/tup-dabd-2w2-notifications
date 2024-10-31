@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { NotificationApi } from '../models/notification';
+import { Notification } from '../models/notification';
 import { forkJoin, map, switchMap } from 'rxjs';
 
 
@@ -23,15 +23,15 @@ export class NotificationService {
     const params = new HttpParams().set('contactId', 1); 
     const url = `${this.apiUrl}/notifications`;
   
-    return this.http.get<NotificationApi[]>(url, { params }).pipe(
+    return this.http.get<Notification[]>(url, { params }).pipe(
       switchMap(notifications => {
         const detailedRequests = notifications.map(notification =>
-          this.http.get<NotificationApi>(`${this.apiUrl}/notifications/${notification.id}`).pipe(
+          this.http.get<Notification>(`${this.apiUrl}/notifications/${notification.id}`).pipe(
             map(detailedNotification => ({
               ...notification,
               body: detailedNotification.body || '', 
               isRead: notification.statusSend === 'VISUALIZED',
-              dateSend: this.convertDateString(notification.dateSend),
+              dateSend: this.convertDate(notification.dateSend),
               dateNotification: new Date().toLocaleDateString() 
             }))
           )
@@ -47,15 +47,15 @@ export class NotificationService {
 
   getAllNotification() {
     const url = `${this.apiUrl}/notifications`;
-    return this.http.get<NotificationApi[]>(url).pipe(
+    return this.http.get<Notification[]>(url).pipe(
       switchMap(notifications => {
         const detailedRequests = notifications.map(notification =>
-          this.http.get<NotificationApi>(`${this.apiUrl}/notifications/${notification.id}`).pipe(
+          this.http.get<Notification>(`${this.apiUrl}/notifications/${notification.id}`).pipe(
             map(detailedNotification => ({
               ...notification,
               body: detailedNotification.body || '', 
               isRead: notification.statusSend === 'VISUALIZED',
-              dateSend: this.convertDateString(notification.dateSend),
+              dateSend: this.convertDate(notification.dateSend),
               dateNotification: new Date().toLocaleDateString() 
             }))
           )
@@ -71,7 +71,7 @@ export class NotificationService {
 
   getNotificationById(id: number) {
     const url = `${this.apiUrl}/notifications/${id}`;
-    return this.http.get<NotificationApi>(url);
+    return this.http.get<Notification>(url);
   }
 
 
@@ -81,12 +81,14 @@ export class NotificationService {
     return this.http.put(url, body)
   }
 
-  private convertDateString(dateString: string): Date {
-    const parts = dateString.split('/');
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1;
-    const year = parseInt(parts[2], 10);
-    return new Date(year, month, day);
-  }
+  private convertDate(date: string | Date): Date {
+    if (typeof date === 'string') {
+        const [day, month, yearTime] = date.split('/');
+        const [year, time] = yearTime.split(' ');
+        const [hours, minutes, seconds] = time ? time.split(':') : [0, 0, 0];
+        return new Date(+year, +month - 1, +day, +hours, +minutes, +seconds);
+    }
+    return date;
+}
   
 }
