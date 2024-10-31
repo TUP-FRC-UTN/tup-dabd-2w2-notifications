@@ -53,6 +53,7 @@ export class NotificationHistoricComponent implements OnInit {
   notificationSubjectFilter: string = '';
   filteredSearchTerm = '';
   showFilteredTextSearchInput: boolean = false;
+  showDatePickerFilter: boolean = false;
 
 
   private searchSubject = new Subject<string>();
@@ -69,13 +70,30 @@ export class NotificationHistoricComponent implements OnInit {
     this.initializePagination();
   }
 
+  formatDateToISOStart = (dateString: string): string => {
+    if (!dateString) return '';
+    // Toma la fecha del datepicker y le agrega el tiempo al inicio del día (00:00:00)
+    const date = new Date(dateString);
+    date.setHours(0, 0, 0, 0);
+    return date.toISOString();
+  };
+  
+   formatDateToISOEnd = (dateString: string): string => {
+    if (!dateString) return '';
+    // Toma la fecha del datepicker y le agrega el tiempo al final del día (23:59:59)
+    const date = new Date(dateString);
+    date.setHours(23, 59, 59, 999);
+    return date.toISOString();
+  };
+
+
   loadNotifications(): void {
     const filter: NotificationFilter = {
       search_term: this.globalSearchTerm,
       viewed: this.statusFilter === 'VISUALIZED' ? true : this.statusFilter === 'SENT' ? false : undefined,
       subject: this.notificationSubjectFilter,
-      from: this.dateFrom || undefined,
-      until: this.dateUntil || undefined,
+      from: this.dateFrom ? this.formatDateToISOStart(this.dateFrom) : undefined,
+      until: this.dateUntil ? this.formatDateToISOEnd(this.dateUntil) : undefined,
       recipient: this.recipientFilter || undefined
     };
 
@@ -101,17 +119,6 @@ export class NotificationHistoricComponent implements OnInit {
 
   }
 
-  clearFilters(): void {
-
-    this.dateFrom = '';
-    this.dateUntil = '';
-    this.statusFilter = '';
-    this.recipientFilter = '';
-    this.globalSearchTerm = '';
-    this.currentPage = 1;
-    this.loadNotifications();
-  
-  }
 
   
   onFilterChange(filterType: string){
@@ -120,7 +127,12 @@ export class NotificationHistoricComponent implements OnInit {
   }
   
   applyDropdownFilters(){
-    this.showFilteredTextSearchInput = true;
+    if(this.currentDropdownFilter !== 'dateFilter'){
+      this.showFilteredTextSearchInput = true;
+    } else {
+      this.showDatePickerFilter = true;
+    }
+
   }
   
   onFilteredSearchTextChange(filteredSearchTerm: string) {
@@ -131,6 +143,22 @@ export class NotificationHistoricComponent implements OnInit {
     if(this.currentDropdownFilter === 'subjectFilter'){
       this.notificationSubjectFilter = filteredSearchTerm;
     }
+    this.loadNotifications();
+  }
+
+  onDatePickerFilterChange(): void {
+    // Validamos que las fechas tengan sentido
+    if (this.dateFrom && this.dateUntil) {
+      const fromDate = new Date(this.dateFrom);
+      const untilDate = new Date(this.dateUntil);
+      
+      if (fromDate > untilDate) {
+        console.error('La fecha "Desde" no puede ser posterior a la fecha "Hasta"');
+        return;
+      }
+    }
+    
+    this.currentPage = 1; 
     this.loadNotifications();
   }
 
@@ -195,15 +223,15 @@ export class NotificationHistoricComponent implements OnInit {
     doc.save(fileName+".pdf");
   }
 
-  clearSearch(): void {
+  clearFilters(): void {
     this.dateFrom = '';
     this.dateUntil = '';
-    this.statusFilter = '';
     this.recipientFilter = '';
     this.globalSearchTerm = '';
     this.filteredSearchTerm = '';
     this.currentPage = 1;
     this.showFilteredTextSearchInput = false;
+    this.showDatePickerFilter = false;
     this.loadNotifications();
   }
 
@@ -295,6 +323,8 @@ export class NotificationHistoricComponent implements OnInit {
   closeModalToRenderHTML(): void {
     this.showModalToRenderHTML = false;
   }
+
+
 
 
 }
