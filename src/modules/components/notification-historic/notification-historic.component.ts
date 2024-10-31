@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
-import { Notification } from '../../../app/models/notification';
+import { Notification } from '../../../app/models/notifications/notification';
 import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { NotificationService } from '../../../app/services/notification.service';
+import { Subject } from 'rxjs';
+import { NotificationFilter } from '../../../app/models/notifications/filters/notificationFilter';
 
 @Component({
   selector: 'app-notification-historic',
@@ -20,6 +22,7 @@ export class NotificationHistoricComponent implements OnInit {
   notifications: Notification[] = [];
   selectedNotification?: Notification;
   filteredNotifications: Notification[] = [];
+
 
   // Paginación
   currentPage = 1;
@@ -44,7 +47,8 @@ export class NotificationHistoricComponent implements OnInit {
   dateFrom: string = '';
   dateUntil: string = '';
   emailFilter: string = '';
-  currentFilter: string = 'status';
+  currentFilter: string = 'Todos';
+  private searchSubject = new Subject<string>();
 
   private notificationService = inject(NotificationService);
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
@@ -52,58 +56,6 @@ export class NotificationHistoricComponent implements OnInit {
   ngOnInit(): void {
     
     this.loadNotifications();
-
-    // this.notifications.push(
-    //   {
-    //     id: 1,
-    //     subject: "Aprovecha esta PROMOCIÓN!",
-    //     recipient: 'gabrielacollazo@hotmail.com',
-    //     templateId: 1,
-    //     templateName: 'Promoción',
-    //     statusSend: 'SENT',
-    //     body : "",
-    //     dateSend: '2002-12-24 17:12',
-    //   },
-    //   {
-    //     id: 2,
-    //     subject: "Pago de Epec rechazado",
-    //     recipient: 'jorge@example.com',
-    //     templateId: 2,
-    //     body : "",
-    //     templateName: 'Cuenta',
-    //     statusSend: 'VISUALIZED',
-    //     dateSend: '2024-05-15 03:16',
-    //   },
-    //   {
-    //     id: 3,
-    //     recipient: 'maria@example.com',
-    //     subject: "Su comentario ha sido enviado",
-    //     templateId: 1,
-    //     body : "",
-    //     templateName: 'Comentarios',
-    //     statusSend: 'SENT',
-    //     dateSend:'2024-01-30 19:46',
-    //   },
-    //   {
-    //     id: 4,
-    //     recipient: 'luisa@example.com',
-    //     subject: "Te recordamos el cumpleaños de ...",
-    //     templateId: 3,
-    //     body : "",
-    //     templateName: 'Recordatorio',
-    //     statusSend: 'VISUALIZED',
-    //     dateSend: '2023-11-05 15:31',
-    //   },
-    //   {
-    //     id: 5,
-    //     recipient: 'pablo@example.com',
-    //     subject: "Confirmación de envío de producto",
-    //     templateId: 2,
-    //     body : "",
-    //     templateName: 'Confirmación',
-    //     statusSend: 'SENT',
-    //     dateSend: '2023-10-01 12:00',
-    //   },)
   }
 
   constructor() {
@@ -111,14 +63,34 @@ export class NotificationHistoricComponent implements OnInit {
   }
 
   loadNotifications(): void {
-    this.notificationService.getAllNotification()
-      .subscribe(response => {
-        this.notifications = response;
-        this.filteredNotifications = [...this.notifications];
-        this.totalItems = this.filteredNotifications.length;
+    const filter: NotificationFilter = {
+      search_term: this.searchTerm,
+      viewed: this.status === 'VISUALIZED' ? true : this.status === 'SENT' ? false : undefined,
+      from: this.dateFrom || undefined,
+      until: this.dateUntil || undefined,
+      recipient: this.emailFilter || undefined
+    };
+
+    const pageRequest = {
+      page: this.currentPage,
+      size: this.itemsPerPage,
+      sort: ['id,desc']
+    };
+
+
+    this.notificationService.getPaginatedNotifications(filter, pageRequest)
+      .subscribe({
+        next: (response) => {
+          this.notifications = response.content;
+          this.filteredNotifications = this.notifications;
+          this.totalItems = response.totalElements;
+        },
+        error: (error)=>{
+          console.error('Error loading notifications: ', error);
+        
+        }
       });
-    this.filteredNotifications = [...this.notifications];
-    this.totalItems = this.filteredNotifications.length;
+
   }
 
   clearFilters(): void {
@@ -128,28 +100,9 @@ export class NotificationHistoricComponent implements OnInit {
     this.status = '';
     this.emailFilter = '';
     this.searchTerm = '';
-    this.filteredNotifications = [...this.notifications];
-    this.totalItems = this.filteredNotifications.length;
-  }
-
-  filterNotifications(): void {
-    this.filteredNotifications = this.notifications.filter(notification => {
-      let matches = true;
-      if (this.status) {
-        matches = matches && notification.statusSend === this.status.toUpperCase();
-      }
-      if (this.dateFrom) {
-        matches = matches && notification.dateSend >= this.dateFrom;
-      }
-      if (this.dateUntil) {
-        matches = matches && notification.dateSend <= this.dateUntil;
-      }
-      if (this.emailFilter) {
-        matches = matches && notification.recipient.includes(this.emailFilter);
-      }
-      return matches;
-    });
-    this.totalItems = this.filteredNotifications.length;
+    this.currentPage = 1;
+    this.loadNotifications();
+  
   }
 
   onFilterChange(filter: string) {
@@ -166,8 +119,22 @@ export class NotificationHistoricComponent implements OnInit {
       this.dateFrom = '';
       this.dateUntil = '';
     }
-    this.filterNotifications();
+    this.currentPage = 1;
+    this.loadNotifications();
   }
+
+
+
+  filterNotifications(): void {
+    this.currentPage = 1;
+    this.loadNotifications();
+  }
+
+  
+
+
+
+
 
   exportToExcel(): void {
     const data = this.filteredNotifications.map((notification) => ({

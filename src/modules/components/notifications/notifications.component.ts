@@ -1,7 +1,7 @@
 import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../app/services/notification.service';
-import { Notification } from '../../../app/models/notification';
+import { Notification } from '../../../app/models/notifications/notification';
 import { Router } from '@angular/router';
 
 @Component({
