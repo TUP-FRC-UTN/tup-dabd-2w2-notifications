@@ -8,6 +8,7 @@ import { ContactListComponent } from '../modules/components/contact-list/contact
 import { ContactNewComponent } from '../modules/components/contact-new/contact-new.component'
 import { NotificationHistoricComponent } from '../modules/components/notification-historic/notification-historic.component';
 import { NotificationChartComponent } from './notification-chart/notification-chart.component';
+import { MyNotificationComponent } from '../modules/components/my-notification/my-notification.component';
 
 export const routes: Routes = [
   {
@@ -29,6 +30,10 @@ export const routes: Routes = [
   {
     path: 'notifications-historic',
     component: NotificationHistoricComponent,
+  },
+  {
+    path: 'my-notification',
+    component: MyNotificationComponent,
   },
   {
     path: 'contact-audit', component: ContactAuditHistoryComponent

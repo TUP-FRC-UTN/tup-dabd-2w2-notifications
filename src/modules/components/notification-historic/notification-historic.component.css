@@ -76,39 +76,6 @@
 }
 
 .modal {
-  background-color: rgba(0, 0, 0, 0.5);
-  color: black;
-}
-
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color:  rgba(0, 0, 0, 0.5);
-}
-.modal-body {
-  max-width: 100%;
-  width: auto;
-  height: auto;
-}
-
-.modal-dialog {
-  max-width: 50%; 
-  width: auto;    
-  margin: 1rem auto; 
-}
-
-.modal-content {
-  max-width: 100%;
-  width: auto;
-  height: auto;
-  padding: 1rem;
-}
-
-
-.modal {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -120,6 +87,27 @@
   background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
 }
 
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color:  rgba(0, 0, 0, 0.5);
+}
+.modal-body {
+  overflow-y: auto; /* Permite el desplazamiento vertical */
+  max-height: 70vh; /* Ajusta la altura máxima del cuerpo del modal */
+  padding: 10px; /* Espaciado interno */
+}
+
+
+.modal-dialog {
+  max-width: 50%; 
+  width: auto;    
+  margin: 1rem auto; 
+}
+
 .modal-content {
   background-color: white;
   padding: 20px;
@@ -127,6 +115,21 @@
   width: 80%;
   max-width: 800px;
   position: relative;
+  max-height: 90vh; /* Ajusta la altura máxima del modal */
+  overflow: hidden; /* Evita que el contenido se desborde del contenedor del modal */
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  margin: 0;
 }
 
 .close {

@@ -1,7 +1,7 @@
 import { Component, Inject, inject } from '@angular/core';
 import { ToastService } from 'ngx-dabd-grupo01';
 import { TemplateService } from '../../../app/services/template.service';
-import { FormsModule, NgForm } from '@angular/forms';
+import { AbstractControl, FormsModule, NgForm, ValidatorFn } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TemplateModel } from '../../../app/models/templates/templateModel';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -33,6 +33,11 @@ export class TemplateEmailComponent {
   toastService: ToastService = inject(ToastService);
 
   public async sendForm(form: NgForm) {
+    // Agrega el validador a templateBody
+    const templateBodyControl = form.controls['templateBodyModel'];
+    templateBodyControl.setValidators([this.isValidHTML()]);
+    templateBodyControl.updateValueAndValidity();
+
     if (form.valid) {
       return await this.sendEmailTemplate(
         form.value.templateNameModel,
@@ -74,4 +79,21 @@ export class TemplateEmailComponent {
     this.templateName = '';
     this.templateBody = '';
   }
+  isValidHTML(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const html = control.value;
+  
+      if (!html) {
+        return null; // No hay valor, no se aplica la validación
+      }
+  
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+  
+      const isValid = !doc.getElementsByTagName('parsererror').length; // Verifica si hay errores
+  
+      return isValid ? null : { invalidHtml: true }; // Retorna un objeto de error si es inválido
+    };
+  }
+  
 }
