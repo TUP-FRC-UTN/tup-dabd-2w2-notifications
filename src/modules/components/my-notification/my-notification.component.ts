@@ -9,14 +9,16 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { NotificationService } from '../../../app/services/notification.service';
 
+
 @Component({
-  selector: 'app-notification-historic',
+  selector: 'app-my-notification',
   standalone: true,
   imports: [CommonModule, NgbPagination, MainContainerComponent, FormsModule],
-  templateUrl: './notification-historic.component.html',
-  styleUrl: './notification-historic.component.css'
+  templateUrl: './my-notification.component.html',
+  styleUrl: './my-notification.component.css'
 })
-export class NotificationHistoricComponent implements OnInit {
+export class MyNotificationComponent implements OnInit {
+
   notifications: Notification[] = [];
   selectedNotification?: Notification;
   filteredNotifications: Notification[] = [];
@@ -104,6 +106,7 @@ export class NotificationHistoricComponent implements OnInit {
     //     statusSend: 'SENT',
     //     dateSend: '2023-10-01 12:00',
     //   },)
+
   }
 
   constructor() {
@@ -111,7 +114,7 @@ export class NotificationHistoricComponent implements OnInit {
   }
 
   loadNotifications(): void {
-    this.notificationService.getAllNotification()
+    this.notificationService.getNotificationByContact()
       .subscribe(response => {
         this.notifications = response;
         this.filteredNotifications = [...this.notifications];
@@ -184,7 +187,7 @@ export class NotificationHistoricComponent implements OnInit {
     const fileName = `Notificaciones-${dateTime}.xlsx`;
     XLSX.writeFile(wb, fileName);
   }
-
+  
   exportToPDF(): void {
     const doc = new jsPDF();
     doc.setFontSize(18);
@@ -281,19 +284,30 @@ export class NotificationHistoricComponent implements OnInit {
   }
 
   previewContent(notification: Notification): void {
-    this.showModalToRenderHTML = true;
-    this.selectedNotification = notification;
-    setTimeout(() => {
-      const iframe = this.iframePreview.nativeElement as HTMLIFrameElement;
-      iframe.srcdoc = notification.body; // Usa el body de la notificación como contenido del iframe
-      iframe.onload = () => {
-        const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
-        if (iframeDocument) {
-          const height = iframeDocument.documentElement.scrollHeight;
-          iframe.style.height = `${height}px`; // Ajusta la altura del iframe
-        }
-      };
-    }, 5);
+    // Llamar al método isRead para marcar la notificación como leída
+    this.notificationService.isRead(notification.id).subscribe(
+      () => {
+        // Si la actualización fue exitosa, continúa mostrando el contenido
+        this.showModalToRenderHTML = true;
+        this.selectedNotification = notification;
+  
+        setTimeout(() => {
+          const iframe = this.iframePreview.nativeElement as HTMLIFrameElement;
+          iframe.srcdoc = notification.body; // Usa el body de la notificación como contenido del iframe
+          iframe.onload = () => {
+            const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
+            if (iframeDocument) {
+              const height = iframeDocument.documentElement.scrollHeight;
+              iframe.style.height = `${height}px`; // Ajusta la altura del iframe
+            }
+          };
+        }, 5);
+      },
+      (err) => {
+        console.error("Error al marcar la notificación como leída", err);
+        // Maneja el error si es necesario
+      }
+    );
   }
 
   // Cierra los modales
@@ -306,6 +320,4 @@ export class NotificationHistoricComponent implements OnInit {
   closeModalToRenderHTML(): void {
     this.showModalToRenderHTML = false;
   }
-
-
 }

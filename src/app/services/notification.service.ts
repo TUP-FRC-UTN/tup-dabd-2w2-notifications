@@ -83,10 +83,12 @@ export class NotificationService {
 
   private convertDate(date: string | Date): Date {
     if (typeof date === 'string') {
-      const [day, month, year] = date.split('/');
-      return new Date(+year, +month - 1, +day);
+        const [day, month, yearTime] = date.split('/');
+        const [year, time] = yearTime.split(' ');
+        const [hours, minutes, seconds] = time ? time.split(':') : [0, 0, 0];
+        return new Date(+year, +month - 1, +day, +hours, +minutes, +seconds);
     }
     return date;
-  }
+}
   
 }

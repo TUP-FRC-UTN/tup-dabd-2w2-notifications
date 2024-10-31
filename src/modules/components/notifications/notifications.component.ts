@@ -2,6 +2,7 @@ import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../app/services/notification.service';
 import { Notification } from '../../../app/models/notification';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-notifications',
@@ -10,6 +11,7 @@ import { Notification } from '../../../app/models/notification';
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.css']
 })
+
 export class NotificationsComponent implements OnInit {
   notifications: Notification[] = [];
   selectedNotification: Notification | null = null;
@@ -21,7 +23,12 @@ export class NotificationsComponent implements OnInit {
 
   showModalToRenderHTML: boolean = false;
   
+  clickCount = 0;
+  showNotification = false;
+
   notificationService = new NotificationService();
+  constructor(private router: Router) {}
+
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
 
   ngOnInit() {
@@ -65,7 +72,6 @@ export class NotificationsComponent implements OnInit {
         console.error('Error al actualizar la notificación como leída', error);
       }
     });
-
   }
 
   closeModal() {
@@ -101,9 +107,22 @@ export class NotificationsComponent implements OnInit {
     }, 5);
   }
 
+  handleDoubleClick() {
+    this.clickCount++;
+    if (this.clickCount === 2) {
+      this.router.navigate(['/my-notification']);
+      this.clickCount = 0;
+    }
+    setTimeout(() => {
+      this.clickCount = 0;
+    }, 300);
+  }
+
   loadMoreNotifications(){
     const nextNotifications = this.remainingNotifications.slice(0, 5);
     this.displayedNotifications = [...this.displayedNotifications, ...nextNotifications];
     this.remainingNotifications = this.remainingNotifications.slice(5); // Elimina las cargadas
+    this.handleDoubleClick();
+    
   }
 }
