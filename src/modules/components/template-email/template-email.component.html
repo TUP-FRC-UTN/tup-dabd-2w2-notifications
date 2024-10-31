@@ -27,8 +27,7 @@
         <textarea #templateBodyModel="ngModel"
           [ngClass]="{'is-invalid': templateBodyModel.invalid  && (templateBodyModel.dirty || templateBodyModel.touched) ,'is-valid': templateBodyModel.valid }"
           class="form-control" id="templateBodyModel" name="templateBodyModel" style="max-width: 400px;"
-          [(ngModel)]="templateBody" required minlength="100" rows="10" 
-          [isValidHTML]></textarea>
+          [(ngModel)]="templateBody" required minlength="100" rows="10"></textarea>
         @if(templateBodyModel.invalid && (templateBodyModel.dirty || templateBodyModel.touched)) {
         
           @if(templateBodyModel.getError('minlength')) {
