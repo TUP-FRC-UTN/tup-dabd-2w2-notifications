@@ -15,6 +15,8 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { PaginatedContacts } from '../../../app/models/contacts/paginated/PaginatedContact';
+import { TelegramSenderComponent } from '../telegram-sender/telegram-sender.component';
+import { ActiveSearchTerm } from '../../../app/models/contacts/filters/activeSearchTerm';
 
 @Component({
   selector: 'app-contact-list',
@@ -26,6 +28,7 @@ import { PaginatedContacts } from '../../../app/models/contacts/paginated/Pagina
     NgbPagination,
     NgbDropdownModule,
     MainContainerComponent,
+    TelegramSenderComponent
   ],
   templateUrl: './contact-list.component.html',
   styleUrls: ['./contact-list.component.css'],
@@ -35,6 +38,7 @@ export class ContactListComponent implements OnInit {
   private contactService = inject(ContactService);
   toastService: ToastService = inject(ToastService);
   suscriptionService: SubscriptionService = inject(SubscriptionService);
+  isTelegramModalOpen = false;
 
   availableSubscriptions: string[] = [];
 
@@ -52,7 +56,11 @@ export class ContactListComponent implements OnInit {
   sizeOptions: number[] = [10, 25, 50];
 
   // Filtros
-  searchTerm = '';
+  globalSearchTerm = '';
+  filteredSearchTerm = '';
+
+  
+
   isActiveContactFilter: boolean | undefined = true;
   selectedContactType: string = '';
 
@@ -71,6 +79,7 @@ export class ContactListComponent implements OnInit {
 
   //Estado de filtors
   showInput: boolean = false;
+  activeSearchTerm : ActiveSearchTerm = ActiveSearchTerm.GLOBAL;
 
   // Referencias
   @ViewChild('editForm') editForm!: NgForm;
@@ -101,6 +110,7 @@ export class ContactListComponent implements OnInit {
     console.log('contactType ', contactType)
     this.selectedContactType = contactType;
     this.showInput = true;
+    this.activeSearchTerm = ActiveSearchTerm.FILTERED;
     this.applyFilters();
   }
 
@@ -108,7 +118,7 @@ export class ContactListComponent implements OnInit {
     this.currentPage = 1; // Resetear a la primera página al filtrar
     this.loadContacts(
       this.isActiveContactFilter, 
-      this.searchTerm, 
+      this.activeSearchTerm === ActiveSearchTerm.FILTERED ? this.filteredSearchTerm : this.globalSearchTerm , 
       this.selectedContactType
     );
   }
@@ -128,10 +138,17 @@ export class ContactListComponent implements OnInit {
     this.applyFilters();
   }
 
-  onSearchTextChange(searchTerm: string) {
-    this.searchTerm = searchTerm;
+  onGlobalSearchTextChange(searchTerm: string) {
+    this.globalSearchTerm = searchTerm;
     this.applyFilters();
   }
+
+  onFilteredSearchTextChange(filteredSearchTerm: string) {
+    this.filteredSearchTerm = filteredSearchTerm;
+    this.applyFilters();
+  }
+
+  
 
 
 
@@ -152,21 +169,23 @@ export class ContactListComponent implements OnInit {
   nextPage() {
     if (this.currentPage < this.totalPages - 1) {
       this.currentPage++;
-      this.loadContacts(this.isActiveContactFilter, this.searchTerm, this.selectedContactType);
+      this.loadContacts(this.isActiveContactFilter, this.globalSearchTerm, this.selectedContactType);
     }
   }
   
   previousPage() {
     if (this.currentPage > 0) {
       this.currentPage--;
-      this.loadContacts(this.isActiveContactFilter, this.searchTerm, this.selectedContactType);
+      this.loadContacts(this.isActiveContactFilter, this.globalSearchTerm, this.selectedContactType);
     }
   }
 
 
 
   clearSearch() {
-    this.searchTerm = '';
+    this.globalSearchTerm = '';
+    this.filteredSearchTerm = '';
+    this.activeSearchTerm = ActiveSearchTerm.GLOBAL;
     this.selectedContactType = '';
     this.isActiveContactFilter = true;
     this.showInput = false; // Ocultar input al limpiar
@@ -436,4 +455,11 @@ export class ContactListComponent implements OnInit {
     this.showModal('Información', message);
   }
 
+  openTelegramModal() {
+    this.isTelegramModalOpen = true;
+  }
+  
+  closeTelegramModal() {
+    this.isTelegramModalOpen = false;
+  }
 }

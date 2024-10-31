@@ -55,58 +55,6 @@ export class MyNotificationComponent implements OnInit {
 
     this.loadNotifications();
 
-    // this.notifications.push(
-    //   {
-    //     id: 1,
-    //     subject: "Aprovecha esta PROMOCIÓN!",
-    //     recipient: 'gabrielacollazo@hotmail.com',
-    //     templateId: 1,
-    //     templateName: 'Promoción',
-    //     statusSend: 'SENT',
-    //     body : "",
-    //     dateSend: '2002-12-24 17:12',
-    //   },
-    //   {
-    //     id: 2,
-    //     subject: "Pago de Epec rechazado",
-    //     recipient: 'jorge@example.com',
-    //     templateId: 2,
-    //     body : "",
-    //     templateName: 'Cuenta',
-    //     statusSend: 'VISUALIZED',
-    //     dateSend: '2024-05-15 03:16',
-    //   },
-    //   {
-    //     id: 3,
-    //     recipient: 'maria@example.com',
-    //     subject: "Su comentario ha sido enviado",
-    //     templateId: 1,
-    //     body : "",
-    //     templateName: 'Comentarios',
-    //     statusSend: 'SENT',
-    //     dateSend:'2024-01-30 19:46',
-    //   },
-    //   {
-    //     id: 4,
-    //     recipient: 'luisa@example.com',
-    //     subject: "Te recordamos el cumpleaños de ...",
-    //     templateId: 3,
-    //     body : "",
-    //     templateName: 'Recordatorio',
-    //     statusSend: 'VISUALIZED',
-    //     dateSend: '2023-11-05 15:31',
-    //   },
-    //   {
-    //     id: 5,
-    //     recipient: 'pablo@example.com',
-    //     subject: "Confirmación de envío de producto",
-    //     templateId: 2,
-    //     body : "",
-    //     templateName: 'Confirmación',
-    //     statusSend: 'SENT',
-    //     dateSend: '2023-10-01 12:00',
-    //   },)
-
   }
 
   constructor() {
@@ -223,7 +171,9 @@ export class MyNotificationComponent implements OnInit {
 
   onSearchTextChange(searchTerm: string): void {
     this.searchTerm = searchTerm;
-    this.loadNotifications();
+    this.notificationService.getNotificationByContact().subscribe(data => {
+      this.filteredNotifications = data.filter(n => n.subject.toUpperCase().includes(this.searchTerm.toUpperCase()))
+    })    
   }
 
   initializePagination() {
