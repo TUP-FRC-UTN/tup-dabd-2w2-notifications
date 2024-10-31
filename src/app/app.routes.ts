@@ -7,7 +7,7 @@ import { ContactAuditHistoryComponent } from '../modules/components/contact-audi
 import { ContactListComponent } from '../modules/components/contact-list/contact-list.component'
 import { ContactNewComponent } from '../modules/components/contact-new/contact-new.component'
 import { NotificationHistoricComponent } from '../modules/components/notification-historic/notification-historic.component';
-import { NotificationChartComponent } from './notification-chart/notification-chart.component';
+import { NotificationChartComponent } from '../modules/components/notification-chart/notification-chart.component';
 import { MyNotificationComponent } from '../modules/components/my-notification/my-notification.component';
 
 export const routes: Routes = [
