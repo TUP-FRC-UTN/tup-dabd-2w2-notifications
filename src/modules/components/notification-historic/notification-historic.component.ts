@@ -129,8 +129,10 @@ export class NotificationHistoricComponent implements OnInit {
   applyDropdownFilters(){
     if(this.currentDropdownFilter !== 'dateFilter'){
       this.showFilteredTextSearchInput = true;
+      this.showDatePickerFilter = false;
     } else {
       this.showDatePickerFilter = true;
+      this.showFilteredTextSearchInput = false;
     }
 
   }
