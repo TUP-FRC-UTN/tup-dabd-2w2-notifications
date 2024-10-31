@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
-import { Notification } from '../../../app/models/notification';
+import { Notification } from '../../../app/models/notifications/notification';
 import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
@@ -52,7 +52,7 @@ export class MyNotificationComponent implements OnInit {
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
 
   ngOnInit(): void {
-    
+
     this.loadNotifications();
 
     // this.notifications.push(
@@ -187,7 +187,7 @@ export class MyNotificationComponent implements OnInit {
     const fileName = `Notificaciones-${dateTime}.xlsx`;
     XLSX.writeFile(wb, fileName);
   }
-  
+
   exportToPDF(): void {
     const doc = new jsPDF();
     doc.setFontSize(18);
@@ -290,7 +290,7 @@ export class MyNotificationComponent implements OnInit {
         // Si la actualización fue exitosa, continúa mostrando el contenido
         this.showModalToRenderHTML = true;
         this.selectedNotification = notification;
-  
+
         setTimeout(() => {
           const iframe = this.iframePreview.nativeElement as HTMLIFrameElement;
           iframe.srcdoc = notification.body; // Usa el body de la notificación como contenido del iframe

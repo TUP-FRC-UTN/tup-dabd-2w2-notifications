@@ -1,7 +1,7 @@
 import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../app/services/notification.service';
-import { Notification } from '../../../app/models/notification';
+import { Notification } from '../../../app/models/notifications/notification';
 import { Router } from '@angular/router';
 
 @Component({
@@ -18,11 +18,11 @@ export class NotificationsComponent implements OnInit {
   showNotifications = false;
   showModal = false;
 
-  displayedNotifications: Notification[] = []; 
-  remainingNotifications: Notification[] = []; 
+  displayedNotifications: Notification[] = [];
+  remainingNotifications: Notification[] = [];
 
   showModalToRenderHTML: boolean = false;
-  
+
   clickCount = 0;
   showNotification = false;
 
@@ -122,6 +122,6 @@ export class NotificationsComponent implements OnInit {
     this.displayedNotifications = [...this.displayedNotifications, ...nextNotifications];
     this.remainingNotifications = this.remainingNotifications.slice(5); // Elimina las cargadas
     this.handleDoubleClick();
-    
+
   }
 }

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
-import { Notification } from '../../../app/models/notification';
+import { Notification } from '../../../app/models/notifications/notification';
 import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
@@ -50,7 +50,7 @@ export class NotificationHistoricComponent implements OnInit {
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
 
   ngOnInit(): void {
-    
+
     this.loadNotifications();
 
     // this.notifications.push(
