@@ -42,12 +42,11 @@ export class NotificationHistoricComponent implements OnInit {
   showModalToRenderHTML: boolean = false;
 
   // Filtros
-  searchTerm = '';
-  status: string = '';
+  globalSearchTerm = '';
+  statusFilter: string = '';
   dateFrom: string = '';
   dateUntil: string = '';
   emailFilter: string = '';
-  currentFilter: string = 'Todos';
   private searchSubject = new Subject<string>();
 
   private notificationService = inject(NotificationService);
@@ -64,8 +63,8 @@ export class NotificationHistoricComponent implements OnInit {
 
   loadNotifications(): void {
     const filter: NotificationFilter = {
-      search_term: this.searchTerm,
-      viewed: this.status === 'VISUALIZED' ? true : this.status === 'SENT' ? false : undefined,
+      search_term: this.globalSearchTerm,
+      viewed: this.statusFilter === 'VISUALIZED' ? true : this.statusFilter === 'SENT' ? false : undefined,
       from: this.dateFrom || undefined,
       until: this.dateUntil || undefined,
       recipient: this.emailFilter || undefined
@@ -74,7 +73,7 @@ export class NotificationHistoricComponent implements OnInit {
     const pageRequest = {
       page: this.currentPage,
       size: this.itemsPerPage,
-      sort: ['id,desc']
+      sort: ['id,asc']
     };
 
 
@@ -94,34 +93,17 @@ export class NotificationHistoricComponent implements OnInit {
   }
 
   clearFilters(): void {
-    this.currentFilter = 'Todos';
+
     this.dateFrom = '';
     this.dateUntil = '';
-    this.status = '';
+    this.statusFilter = '';
     this.emailFilter = '';
-    this.searchTerm = '';
+    this.globalSearchTerm = '';
     this.currentPage = 1;
     this.loadNotifications();
   
   }
 
-  onFilterChange(filter: string) {
-    this.currentFilter = filter;
-    if (filter === 'Usuario') {
-      this.status = '';
-      this.dateFrom = '';
-      this.dateUntil = '';
-    } else if (filter === 'Fecha') {
-      this.status = '';
-      this.emailFilter = '';
-    } else if (filter === 'Estado') {
-      this.emailFilter = '';
-      this.dateFrom = '';
-      this.dateUntil = '';
-    }
-    this.currentPage = 1;
-    this.loadNotifications();
-  }
 
 
 
@@ -129,6 +111,15 @@ export class NotificationHistoricComponent implements OnInit {
     this.currentPage = 1;
     this.loadNotifications();
   }
+
+
+  
+  filterByStatus(status: 'SENT' | 'VISUALIZED' ) {
+
+    this.statusFilter = status;
+    this.loadNotifications();
+  }
+
 
   
 
@@ -181,12 +172,12 @@ export class NotificationHistoricComponent implements OnInit {
   }
 
   clearSearch(): void {
-    this.searchTerm = '';
+    this.globalSearchTerm = '';
     this.loadNotifications();
   }
 
-  onSearchTextChange(searchTerm: string): void {
-    this.searchTerm = searchTerm;
+  onGlobalSearchTextChange(globalSearch: string): void {
+    this.globalSearchTerm = globalSearch;
     this.loadNotifications();
   }
 

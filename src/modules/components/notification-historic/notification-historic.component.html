@@ -8,11 +8,11 @@
           <i class="bi bi-search"></i>
         </span>
         <input
-        [(ngModel)]="searchTerm"
+        [(ngModel)]="globalSearchTerm"
           type="text"
           class="form-control"
           id="filter-text-box"
-          (input)="onSearchTextChange(searchTerm)"
+          (input)="onGlobalSearchTextChange(globalSearchTerm)"
         />
       </div>
     </div>
@@ -36,9 +36,6 @@
     </div>
 
 
-
-
-  
       <div class="d-flex justify-content-between align-items-center mb-3">
         <!-- Grupo de botones izquierdo -->
         <div class="btn-group me-5" role="group">
@@ -55,45 +52,26 @@
                 <li>
                   <h6 class="dropdown-header">Tipo de Filtro</h6>
                 </li>
-                <li><a class="dropdown-item" (click)="onFilterChange('Todos')">Todos</a></li>
-                <li><a class="dropdown-item" (click)="onFilterChange('Estado')">Estado</a></li>
-                <li><a class="dropdown-item" (click)="onFilterChange('Fecha')">Fecha</a></li>
-                <li><a class="dropdown-item" (click)="onFilterChange('Usuario')">Usuario</a></li>
               </ul>
             </div>
           </div>
         </div>
-  
-  
-            <!-- Inputs para filtrado -->
-            @if(currentFilter === 'Fecha'){
-              <div  class="mb-3">
-                  <label for="dateFrom">Desde:</label>
-                  <input type="date" id="dateFrom" [(ngModel)]="dateFrom" (ngModelChange)="filterNotifications()" class="form-control mb-2">
-                  
-                  <label for="dateUntil">Hasta:</label>
-                  <input type="date" id="dateUntil" [(ngModel)]="dateUntil"  (ngModelChange)="filterNotifications()" class="form-control">
-                </div>
-            }
-            @if(currentFilter === 'Estado'){
-            <div class="mb-3">
-              <label for="status">Estado:</label>
-                  <select id="status" [(ngModel)]="status" (ngModelChange)="filterNotifications()" class="form-select">
 
-                <option value="">Seleccione Estado</option>
-                <option value="SENT">Pendiente</option>
-                <option value="VISUALIZED">Visualizado</option>
-              </select>
-            </div>
-          }
-          @if(currentFilter === 'Usuario'){
-              <div  class="mb-3">
-                  <label for="userFilter">Usuario:</label>
-                  <input type="text" id="userFilter" [(ngModel)]="emailFilter"
-                  (ngModelChange)="filterNotifications()" class="form-control" placeholder="Ingresa el correo del usuario">
-                </div>
-            
-          }
+        <div class="btn-group" role="group">
+          <input type="radio" class="btn-check" name="btnradio" id="btnradio1" (change)="filterByStatus('SENT')">
+          <label class="btn btn-outline-primary" for="btnradio1">Pendiente</label>
+  
+          <input type="radio" class="btn-check" name="btnradio" id="btnradio2" (change)="filterByStatus('VISUALIZED')">
+          <label class="btn btn-outline-primary" for="btnradio2">Visualizada</label>
+  
+      
+        </div>
+
+
+
+    
+  
+           
     
       </div>
   
@@ -124,7 +102,7 @@
             </tr>
           </thead>
           <tbody>
-            @for(notification of paginatedNotifications; track $index) {
+            @for(notification of notifications; track $index) {
             <tr>
                 <td title="{{ notification.recipient }}">
                     {{ notification.recipient.split('@')[0] }}&#64;...
