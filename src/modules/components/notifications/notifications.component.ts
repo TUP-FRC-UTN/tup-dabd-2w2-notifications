@@ -110,12 +110,11 @@ export class NotificationsComponent implements OnInit {
   handleDoubleClick() {
     this.clickCount++;
     if (this.clickCount === 2) {
+      console.log("doble click")
       this.router.navigate(['/my-notification']);
       this.clickCount = 0;
+      console.log(this.clickCount)
     }
-    setTimeout(() => {
-      this.clickCount = 0;
-    }, 300);
   }
 
   loadMoreNotifications(){
