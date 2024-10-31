@@ -32,7 +32,7 @@ export class NotificationsComponent implements OnInit {
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
 
   ngOnInit() {
-    this.notificationService.getAllNotification().subscribe({
+    this.notificationService.getNotificationByContact().subscribe({
       next: (notifications) => {
         this.notifications = notifications.sort((a, b) => {
           return new Date(b.dateSend).getTime() - new Date(a.dateSend).getTime();
