@@ -15,6 +15,7 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { PaginatedContacts } from '../../../app/models/contacts/paginated/PaginatedContact';
+import { TelegramSenderComponent } from '../telegram-sender/telegram-sender.component';
 
 @Component({
   selector: 'app-contact-list',
@@ -26,6 +27,7 @@ import { PaginatedContacts } from '../../../app/models/contacts/paginated/Pagina
     NgbPagination,
     NgbDropdownModule,
     MainContainerComponent,
+    TelegramSenderComponent
   ],
   templateUrl: './contact-list.component.html',
   styleUrls: ['./contact-list.component.css'],
@@ -35,6 +37,7 @@ export class ContactListComponent implements OnInit {
   private contactService = inject(ContactService);
   toastService: ToastService = inject(ToastService);
   suscriptionService: SubscriptionService = inject(SubscriptionService);
+  isTelegramModalOpen = false;
 
   availableSubscriptions: string[] = [];
 
@@ -436,4 +439,11 @@ export class ContactListComponent implements OnInit {
     this.showModal('Información', message);
   }
 
+  openTelegramModal() {
+    this.isTelegramModalOpen = true;
+  }
+  
+  closeTelegramModal() {
+    this.isTelegramModalOpen = false;
+  }
 }
