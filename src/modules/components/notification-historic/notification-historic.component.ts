@@ -8,7 +8,7 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { NotificationService } from '../../../app/services/notification.service';
-import { Subject } from 'rxjs';
+import { filter, Subject } from 'rxjs';
 import { NotificationFilter } from '../../../app/models/notifications/filters/notificationFilter';
 
 @Component({
@@ -46,7 +46,15 @@ export class NotificationHistoricComponent implements OnInit {
   statusFilter: string = '';
   dateFrom: string = '';
   dateUntil: string = '';
-  emailFilter: string = '';
+
+  //Dropdown filters
+  currentDropdownFilter = '';
+  recipientFilter: string = '';
+  notificationSubjectFilter: string = '';
+  filteredSearchTerm = '';
+  showFilteredTextSearchInput: boolean = false;
+
+
   private searchSubject = new Subject<string>();
 
   private notificationService = inject(NotificationService);
@@ -65,9 +73,10 @@ export class NotificationHistoricComponent implements OnInit {
     const filter: NotificationFilter = {
       search_term: this.globalSearchTerm,
       viewed: this.statusFilter === 'VISUALIZED' ? true : this.statusFilter === 'SENT' ? false : undefined,
+      subject: this.notificationSubjectFilter,
       from: this.dateFrom || undefined,
       until: this.dateUntil || undefined,
-      recipient: this.emailFilter || undefined
+      recipient: this.recipientFilter || undefined
     };
 
     const pageRequest = {
@@ -97,24 +106,39 @@ export class NotificationHistoricComponent implements OnInit {
     this.dateFrom = '';
     this.dateUntil = '';
     this.statusFilter = '';
-    this.emailFilter = '';
+    this.recipientFilter = '';
     this.globalSearchTerm = '';
     this.currentPage = 1;
     this.loadNotifications();
   
   }
 
-
-
-
-  filterNotifications(): void {
-    this.currentPage = 1;
+  
+  onFilterChange(filterType: string){
+    this.currentDropdownFilter = filterType;
+    this.applyDropdownFilters();
+  }
+  
+  applyDropdownFilters(){
+    this.showFilteredTextSearchInput = true;
+  }
+  
+  onFilteredSearchTextChange(filteredSearchTerm: string) {
+    this.filteredSearchTerm = filteredSearchTerm;
+    if(this.currentDropdownFilter === 'recipientFilter'){
+      this.recipientFilter = filteredSearchTerm;
+    }
+    if(this.currentDropdownFilter === 'subjectFilter'){
+      this.notificationSubjectFilter = filteredSearchTerm;
+    }
     this.loadNotifications();
   }
 
+  
+
 
   
-  filterByStatus(status: 'SENT' | 'VISUALIZED' ) {
+  filterByStatus(status: 'SENT' | 'VISUALIZED' | 'ALL' ) {
 
     this.statusFilter = status;
     this.loadNotifications();
@@ -172,7 +196,14 @@ export class NotificationHistoricComponent implements OnInit {
   }
 
   clearSearch(): void {
+    this.dateFrom = '';
+    this.dateUntil = '';
+    this.statusFilter = '';
+    this.recipientFilter = '';
     this.globalSearchTerm = '';
+    this.filteredSearchTerm = '';
+    this.currentPage = 1;
+    this.showFilteredTextSearchInput = false;
     this.loadNotifications();
   }
 

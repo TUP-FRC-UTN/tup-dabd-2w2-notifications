@@ -52,7 +52,15 @@
                 <li>
                   <h6 class="dropdown-header">Tipo de Filtro</h6>
                 </li>
+              
+                <li><a class="dropdown-item" (click)="onFilterChange('recipientFilter')">Usuario</a></li>
+                <li><a class="dropdown-item" (click)="onFilterChange('subjectFilter')">Asunto</a></li>
               </ul>
+              <div class="input-group" *ngIf="showFilteredTextSearchInput">
+                <input type="text" class="form-control rounded-start" [(ngModel)]="filteredSearchTerm"
+                  (input)="onFilteredSearchTextChange(filteredSearchTerm)" placeholder="Buscar...">
+                <button class="btn btn-dark rounded-start ms-2">Buscar</button>
+              </div>
             </div>
           </div>
         </div>
@@ -63,6 +71,9 @@
   
           <input type="radio" class="btn-check" name="btnradio" id="btnradio2" (change)="filterByStatus('VISUALIZED')">
           <label class="btn btn-outline-primary" for="btnradio2">Visualizada</label>
+
+          <input type="radio" class="btn-check" name="btnradio" id="btnradio3" (change)="filterByStatus('ALL')" checked>
+          <label class="btn btn-outline-primary" for="btnradio3">Todos</label>
   
       
         </div>
