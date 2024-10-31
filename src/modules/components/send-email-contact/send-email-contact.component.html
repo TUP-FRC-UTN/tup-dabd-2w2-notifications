@@ -7,18 +7,19 @@
                 <div class="col-6">
                     <label class="form-label">Elegir Contactos:</label>
                     <div class="d-flex align-items-center">
-                        <select #contactos="ngModel" class="form-select me-2" style="max-width: 350px;" name="Contactos" id="contactos" [(ngModel)]="selectedContactId"
+                        <select #contactos="ngModel" class="form-select me-2" style="max-width: 350px;" name="Contactos" id="contactos" 
+                        [(ngModel)]="selectedContactId"
                         required
                         [ngClass]="{'is-invalid': contactos.invalid && (contactos.dirty || contactos.touched), 'is-valid': contactos.valid && (contactos.dirty || contactos.touched)}">
                             @for (c of allContacts; track $index) {
                                 <option [value]="c.id"> {{c.contactValue}} </option>
                             }
-                            @if (contactos.invalid && (contactos.dirty || contactos.touched)) {
-                                @if (contactos.getError('required')) {
-                                    <div class="text-danger"> Campo Obligatorio </div>
-                                }
-                            }
                         </select>
+                        @if (contactos.invalid && (contactos.dirty || contactos.touched)) {
+                            @if (contactos.getError('required')) {
+                                <div class="text-danger"> Campo Obligatorio </div>
+                            }
+                        }
                         <button type="button" class="btn btn-secondary"(click)="addContact()"> + </button>
                     </div>
                 </div>
