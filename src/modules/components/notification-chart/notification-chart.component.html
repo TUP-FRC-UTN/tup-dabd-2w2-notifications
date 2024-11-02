@@ -1,33 +1,108 @@
+<br>
+<br>
+<!-- KPIs Row -->
+<div class="row mb-4">
+  <!-- Success Rate KPI -->
+  <h2 class="h4 mb-3">KPIs</h2>
+  <div class="col-md-3 mb-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2">
+          <div class="icon-circle bg-success text-white me-3">
+            <i class="bi bi-check-circle"></i>
+          </div>
+          <h6 class="card-subtitle text-muted mb-0">Tasa de Éxito</h6>
+        </div>
+        <h2 class="card-title mb-0 text-success">{{kpis.successRate | number:'1.0-1'}}%</h2>
+        <small class="text-muted">Notificaciones enviadas exitosamente</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily Average KPI -->
+  <div class="col-md-3 mb-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2">
+          <div class="icon-circle bg-primary text-white me-3">
+            <i class="bi bi-graph-up"></i>
+          </div>
+          <h6 class="card-subtitle text-muted mb-0">Promedio Diario</h6>
+        </div>
+        <h2 class="card-title mb-0">{{kpis.dailyAverage | number:'1.0-1'}}</h2>
+        <small class="text-muted">Notificaciones por día</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Most Used Template KPI -->
+  <div class="col-md-3 mb-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2">
+          <div class="icon-circle bg-warning text-white me-3">
+            <i class="bi bi-file-text"></i>
+          </div>
+          <h6 class="card-subtitle text-muted mb-0">Plantilla más Usada</h6>
+        </div>
+        <h2 class="card-title mb-0">{{kpis.mostUsedTemplate.count}}</h2>
+        <small class="text-muted">{{kpis.mostUsedTemplate.name}}</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Peak Hour KPI -->
+  <div class="col-md-3 mb-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2">
+          <div class="icon-circle bg-info text-white me-3">
+            <i class="bi bi-clock"></i>
+          </div>
+          <h6 class="card-subtitle text-muted mb-0">Hora Pico</h6>
+        </div>
+        <h2 class="card-title mb-0">{{kpis.peakHour.hour}}:00</h2>
+        <small class="text-muted">{{kpis.peakHour.count}} notificaciones</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!--GRAFICOS-->
+
 <div class="container-fluid p-4">
   <!-- Header -->
   <div class="row mb-4">
     <div class="col">
-      <h2 class="h4 mb-3">Notificaciones</h2>
+      <h2 class="h4 mb-3">Charts</h2>
     </div>
   </div>
   <!-- Date Filters -->
+  <!-- Date Filters -->
+  <!-- Date Filters -->
   <div class="row mb-4">
-    <div class="col-lg-8">
+    <div class="col-12">
       <div class="card">
-        <div class="card-body">
-          <h5 class="card-title mb-3">Filtros</h5>
-          <div class="row">
-            <div class="col-8">
-              <div class="mb-3">
-                <label for="dateFrom" class="form-label">Desde:</label>
-                <input type="date" id="dateFrom" [(ngModel)]="dateFrom" placeholder="dd/mm/aaaa"
-                  class="form-control mb-3">
-
-                <label for="dateUntil" class="form-label">Hasta:</label>
-                <input type="date" id="dateUntil" [(ngModel)]="dateUntil" placeholder="dd/mm/aaaa" class="form-control">
-              </div>
+        <div class="card-body p-3">
+          <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2">
+              <span class="text-secondary">Desde:</span>
+              <input type="date" [(ngModel)]="dateFrom" class="form-control form-control-sm">
             </div>
-            <div class="col-4 d-flex flex-column" style="padding-top: 32px;">
-              <button type="button" class="btn btn-outline-info mb-4" (click)="filterNotifications()">
-                <i class="bi bi-funnel-fill"></i> Filtros
+
+            <div class="d-flex align-items-center gap-2">
+              <span class="text-secondary">Hasta:</span>
+              <input type="date" [(ngModel)]="dateUntil" class="form-control form-control-sm">
+            </div>
+
+            <div class="d-flex gap-1">
+              <button class="btn btn-outline-danger btn-sm border-0" (click)="resetFilters()">
+                <i class="bi bi-trash3"></i> <!-- Cambiado a trash3 que es el icono outline -->
               </button>
-              <button type="button" class="btn btn-outline-danger" style="margin-top: 8px;" (click)="resetFilters()">
-                <i class="bi bi-trash-fill"></i> Limpiar
+              <button class="btn btn-outline-info btn-sm border-0" (click)="filterNotifications()">
+                <i class="bi bi-funnel-fill"></i> <!-- Cambiado a funnel-fill que es el icono sólido -->
               </button>
             </div>
           </div>
@@ -36,13 +111,26 @@
     </div>
   </div>
 
-  <!-- Charts Grid -->
   <div class="row">
-    <!-- Status Chart -->
-    <div class="col-lg-4 mb-4">
+    <!-- Daily Notifications Chart - Full Width -->
+    <div class="col-12 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title text-center">Notificaciones por Día</h5>
+          <div class="chart-container">
+            <canvas baseChart #dailyChart="base-chart" [data]="dailyChartData" [options]="dailyChartOptions"
+              [type]="'line'">
+            </canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two columns for remaining charts -->
+    <div class="col-md-6 mb-4">
       <div class="card h-100">
         <div class="card-body">
-          <h5 class="card-title mb-3">Estado de Notificaciones</h5>
+          <h5 class="card-title text-center">Estado de Notificaciones</h5>
           <div class="chart-container">
             <canvas baseChart #statusChart="base-chart" [data]="statusChartData" [options]="statusChartOptions"
               [type]="'pie'">
@@ -52,11 +140,10 @@
       </div>
     </div>
 
-    <!-- Template Usage Chart -->
-    <div class="col-lg-4 mb-4">
+    <div class="col-md-6 mb-4">
       <div class="card h-100">
         <div class="card-body">
-          <h5 class="card-title mb-3">Uso de Plantillas</h5>
+          <h5 class="card-title text-center">Uso de Plantillas</h5>
           <div class="chart-container">
             <canvas baseChart #templateChart="base-chart" [data]="templateChartData" [options]="templateChartOptions"
               [type]="'bar'">
@@ -65,19 +152,4 @@
         </div>
       </div>
     </div>
-
-    <!-- Daily Notifications Chart -->
-    <div class="col-lg-4 mb-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title mb-3">Notificaciones por Día</h5>
-          <div class="chart-container">
-            <canvas baseChart #dailyChart="base-chart" [data]="dailyChartData" [options]="dailyChartOptions"
-              [type]="'line'">
-            </canvas>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
-</div>

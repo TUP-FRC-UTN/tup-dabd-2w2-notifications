@@ -6,6 +6,22 @@ import { ChartConfiguration } from 'chart.js';
 import { NotificationService } from '../../../app/services/notification.service';
 import { Notification, NotificationMock } from '../../../app/models/notifications/notification';
 
+
+interface KPIMetrics {
+  successRate: number;
+  failureRate: number;
+  pendingRate: number;
+  dailyAverage: number;
+  mostUsedTemplate: {
+    name: string;
+    count: number;
+  };
+  peakHour: {
+    hour: number;
+    count: number;
+  };
+}
+
 @Component({
   selector: 'app-notification-chart',
   standalone: true,
@@ -17,6 +33,8 @@ import { Notification, NotificationMock } from '../../../app/models/notification
   templateUrl: './notification-chart.component.html',
   styleUrl: './notification-chart.component.css'
 })
+
+
 
 export class NotificationChartComponent implements OnInit {
   @ViewChild('statusChart') statusChart?: BaseChartDirective;
@@ -31,6 +49,10 @@ export class NotificationChartComponent implements OnInit {
 
 
   notificationService = inject(NotificationService)
+
+
+
+  kpis!: KPIMetrics;
 
 
   notifications: NotificationMock[] = [
@@ -393,25 +415,31 @@ export class NotificationChartComponent implements OnInit {
     }
   };
 
-  // Status Chart (Pie)
   public statusChartData: ChartConfiguration<'pie'>['data'] = {
-    labels: ['Enviados', 'Fallidos', 'Pendientes'],
+    labels: ['Enviados', 'Fallidos', 'No Leída'],
     datasets: [{
       data: [0, 0, 0],
       backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56']
     }]
   };
 
-  public statusChartOptions: ChartConfiguration['options'] = {
-    ...this.commonOptions,
-    plugins: {
-      ...this.commonOptions?.plugins,
-      title: {
-        display: true,
-        text: 'Estado de Notificaciones'
+ // Status Chart (Pie)
+public statusChartOptions: ChartConfiguration['options'] = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'bottom',
+      labels: {
+        usePointStyle: true,
+        padding: 20
       }
+    },
+    title: {
+      display: false
     }
-  };
+  }
+};
 
   // Template Usage Chart (Bar)
   public templateChartData: ChartConfiguration<'bar'>['data'] = {
@@ -424,62 +452,90 @@ export class NotificationChartComponent implements OnInit {
   };
 
   public templateChartOptions: ChartConfiguration['options'] = {
-    ...this.commonOptions,
+    responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      ...this.commonOptions?.plugins,
+      legend: {
+        display: false
+      },
       title: {
-        display: true,
-        text: 'Uso de Plantillas'
+        display: false
       }
     },
     scales: {
       y: {
         beginAtZero: true,
         ticks: {
-          stepSize: 1,
+          stepSize: 4,
           precision: 0
+        },
+        grid: {
+          color: '#e9ecef'
+        }
+      },
+      x: {
+        grid: {
+          display: false
         }
       }
     }
   };
 
-  // Daily Notifications Chart (Line)
-  public dailyChartData: ChartConfiguration<'line'>['data'] = {
-    labels: [],
-    datasets: [{
-      data: [],
-      label: 'Notificaciones Enviadas',
-      fill: false,
-      tension: 0.1,
-      borderColor: '#36A2EB'
-    }]
-  };
+// Daily Chart (Line)
+public dailyChartData: ChartConfiguration<'line'>['data'] = {
+  labels: [],
+  datasets: [{
+    data: [],
+    label: 'Notificaciones Enviadas',
+    fill: false,
+    tension: 0.1,
+    borderColor: '#36A2EB',
+    backgroundColor: '#36A2EB',
+    pointBackgroundColor: '#36A2EB',
+    pointBorderColor: '#fff',
+    pointHoverBackgroundColor: '#fff',
+    pointHoverBorderColor: '#36A2EB'
+  }]
+};
 
-  public dailyChartOptions: ChartConfiguration['options'] = {
-    ...this.commonOptions,
-    plugins: {
-      ...this.commonOptions?.plugins,
-      title: {
-        display: true,
-        text: 'Notificaciones por Día'
+public dailyChartOptions: ChartConfiguration['options'] = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false
+    },
+    title: {
+      display: false
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      ticks: {
+        stepSize: 1,
+        precision: 0
+      },
+      grid: {
+        color: '#e9ecef'
       }
     },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          stepSize: 1,
-          precision: 0
-        }
+    x: {
+      grid: {
+        color: '#e9ecef'
       }
     }
-  };
+  }
+};
+
 
   ngOnInit() {
 
     /*this.getAllNotifications();*/
 
     this.filterAndUpdateCharts();
+
+
 
   }
 
@@ -529,7 +585,7 @@ export class NotificationChartComponent implements OnInit {
     });
 
     this.statusChartData = {
-      labels: ['Enviados', 'Fallidos', 'NO LEIDA'],
+      labels: ['Enviados', 'Fallidos', 'No Leida'],
       datasets: [{
         data: [statusCount.SENT, statusCount.FAILED, statusCount['NO LEIDA']],
         backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56']
@@ -583,5 +639,54 @@ export class NotificationChartComponent implements OnInit {
       this.templateChart?.update();
       this.dailyChart?.update();
     });
+
+    this.calculateKPIs(data);
   }
+
+
+  private calculateKPIs(data: any[]): void {
+    const total = data.length;
+
+    // Tasas de estado
+    const sent = data.filter(n => n.statusSend === 'SENT').length;
+    const failed = data.filter(n => n.statusSend === 'FAILED').length;
+    const pending = data.filter(n => n.statusSend === 'PENDING').length;
+
+    // Promedio diario
+    const uniqueDays = new Set(data.map(n => n.dateSend.split(' ')[0])).size;
+
+    // Plantilla más usada
+    const templateCount = new Map<string, number>();
+    data.forEach(n => {
+      templateCount.set(n.templateName, (templateCount.get(n.templateName) || 0) + 1);
+    });
+    const mostUsedTemplate = Array.from(templateCount.entries())
+      .reduce((a, b) => a[1] > b[1] ? a : b, ['', 0]);
+
+    // Hora pico
+    const hourCount = new Map<number, number>();
+    data.forEach(n => {
+      const hour = parseInt(n.dateSend.split(' ')[1].split(':')[0]);
+      hourCount.set(hour, (hourCount.get(hour) || 0) + 1);
+    });
+    const peakHour = Array.from(hourCount.entries())
+      .reduce((a, b) => a[1] > b[1] ? a : b, [0, 0]);
+
+    this.kpis = {
+      successRate: (sent / total) * 100,
+      failureRate: (failed / total) * 100,
+      pendingRate: (pending / total) * 100,
+      dailyAverage: total / uniqueDays,
+      mostUsedTemplate: {
+        name: mostUsedTemplate[0],
+        count: mostUsedTemplate[1]
+      },
+      peakHour: {
+        hour: peakHour[0],
+        count: peakHour[1]
+      }
+    };
+  }
+
+
 }
