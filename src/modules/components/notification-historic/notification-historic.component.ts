@@ -8,13 +8,14 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { NotificationService } from '../../../app/services/notification.service';
-import { filter, Subject } from 'rxjs';
+import {  Subject } from 'rxjs';
 import { NotificationFilter } from '../../../app/models/notifications/filters/notificationFilter';
+import {Filter, FilterConfigBuilder, TableFiltersComponent } from 'ngx-dabd-grupo01'
 
 @Component({
   selector: 'app-notification-historic',
   standalone: true,
-  imports: [CommonModule, NgbPagination, MainContainerComponent, FormsModule],
+  imports: [CommonModule, NgbPagination, MainContainerComponent, TableFiltersComponent, FormsModule],
   templateUrl: './notification-historic.component.html',
   styleUrl: './notification-historic.component.css'
 })
@@ -55,8 +56,18 @@ export class NotificationHistoricComponent implements OnInit {
   showFilteredTextSearchInput: boolean = false;
   showDatePickerFilter: boolean = false;
 
+  
 
-  private searchSubject = new Subject<string>();
+  filterConfig: Filter[] = new FilterConfigBuilder()
+.textFilter('Asunto', 'subject', "Buscar por asunto...")
+.textFilter('Usuario', "recipient", "Buscar por email de destinatario...")
+.selectFilter('Estado', 'viewed', 'Seleccione un estado', [
+  {value: 'SENT', label: 'Enviadas'},
+  {value: 'VISUALIZED', label: 'Vistas'}
+])
+.build();
+
+
 
   private notificationService = inject(NotificationService);
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
@@ -119,12 +130,17 @@ export class NotificationHistoricComponent implements OnInit {
 
   }
 
+  onFilterChange($event :Record<string, any>){
+    console.log($event);
+  }
+
 
   
+  /*
   onFilterChange(filterType: string){
     this.currentDropdownFilter = filterType;
     this.applyDropdownFilters();
-  }
+  } */
   
   applyDropdownFilters(){
     if(this.currentDropdownFilter !== 'dateFilter'){
