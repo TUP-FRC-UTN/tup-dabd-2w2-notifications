@@ -122,7 +122,7 @@ export class TemplateListComponent implements OnInit {
     };
   }
   onGlobalSearchTextChange(globalSearchTerm : string) {
-
+    this.onSearchTextChange(globalSearchTerm);
   }
   filterConfig : Filter[] = new FilterConfigBuilder()
   .textFilter('Buscar por Nombre', 'filteredName', 'Buscar Nombre...')
@@ -133,32 +133,38 @@ export class TemplateListComponent implements OnInit {
   ])
   .build();
 
-  //TODO MODIFICAR
   filterChange($event: Record<string, any>) {
-    //this.clearFilters();
-    console.log($event);
-    
-    if($event['status']  && $event['status'].trim() !== '' ) {
-      if($event['status']==='ALL'){
-        //alert("todo")
-        this.getEmailTemplates()
-      }
-      if($event['status']==='ACTIVE'){
-        //alert("activo")
-        this.templates = this.templates.filter(t => t.active == true)
-        this.isActivetemplateFilter = true
-      }
-      if ($event['status']==='INACTIVE' ) {
-        //alert("no activo")
-        this.templates = this.templates.filter(t => t.active == false)
-        this.isActivetemplateFilter = false
-      } 
-    }
-    if($event['filteredSearch']  && $event['filteredSearch'].trim() !== '' ) {
-      
-      this.onSearchTextChange(this.filteredName)
-    }
-  }
+    // Cargar todos los templates si no hay filtros aplicados
+    this.templateService.getAllTemplates().subscribe((data) => {
+        let filteredTemplates = data; // Comienza con la lista completa
+
+        // Filtrar por estado
+        if ($event['status'] && $event['status'].trim() !== '') {
+            if ($event['status'] === 'ACTIVE') {
+                filteredTemplates = filteredTemplates.filter(t => t.active === true);
+            } else if ($event['status'] === 'INACTIVE') {
+                filteredTemplates = filteredTemplates.filter(t => t.active === false);
+            }
+        }
+
+        // Filtrar por nombre, solo si hay un término de búsqueda
+        if ($event['filteredName'] && $event['filteredName'].trim() !== '') {
+            filteredTemplates = filteredTemplates.filter(t =>
+                t.name.toUpperCase().includes($event['filteredName'].toUpperCase())
+            );
+        }
+
+        // Actualizar la lista de templates
+        this.templates = filteredTemplates;
+
+        // Actualizar la paginación
+        this.updatePagination();
+    }, error => {
+        this.toastService.sendError("Error al cargar las plantillas");
+    });
+}
+
+
 
   // Paginación
   initializePagination() {
@@ -372,44 +378,15 @@ export class TemplateListComponent implements OnInit {
   }
 
 
-  // clearSearch() {
-  //   this.searchTerm = '';
-  //   this.showInput = false; // Ocultar input al limpiar
-  //   this.getEmailTemplates();
-  // }
-
-  onSearchTextChange(searchTerms: string){
-
-    //this.searchTerm = searchTerms
-    switch(this.isActivetemplateFilter){
-      case undefined: {
-        this.templateService.getAllTemplates().subscribe((data) => {
-          this.templates = data.filter(t => 
-              t.name.toUpperCase().includes(searchTerms.toUpperCase())
-          );
-        })
-        break
-      }
-      case true: {
-        this.templateService.getAllTemplates().subscribe((data) => {
-          this.templates = data.filter(t => 
-              t.name.toUpperCase().includes(searchTerms.toUpperCase()) && t.active == true
-          );
-        })
-        break
-      }
-      case false: {
-        this.templateService.getAllTemplates().subscribe((data) => {
-          this.templates = data.filter(t => 
-              t.name.toUpperCase().includes(searchTerms.toUpperCase()) && t.active == false
-          );
-        })
-        break
-      }
-    }
-  }
-
-
+  onSearchTextChange(searchTerms: string) {
+    this.templateService.getAllTemplates().subscribe((data) => {
+        this.templates = data.filter(t => {
+            const matchesName = t.name.toUpperCase().includes(searchTerms.toUpperCase());
+            return matchesName 
+        });
+        this.updatePagination(); 
+    });
+}
 
   saveEditedTemplate() {
     if (this.editingtemplate) {
@@ -436,4 +413,11 @@ export class TemplateListComponent implements OnInit {
     const endIndex = startIndex + this.itemsPerPage;
     return this.templates.slice(startIndex, endIndex);
   }
+
+  clearFilters() {
+    this.globalSearchTerm = '';
+    this.isActivetemplateFilter = undefined; 
+    this.getEmailTemplates(); 
+}
+
 }
