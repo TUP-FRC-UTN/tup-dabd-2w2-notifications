@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { Notification, NotificationMock } from '../../app/models/notifications/notification';
+import { Notification, NotificationModelChart } from '../../app/models/notifications/notification';
 import { forkJoin, map, Observable, switchMap } from 'rxjs';
 
 
@@ -92,12 +92,12 @@ export class NotificationService {
   }
 
 
-  getAllNotificationsNotFiltered(): Observable<NotificationMock[]> {
+  getAllNotificationsNotFiltered(): Observable<NotificationModelChart[]> {
 
     const url = `${this.apiUrl}/notifications`;
 
 
-    return this.http.get<NotificationMock[]>(url);
+    return this.http.get<NotificationModelChart[]>(url);
 
   }
 

@@ -13,7 +13,7 @@ export interface Notification {
 }
 
 
-export interface NotificationMock {
+export interface NotificationModelChart {
   id: number;
   recipient: string;
   subject: string;
