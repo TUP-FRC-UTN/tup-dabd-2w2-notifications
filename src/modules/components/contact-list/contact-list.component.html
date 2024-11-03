@@ -4,7 +4,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <!-- Sección de búsqueda y filtros -->
       <div class="btn-group me-5" role="group">
-        <div class="col-sm-12 col-md-8 col-xl-8" id="general-search">
+        <div class="col-sm-12 col-md-8 col-xl-10" id="general-search">
           <div class="input-group" style="max-width: 280px">
             <span class="input-group-text mr-3" id="search-icon">
               <i class="bi bi-search"></i>
@@ -15,6 +15,8 @@
               class="form-control"
               id="filter-text-box"
               (input)="onGlobalSearchTextChange(globalSearchTerm)"
+              placeholder="Buscar..."
+
             />
             <app-table-filters [filters]="filterConfig" (filterValueChange)="filterChange($event)" (clearFilters)="clearFilters()"></app-table-filters> 
           </div>
@@ -44,9 +46,6 @@
             <path d="M228.646,34.7676a11.96514,11.96514,0,0,0-12.21778-2.0752L31.87109,105.19729a11.99915,11.99915,0,0,0,2.03467,22.93457L84,138.15139v61.833a11.8137,11.8137,0,0,0,7.40771,11.08593,12.17148,12.17148,0,0,0,4.66846.94434,11.83219,11.83219,0,0,0,8.40918-3.5459l28.59619-28.59619L175.2749,217.003a11.89844,11.89844,0,0,0,7.88819,3.00195,12.112,12.112,0,0,0,3.72265-.59082,11.89762,11.89762,0,0,0,8.01319-8.73925L232.5127,46.542A11.97177,11.97177,0,0,0,228.646,34.7676ZM32.2749,116.71877a3.86572,3.86572,0,0,1,2.522-4.07617L203.97217,46.18044,87.07227,130.60769,35.47461,120.28811A3.86618,3.86618,0,0,1,32.2749,116.71877Zm66.55322,86.09375A3.99976,3.99976,0,0,1,92,199.9844V143.72048l35.064,30.85669ZM224.71484,44.7549,187.10107,208.88772a4.0003,4.0003,0,0,1-6.5415,2.10937l-86.1543-75.8164,129.66309-93.645A3.80732,3.80732,0,0,1,224.71484,44.7549Z"/>
           </svg>
         </button>
-
-
-
 
     </div>
     </div>
@@ -131,9 +130,6 @@
         <ngb-pagination [(page)]="currentPage" [pageSize]="pageSize" [collectionSize]="totalItems"
           (pageChange)="changePage($event)" [maxSize]="5" [boundaryLinks]="false"></ngb-pagination>
 
-        <button class="btn btn-secondary ms-3 mb-3" (click)="showInfo()">
-          <i class="bi bi-info-circle"></i>
-        </button>
       </div>
     </div>
 
@@ -293,7 +289,42 @@
         <button type="button" class="btn-close" (click)="isModalOpen = false"></button>
       </div>
       <div class="modal-body">
-        <div [innerHTML]="modalMessage"></div>
+        <div class="container-fluid">
+          <!-- Introducción -->
+          <div class="alert alert-info mb-2">
+            <h5 class="alert-heading">Información sobre los Contactos</h5>
+            <p class="mb-0 small">Esta tabla presenta una lista de contactos registrados, junto con su tipo y estado de actividad.</p>
+          </div>
+
+          <!-- Descripción de los campos -->
+          <div class="card mb-2">
+            <div class="card-header">
+              <h5 class="mb-0">Descripción de los Campos</h5>
+            </div>
+            <div class="card-body">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <strong>Contacto:</strong> Dirección de correo electrónico del contacto registrado.
+                </li>
+                <li class="list-group-item">
+                  <strong>Tipo de Contacto:</strong> Tipo de comunicación (en este caso, todos son correos electrónicos).
+                </li>
+                <li class="list-group-item">
+                  <strong>Estado:</strong> Indica si el contacto está activo, marcado con un ícono de verificación (✅).
+                </li>
+                <li class="list-group-item">
+                  <strong>Acciones:</strong> Opciones para gestionar el contacto, como editar o eliminar.
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Nota (OPCIONAL) -->
+          <div class="alert alert-warning mb-0">
+            <h5 class="alert-heading">Nota:</h5>
+            <p class="mb-0 small">Los contactos marcados como activos están disponibles para su uso en futuras notificaciones.</p>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="isModalOpen = false">Volver</button>

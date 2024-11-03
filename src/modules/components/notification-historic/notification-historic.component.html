@@ -4,8 +4,8 @@
   <div class="d-flex justify-content-between align-items-center mb-3">
     <!-- Sección de búsqueda y filtros -->
     <div class="btn-group me-5" role="group">
-      <div class="col-sm-12 col-md-8 col-xl-8" id="general-search">
-        <div class="input-group" style="max-width: 280px">
+      <div class="col-sm-12 col-md-8 col-xl-10" id="general-search">
+        <div class="input-group">
           <span class="input-group-text mr-2" id="search-icon">
             <i class="bi bi-search"></i>
           </span>
@@ -15,8 +15,9 @@
             class="form-control"
             id="filter-text-box"
             (input)="onGlobalSearchTextChange(globalSearchTerm)"
+            placeholder="Buscar..."
           />
-         <app-table-filters [filters]="filterConfig" (filterValueChange)="filterChange($event)" (clearFilters)="clearFilters()"></app-table-filters> 
+         <app-table-filters [filters]="filterConfig"  (filterValueChange)="filterChange($event)" (clearFilters)="clearFilters()"></app-table-filters> 
     
         </div>
       </div>
@@ -113,10 +114,6 @@
       <div class="d-flex align-items-center">
         <ngb-pagination [(page)]="currentPage" [pageSize]="itemsPerPage" [collectionSize]="totalItems"
           (pageChange)="changePage($event)" [maxSize]="5" [boundaryLinks]="false"></ngb-pagination>
-
-        <button class="btn btn-secondary ms-3 mb-3" (click)="showInfo()">
-          <i class="bi bi-info-circle"></i>
-        </button>
       </div>
     </div>
 
@@ -128,18 +125,58 @@
 <div [class.show]="isModalOpen" [style.display]="isModalOpen ? 'block' : 'none'" class="modal fade" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header fs-6 py-1">
         <h5 class="modal-title">{{ modalTitle }}</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="isModalOpen = false"></button>
       </div>
-      <div class="modal-body">
-        <div [innerHTML]="modalMessage"></div>
+      <div class="modal-body fs-6 py-2">
+        <div class="container-fluid">
+          <!-- Introducción -->
+          <div class="alert alert-info mb-2 py-2">
+            <h5 class="alert-heading">Información sobre el Historial de Notificaciones</h5>
+            <p class="mb-0 small">Esta tabla presenta un resumen de las notificaciones enviadas a los usuarios, junto con su estado de visualización.</p>
+          </div>
+
+          <!-- Descripción de los campos -->
+          <div class="card mb-2">
+            <div class="card-header py-1">
+              <h5 class="mb-0">Descripción de los Campos</h5>
+            </div>
+            <div class="card-body py-2">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item py-1">
+                  <strong>Usuario:</strong> Indica el correo electrónico del destinatario de la notificación.
+                </li>
+                <li class="list-group-item py-1">
+                  <strong>Asunto:</strong> Resumen breve del contenido de la notificación enviada.
+                </li>
+                <li class="list-group-item py-1">
+                  <strong>Fecha:</strong> Fecha y hora en que se envió la notificación, lo que permite rastrear la temporalidad de los mensajes.
+                </li>
+                <li class="list-group-item py-1">
+                  <strong>Visualizado:</strong> Estado que indica si el usuario ha abierto o visualizado la notificación. Se representa con un ícono de verificación o una cruz.
+                </li>
+                <li class="list-group-item py-1">
+                  <strong>Acciones:</strong> Botón para permitir al usuario ver el contenido de la notificación.
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Nota (OPCIONAL) -->
+          <div class="alert alert-warning py-2 mb-0">
+            <h5 class="alert-heading">Nota:</h5>
+            <p class="mb-0 small">Las notificaciones no visualizadas están marcadas con un ícono de cruz (❌), mientras que las visualizadas tienen un ícono de verificación (✅).</p>
+          </div>
+        </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer py-2">
         <button type="button" class="btn btn-secondary" (click)="isModalOpen = false">Volver</button>
       </div>
     </div>
   </div>
 </div>
+
 
 <!-- Modal Notificacion -->
 <div [class.show]="isModalOpenNoti" [style.display]="isModalOpenNoti ? 'block' : 'none'" class="modal fade" tabindex="-1">
