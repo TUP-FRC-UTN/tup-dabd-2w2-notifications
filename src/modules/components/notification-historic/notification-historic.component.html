@@ -1,108 +1,46 @@
 <app-main-container title="Historial de Notificaciones">
-<div class="card-body">
-
-  <div class="row align-items-center mb-3">
-    <div class="col-sm-12 col-md-8 col-xl-8" id="general-search">
-      <div class="input-group" style="max-width: 280px">
-        <span class="input-group-text" id="search-icon">
-          <i class="bi bi-search"></i>
-        </span>
-        <input
-        [(ngModel)]="globalSearchTerm"
-          type="text"
-          class="form-control"
-          id="filter-text-box"
-          (input)="onGlobalSearchTextChange(globalSearchTerm)"
-        />
-      </div>
-    </div>
-
-      <!-- Botones de exportación -->
-    <div class="col row d-flex justify-content-end mb-3">
-
-    <div class="col-auto">
-      <button class="btn" (click)="exportToExcel()" style="background-color: #239b56; color: white;" title="Descargar Excel">
-        <i class="bi bi-file-earmark-excel"></i>
-      </button>
-    </div>
-
-    <div class="col-auto btn-export-pdf">
-      <button class="btn"  (click)="exportToPDF()" style="background-color: red; color: white;" title="Descargar PDF">
-        <i class="bi bi-file-pdf"></i>
-      </button>
-    </div>
-    </div>
-
-    </div>
 
 
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <!-- Grupo de botones izquierdo -->
-        <div class="btn-group me-5" role="group">
-          <div class="d-flex align-items-center">
-            <div class="btn-group me-2">
-                <button class="btn btn-outline-danger" (click)="clearFilters()">
-                <i class="bi bi-trash-fill"></i> Limpiar
-              </button>
-  
-              <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-funnel-fill"></i> Filtros
-              </button>
-              <ul class="dropdown-menu">
-                <li>
-                  <h6 class="dropdown-header">Tipo de Filtro</h6>
-                </li>
-              
-                <li><a class="dropdown-item" (click)="onFilterChange('recipientFilter')">Usuario</a></li>
-                <li><a class="dropdown-item" (click)="onFilterChange('subjectFilter')">Asunto</a></li>
-                <li><a class="dropdown-item" (click)="onFilterChange('dateFilter')">Fecha</a></li>
-              </ul>
-              <div class="input-group" *ngIf="showFilteredTextSearchInput">
-                <input type="text" class="form-control rounded-start" [(ngModel)]="filteredSearchTerm"
-                  (input)="onFilteredSearchTextChange(filteredSearchTerm)" placeholder="Buscar...">
-                <button class="btn btn-dark rounded-start ms-2">Buscar</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="d-flex gap-2 mb-3 me-5" *ngIf="showDatePickerFilter">
-          <label for="dateFrom" class="form-label mt-2">Desde:</label>
-          <input 
-            type="date" 
-            id="dateFrom" 
-            [(ngModel)]="dateFrom" 
-            (ngModelChange)="onDatePickerFilterChange()" 
-            class="form-control" 
-            [max]="dateUntil || undefined">
-    
-      
-          <label for="dateUntil" class="form-label mt-2">Hasta:</label>
-          <input 
-            type="date" 
-            id="dateUntil" 
-            [(ngModel)]="dateUntil"  
-            (ngModelChange)="onDatePickerFilterChange()" 
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- Sección de búsqueda y filtros -->
+    <div class="btn-group me-5" role="group">
+      <div class="col-sm-12 col-md-8 col-xl-8">
+        <div class="input-group">
+          <span class="input-group-text" id="search-icon">
+            <i class="bi bi-search"></i>
+          </span>
+          <input
+          [(ngModel)]="globalSearchTerm"
+            type="text"
             class="form-control"
-            [min]="dateFrom || undefined">
-   
+            id="filter-text-box"
+            (input)="onGlobalSearchTextChange(globalSearchTerm)"
+          />
+         <app-table-filters [filters]="filterConfig" (filterValueChange)="filterChange($event)" (clearFilters)="clearFilters()"></app-table-filters> 
     
         </div>
-
-        <div class="btn-group" role="group">
-          <input type="radio" class="btn-check" name="btnradio" id="btnradio1" (change)="filterByStatus('SENT')">
-          <label class="btn btn-outline-primary" for="btnradio1">Pendiente</label>
-  
-          <input type="radio" class="btn-check" name="btnradio" id="btnradio2" (change)="filterByStatus('VISUALIZED')">
-          <label class="btn btn-outline-primary" for="btnradio2">Visualizada</label>
-
-          <input type="radio" class="btn-check" name="btnradio" id="btnradio3" (change)="filterByStatus('ALL')" checked>
-          <label class="btn btn-outline-primary" for="btnradio3">Todos</label>
-  
-      
-        </div>
-
       </div>
+      
+
+    </div>  
+
+      <!-- Botones de Activo, Inactivo, Todo y "+" en el mismo grupo -->
+      <div class="d-flex align-items-center">
+
+        <!-- Línea vertical y botones de exportación -->
+        <div class="vertical-line mx-3"></div>
+        <button class="btn btn-success me-2" (click)="exportToExcel()">
+          <i class="bi bi-file-earmark-excel"></i>
+        </button>
+        <button class="btn btn-danger me-2" (click)="exportToPDF()">
+          <i class="bi bi-file-earmark-pdf"></i>
+        </button>
+      </div>
+
+    </div>
+
+
+
   
       <!-- Tabla -->
       <div class="table-container">
@@ -181,7 +119,7 @@
         </button>
       </div>
     </div>
-  </div>
+
 </app-main-container>
 
 

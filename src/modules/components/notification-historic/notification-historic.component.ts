@@ -1,22 +1,23 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Notification } from '../../../app/models/notifications/notification';
-import { MainContainerComponent } from 'ngx-dabd-grupo01';
+import { MainContainerComponent, Filter, FilterConfigBuilder, TableFiltersComponent } from 'ngx-dabd-grupo01';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { NotificationService } from '../../../app/services/notification.service';
-import { filter, Subject } from 'rxjs';
 import { NotificationFilter } from '../../../app/models/notifications/filters/notificationFilter';
+//import {Filter, FilterConfigBuilder } from 'ngx-dabd-grupo01'
 
 @Component({
   selector: 'app-notification-historic',
   standalone: true,
-  imports: [CommonModule, NgbPagination, MainContainerComponent, FormsModule],
+  imports: [CommonModule, NgbPagination,  FormsModule, MainContainerComponent, TableFiltersComponent],
   templateUrl: './notification-historic.component.html',
-  styleUrl: './notification-historic.component.css'
+  styleUrl: './notification-historic.component.css',
+  providers: [DatePipe]
 })
 export class NotificationHistoricComponent implements OnInit {
   notifications: Notification[] = [];
@@ -48,15 +49,28 @@ export class NotificationHistoricComponent implements OnInit {
   dateUntil: string = '';
 
   //Dropdown filters
-  currentDropdownFilter = '';
+
   recipientFilter: string = '';
   notificationSubjectFilter: string = '';
-  filteredSearchTerm = '';
-  showFilteredTextSearchInput: boolean = false;
-  showDatePickerFilter: boolean = false;
 
 
-  private searchSubject = new Subject<string>();
+  
+
+  filterConfig: Filter[] = new FilterConfigBuilder()
+.textFilter('Asunto', 'subject', "Buscar por asunto...")
+.textFilter('Usuario', "recipient", "Buscar por email de destinatario...")
+.selectFilter('Estado', 'statusSend', 'Seleccione un estado', [
+  {value: 'ALL', label: 'Todas'},
+  {value: 'SENT', label: 'Enviadas'},
+  {value: 'VISUALIZED', label: 'Vistas'}
+])
+.dateFilter("Fecha desde:", "dateFrom", "Fecha:"  )
+.dateFilter("Fecha hasta:", "dateUntil", "Fecha:"  )
+.build();
+
+
+
+
 
   private notificationService = inject(NotificationService);
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
@@ -87,7 +101,100 @@ export class NotificationHistoricComponent implements OnInit {
   };
 
 
+
+  /*
+   
+  applyDropdownFilters(){
+    if(this.currentDropdownFilter !== 'dateFilter'){
+      this.showFilteredTextSearchInput = true;
+      this.showDatePickerFilter = false;
+    } else {
+      this.showDatePickerFilter = true;
+      this.showFilteredTextSearchInput = false;
+    }
+
+  }
+    */
+
+  /*
+  
+  onFilteredSearchTextChange(filteredSearchTerm: string) {
+    this.filteredSearchTerm = filteredSearchTerm;
+    if(this.currentDropdownFilter === 'recipientFilter'){
+      this.recipientFilter = filteredSearchTerm;
+    }
+    if(this.currentDropdownFilter === 'subjectFilter'){
+      this.notificationSubjectFilter = filteredSearchTerm;
+    }
+    this.loadNotifications();
+  }
+    */
+
+  /*
+
+  onDatePickerFilterChange(): void {
+    // Validamos que las fechas tengan sentido
+    if (this.dateFrom && this.dateUntil) {
+      const fromDate = new Date(this.dateFrom);
+      const untilDate = new Date(this.dateUntil);
+      
+      if (fromDate > untilDate) {
+        console.error('La fecha "Desde" no puede ser posterior a la fecha "Hasta"');
+        return;
+      }
+    }
+    
+    this.currentPage = 1; 
+    this.loadNotifications();
+  }
+
+  */
+
+  
+ 
+  filterChange($event: Record<string, any>) {
+
+    this.clearFilters();
+    
+    if($event['statusSend'] && $event['statusSend'].trim() !== '' )
+    {
+      if($event['statusSend']==='SENT'){
+         this.statusFilter = 'SENT';
+  
+      } else if ($event['statusSend']==='VISUALIZED' ) {
+        this.statusFilter = 'VISUALIZED'
+      } else {
+        this.statusFilter = 'ALL'
+      }
+
+    }
+  
+
+    if($event['subject'] && $event['subject'].trim() !== ''){
+      this.notificationSubjectFilter = $event['subject'];
+    }
+
+    if($event['recipient'] && $event['recipient'].trim() !== ''){
+      this.recipientFilter = $event['recipient'];
+    }
+
+    if($event['dateFrom'] && $event['dateFrom'].trim() !== ''){
+      this.dateFrom = $event['dateFrom'];
+    }
+
+    
+    if($event['dateUntil'] && $event['dateUntil'].trim() !== ''){
+      this.dateUntil = $event['dateUntil'];
+    }
+
+
+
+    this.loadNotifications();
+  }
+
+
   loadNotifications(): void {
+
     const filter: NotificationFilter = {
       search_term: this.globalSearchTerm,
       viewed: this.statusFilter === 'VISUALIZED' ? true : this.statusFilter === 'SENT' ? false : undefined,
@@ -121,48 +228,12 @@ export class NotificationHistoricComponent implements OnInit {
 
 
   
+  /*
   onFilterChange(filterType: string){
     this.currentDropdownFilter = filterType;
     this.applyDropdownFilters();
-  }
-  
-  applyDropdownFilters(){
-    if(this.currentDropdownFilter !== 'dateFilter'){
-      this.showFilteredTextSearchInput = true;
-      this.showDatePickerFilter = false;
-    } else {
-      this.showDatePickerFilter = true;
-      this.showFilteredTextSearchInput = false;
-    }
-
-  }
-  
-  onFilteredSearchTextChange(filteredSearchTerm: string) {
-    this.filteredSearchTerm = filteredSearchTerm;
-    if(this.currentDropdownFilter === 'recipientFilter'){
-      this.recipientFilter = filteredSearchTerm;
-    }
-    if(this.currentDropdownFilter === 'subjectFilter'){
-      this.notificationSubjectFilter = filteredSearchTerm;
-    }
-    this.loadNotifications();
-  }
-
-  onDatePickerFilterChange(): void {
-    // Validamos que las fechas tengan sentido
-    if (this.dateFrom && this.dateUntil) {
-      const fromDate = new Date(this.dateFrom);
-      const untilDate = new Date(this.dateUntil);
-      
-      if (fromDate > untilDate) {
-        console.error('La fecha "Desde" no puede ser posterior a la fecha "Hasta"');
-        return;
-      }
-    }
-    
-    this.currentPage = 1; 
-    this.loadNotifications();
-  }
+  } */
+ 
 
   
 
@@ -226,15 +297,13 @@ export class NotificationHistoricComponent implements OnInit {
   }
 
   clearFilters(): void {
+    this.notificationSubjectFilter = '';
     this.dateFrom = '';
     this.dateUntil = '';
     this.recipientFilter = '';
+    this.statusFilter = ''
     this.globalSearchTerm = '';
-    this.filteredSearchTerm = '';
     this.currentPage = 1;
-    this.showFilteredTextSearchInput = false;
-    this.showDatePickerFilter = false;
-    this.loadNotifications();
   }
 
   onGlobalSearchTextChange(globalSearch: string): void {
