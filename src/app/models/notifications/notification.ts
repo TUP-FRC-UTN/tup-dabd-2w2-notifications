@@ -12,7 +12,6 @@ export interface Notification {
     dateNotification?: string | Date;
 }
 
-
 export interface NotificationModelChart {
   id: number;
   recipient: string;

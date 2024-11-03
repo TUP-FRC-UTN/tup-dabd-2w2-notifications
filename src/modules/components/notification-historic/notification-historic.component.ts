@@ -8,6 +8,8 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { NotificationService } from '../../../app/services/notification.service';
+import { filter, Subject } from 'rxjs';
+import { NotificationFilter } from '../../../app/models/notifications/filters/notificationFilter';
 
 @Component({
   selector: 'app-notification-historic',
@@ -20,6 +22,7 @@ export class NotificationHistoricComponent implements OnInit {
   notifications: Notification[] = [];
   selectedNotification?: Notification;
   filteredNotifications: Notification[] = [];
+
 
   // Paginación
   currentPage = 1;
@@ -39,12 +42,21 @@ export class NotificationHistoricComponent implements OnInit {
   showModalToRenderHTML: boolean = false;
 
   // Filtros
-  searchTerm = '';
-  status: string = '';
+  globalSearchTerm = '';
+  statusFilter: string = '';
   dateFrom: string = '';
   dateUntil: string = '';
-  emailFilter: string = '';
-  currentFilter: string = 'status';
+
+  //Dropdown filters
+  currentDropdownFilter = '';
+  recipientFilter: string = '';
+  notificationSubjectFilter: string = '';
+  filteredSearchTerm = '';
+  showFilteredTextSearchInput: boolean = false;
+  showDatePickerFilter: boolean = false;
+
+
+  private searchSubject = new Subject<string>();
 
   private notificationService = inject(NotificationService);
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
@@ -52,122 +64,122 @@ export class NotificationHistoricComponent implements OnInit {
   ngOnInit(): void {
 
     this.loadNotifications();
-
-    // this.notifications.push(
-    //   {
-    //     id: 1,
-    //     subject: "Aprovecha esta PROMOCIÓN!",
-    //     recipient: 'gabrielacollazo@hotmail.com',
-    //     templateId: 1,
-    //     templateName: 'Promoción',
-    //     statusSend: 'SENT',
-    //     body : "",
-    //     dateSend: '2002-12-24 17:12',
-    //   },
-    //   {
-    //     id: 2,
-    //     subject: "Pago de Epec rechazado",
-    //     recipient: 'jorge@example.com',
-    //     templateId: 2,
-    //     body : "",
-    //     templateName: 'Cuenta',
-    //     statusSend: 'VISUALIZED',
-    //     dateSend: '2024-05-15 03:16',
-    //   },
-    //   {
-    //     id: 3,
-    //     recipient: 'maria@example.com',
-    //     subject: "Su comentario ha sido enviado",
-    //     templateId: 1,
-    //     body : "",
-    //     templateName: 'Comentarios',
-    //     statusSend: 'SENT',
-    //     dateSend:'2024-01-30 19:46',
-    //   },
-    //   {
-    //     id: 4,
-    //     recipient: 'luisa@example.com',
-    //     subject: "Te recordamos el cumpleaños de ...",
-    //     templateId: 3,
-    //     body : "",
-    //     templateName: 'Recordatorio',
-    //     statusSend: 'VISUALIZED',
-    //     dateSend: '2023-11-05 15:31',
-    //   },
-    //   {
-    //     id: 5,
-    //     recipient: 'pablo@example.com',
-    //     subject: "Confirmación de envío de producto",
-    //     templateId: 2,
-    //     body : "",
-    //     templateName: 'Confirmación',
-    //     statusSend: 'SENT',
-    //     dateSend: '2023-10-01 12:00',
-    //   },)
   }
 
   constructor() {
     this.initializePagination();
   }
 
+  formatDateToISOStart = (dateString: string): string => {
+    if (!dateString) return '';
+    // Toma la fecha del datepicker y le agrega el tiempo al inicio del día (00:00:00)
+    const date = new Date(dateString);
+    date.setHours(0, 0, 0, 0);
+    return date.toISOString();
+  };
+  
+   formatDateToISOEnd = (dateString: string): string => {
+    if (!dateString) return '';
+    // Toma la fecha del datepicker y le agrega el tiempo al final del día (23:59:59)
+    const date = new Date(dateString);
+    date.setHours(23, 59, 59, 999);
+    return date.toISOString();
+  };
+
+
   loadNotifications(): void {
-    this.notificationService.getAllNotification()
-      .subscribe(response => {
-        this.notifications = response;
-        this.filteredNotifications = [...this.notifications];
-        this.totalItems = this.filteredNotifications.length;
+    const filter: NotificationFilter = {
+      search_term: this.globalSearchTerm,
+      viewed: this.statusFilter === 'VISUALIZED' ? true : this.statusFilter === 'SENT' ? false : undefined,
+      subject: this.notificationSubjectFilter,
+      from: this.dateFrom ? this.formatDateToISOStart(this.dateFrom) : undefined,
+      until: this.dateUntil ? this.formatDateToISOEnd(this.dateUntil) : undefined,
+      recipient: this.recipientFilter || undefined
+    };
+
+    const pageRequest = {
+      page: this.currentPage,
+      size: this.itemsPerPage,
+      sort: ['id,asc']
+    };
+
+
+    this.notificationService.getPaginatedNotifications(filter, pageRequest)
+      .subscribe({
+        next: (response) => {
+          this.notifications = response.content;
+          this.filteredNotifications = this.notifications;
+          this.totalItems = response.totalElements;
+        },
+        error: (error)=>{
+          console.error('Error loading notifications: ', error);
+        
+        }
       });
-    this.filteredNotifications = [...this.notifications];
-    this.totalItems = this.filteredNotifications.length;
+
   }
 
-  clearFilters(): void {
-    this.currentFilter = 'Todos';
-    this.dateFrom = '';
-    this.dateUntil = '';
-    this.status = '';
-    this.emailFilter = '';
-    this.searchTerm = '';
-    this.filteredNotifications = [...this.notifications];
-    this.totalItems = this.filteredNotifications.length;
-  }
 
-  filterNotifications(): void {
-    this.filteredNotifications = this.notifications.filter(notification => {
-      let matches = true;
-      if (this.status) {
-        matches = matches && notification.statusSend === this.status.toUpperCase();
-      }
-      if (this.dateFrom) {
-        matches = matches && notification.dateSend >= this.dateFrom;
-      }
-      if (this.dateUntil) {
-        matches = matches && notification.dateSend <= this.dateUntil;
-      }
-      if (this.emailFilter) {
-        matches = matches && notification.recipient.includes(this.emailFilter);
-      }
-      return matches;
-    });
-    this.totalItems = this.filteredNotifications.length;
+  
+  onFilterChange(filterType: string){
+    this.currentDropdownFilter = filterType;
+    this.applyDropdownFilters();
   }
-
-  onFilterChange(filter: string) {
-    this.currentFilter = filter;
-    if (filter === 'Usuario') {
-      this.status = '';
-      this.dateFrom = '';
-      this.dateUntil = '';
-    } else if (filter === 'Fecha') {
-      this.status = '';
-      this.emailFilter = '';
-    } else if (filter === 'Estado') {
-      this.emailFilter = '';
-      this.dateFrom = '';
-      this.dateUntil = '';
+  
+  applyDropdownFilters(){
+    if(this.currentDropdownFilter !== 'dateFilter'){
+      this.showFilteredTextSearchInput = true;
+      this.showDatePickerFilter = false;
+    } else {
+      this.showDatePickerFilter = true;
+      this.showFilteredTextSearchInput = false;
     }
-    this.filterNotifications();
+
   }
+  
+  onFilteredSearchTextChange(filteredSearchTerm: string) {
+    this.filteredSearchTerm = filteredSearchTerm;
+    if(this.currentDropdownFilter === 'recipientFilter'){
+      this.recipientFilter = filteredSearchTerm;
+    }
+    if(this.currentDropdownFilter === 'subjectFilter'){
+      this.notificationSubjectFilter = filteredSearchTerm;
+    }
+    this.loadNotifications();
+  }
+
+  onDatePickerFilterChange(): void {
+    // Validamos que las fechas tengan sentido
+    if (this.dateFrom && this.dateUntil) {
+      const fromDate = new Date(this.dateFrom);
+      const untilDate = new Date(this.dateUntil);
+      
+      if (fromDate > untilDate) {
+        console.error('La fecha "Desde" no puede ser posterior a la fecha "Hasta"');
+        return;
+      }
+    }
+    
+    this.currentPage = 1; 
+    this.loadNotifications();
+  }
+
+  
+
+
+  
+  filterByStatus(status: 'SENT' | 'VISUALIZED' | 'ALL' ) {
+
+    this.statusFilter = status;
+    this.loadNotifications();
+  }
+
+
+  
+
+
+
+
 
   exportToExcel(): void {
     const data = this.filteredNotifications.map((notification) => ({
@@ -213,13 +225,20 @@ export class NotificationHistoricComponent implements OnInit {
     doc.save(fileName+".pdf");
   }
 
-  clearSearch(): void {
-    this.searchTerm = '';
+  clearFilters(): void {
+    this.dateFrom = '';
+    this.dateUntil = '';
+    this.recipientFilter = '';
+    this.globalSearchTerm = '';
+    this.filteredSearchTerm = '';
+    this.currentPage = 1;
+    this.showFilteredTextSearchInput = false;
+    this.showDatePickerFilter = false;
     this.loadNotifications();
   }
 
-  onSearchTextChange(searchTerm: string): void {
-    this.searchTerm = searchTerm;
+  onGlobalSearchTextChange(globalSearch: string): void {
+    this.globalSearchTerm = globalSearch;
     this.loadNotifications();
   }
 
@@ -306,6 +325,8 @@ export class NotificationHistoricComponent implements OnInit {
   closeModalToRenderHTML(): void {
     this.showModalToRenderHTML = false;
   }
+
+
 
 
 }
