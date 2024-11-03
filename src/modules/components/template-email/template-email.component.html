@@ -84,7 +84,7 @@
 
 <!-- Modal para Asistente IA -->
 <div [class.show]="isIaModalOpen" [style.display]="isIaModalOpen ? 'block' : 'none'" class="modal fade" id="iaModal" tabindex="-1" aria-labelledby="iaModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="iaModalLabel">Asistente IA</h5>
@@ -106,7 +106,7 @@
               [(ngModel)]="iaInputText"
               required
               minlength="10"
-              rows="15"
+              rows="12"
               placeholder="Describe aquí cómo te gustaría que sea tu plantilla, incluyendo detalles como el tono, el contenido, y cualquier especificación importante que desees..."></textarea>
               
             <div *ngIf="iaTemplateBodyModel.invalid && (iaTemplateBodyModel.dirty || iaTemplateBodyModel.touched)">
@@ -129,10 +129,10 @@
               id="iaResponse"
               [(ngModel)]="iaResponse"  
               readonly
-              rows="15"
+              rows="12"
               placeholder="La respuesta de la IA aparecerá aquí..."></textarea>
             <div class="d-flex justify-content-end mt-2">
-              <button type="button" class="btn btn-secondary" [disabled]="iaResponse.length === 0" (click)="previewContent()">Previsualizar</button>
+              <button type="button" class="btn btn-secondary mt-2" [disabled]="iaResponse.length === 0" (click)="previewContent()">Previsualizar</button>
             </div>
           </div>
         </div>
@@ -153,8 +153,8 @@
 
 
 <!-- Modal para Previsualización -->
-<div class="modal" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
+<div class="modalTemplate" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
+  <div class="modal-template-content" (click)="$event.stopPropagation()">
     <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
     <iframe #iframePreview style="width: 100%; border: none;"></iframe>
     <div class="mt-3 text-end">
