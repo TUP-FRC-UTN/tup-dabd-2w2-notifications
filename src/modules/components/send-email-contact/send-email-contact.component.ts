@@ -134,5 +134,59 @@ export class SendEmailContactComponent implements OnInit {
     this.showModalToRenderHTML = false;
   }
 
+  //Agregado probar
+
+  /* toggleContactSelection(contactId: number) {
+    const index = this.contacts_id.indexOf(contactId);
+    if (index === -1) {
+      this.contacts_id.push(contactId); // Agregar si no está en la lista
+    } else {
+      this.contacts_id.splice(index, 1); // Quitar si ya está en la lista
+    }
+  }
+  trackByContactId(index: number, contact: ContactModel): number {
+    return contact.id;
+  }
+    */
+
+
+
+  
+
+  showContactModal: boolean = false;
+  selectedContacts: any[] = []; // Lista de contactos seleccionados (con detalles)
+
+   // Agregar la variable para controlar la visibilidad del modal
+   openContactSelectionModal() {
+    this.showContactModal = true;
+  }
+
+  closeContactSelectionModal() {
+    this.showContactModal = false;
+  }
+
+  confirmContactSelection() {
+    // Al confirmar, actualizamos la lista de contactos seleccionados
+    this.selectedContacts = this.allContacts.filter(contact => 
+      this.contacts_id.includes(contact.id)
+    );
+    this.showContactModal = false;
+  }
+
+  toggleContactSelection(contactId: number) {
+    const index = this.contacts_id.indexOf(contactId);
+    if (index === -1) {
+      this.contacts_id.push(contactId); // Agregar si no está en la lista
+    } else {
+      this.contacts_id.splice(index, 1); // Quitar si ya está en la lista
+    }
+  }
+
+  trackByContactId(index: number, contact: any): number {
+    return contact.id;
+  }
+  
+  
+
 
 }

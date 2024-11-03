@@ -3,36 +3,58 @@
         <h1> Notificaciones a varios Contactos </h1> <br>
         <form #form="ngForm" (submit)="submit()">
             <!---->
-            <div class="row">
-                <div class="col-6">
-                    <label class="form-label">Elegir Contactos:</label>
-                    <div class="d-flex align-items-center">
-                        <select #contactos="ngModel" class="form-select me-2" style="max-width: 350px;" name="Contactos" id="contactos" 
-                        [(ngModel)]="selectedContactId"
-                        required
-                        [ngClass]="{'is-invalid': contactos.invalid && (contactos.dirty || contactos.touched), 'is-valid': contactos.valid && (contactos.dirty || contactos.touched)}">
-                            @for (c of allContacts; track $index) {
-                                <option [value]="c.id"> {{c.contactValue}} </option>
-                            }
-                        </select>
-                        @if (contactos.invalid && (contactos.dirty || contactos.touched)) {
-                            @if (contactos.getError('required')) {
-                                <div class="text-danger"> Campo Obligatorio </div>
-                            }
-                        }
-                        <button type="button" class="btn btn-secondary"(click)="addContact()"> + </button>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <h6>Contactos Seleccionados:</h6>
-                    @for (selectedContactId of contacts_id; track $index) {
-                        <p> {{showContactById(selectedContactId)}} </p>
-                    }
-                    @if (contacts_id.length == 0) {
-                        <div class="text-danger"> Debe seleccionar al menos un contacto </div>
-                    }
-                </div>
-            </div>
+
+
+<!-- Botón para abrir el modal -->
+<button type="button" class="btn btn-secondary mt-3" (click)="openContactSelectionModal()">Seleccionar contactos</button>
+
+<!-- Mostrar contactos seleccionados -->
+<div *ngIf="selectedContacts.length > 0" class="selected-contacts mt-3">
+  <h6>Contactos seleccionados:</h6>
+  <ul>
+    <li *ngFor="let contact of selectedContacts">
+      {{ contact.contactValue }}
+    </li>
+  </ul>
+</div>
+
+<!-- Modal de selección de contactos -->
+<div class="modal" *ngIf="showContactModal" (click)="closeContactSelectionModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <span class="close" (click)="closeContactSelectionModal()">&times;</span>
+    <h5>Selecciona los contactos:</h5>
+
+    <!-- Tabla de contactos con checkboxes -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Seleccionar</th>
+          <th scope="col">Contacto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let contact of allContacts; trackBy: trackByContactId">
+          <td>
+            <input type="checkbox" 
+                   [checked]="contacts_id.includes(contact.id)"
+                   (change)="toggleContactSelection(contact.id)">
+          </td>
+          <td>{{ contact.contactValue }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Botón de confirmación para cerrar el modal y guardar los cambios -->
+    <div class="text-end">
+      <button type="button" class="btn btn-primary" (click)="confirmContactSelection()">Confirmar selección</button>
+    </div>
+  </div>
+</div>
+
+           
+              
+
+
             <!---->
             <label class="form-label mt-3">Asunto:</label>
             <input #asunto="ngModel" name="subject" type="text" class="form-control mb-3" style="max-width: 350px;" [(ngModel)]="subjectToSend"
