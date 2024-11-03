@@ -11,13 +11,14 @@ import { EmailDataContact } from '../../../app/models/notifications/emailDataCon
 import { CommonModule } from '@angular/common';
 import { ToastService } from 'ngx-dabd-grupo01';
 import { EmailService } from '../../../app/services/emailService';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-send-email-contact',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule],
+  imports: [RouterLink, FormsModule, CommonModule, NgSelectModule],
   templateUrl: './send-email-contact.component.html',
-  styleUrl: './send-email-contact.component.css'
+  styleUrls: ['./send-email-contact.component.css']
 })
 @Inject('TemplateService')
 @Inject('EmailService')
@@ -42,13 +43,9 @@ export class SendEmailContactComponent implements OnInit {
   variableName: string = ""
   variableValue: string = ""
 
-  //Estado para modal de preview template
   showModalToRenderHTML: boolean = false;
 
-  //ViewChild para preview de template
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
-
-
 
   ngOnInit(): void {
     this.serviceContacts.getAllContacts().subscribe((data) => {
@@ -57,57 +54,58 @@ export class SendEmailContactComponent implements OnInit {
         .sort((a, b) => a.contactValue.localeCompare(b.contactValue));
     });
     this.templateService.getAllTemplates().subscribe((data) => {
-      this.allTemplates = data
-    })
+      this.allTemplates = data;
+    });
   }
-  addContact() { //CAMBIOS
-    if (this.selectedContactId) {
-      this.contacts_id.push(this.selectedContactId)
+
+  addContact() {
+    if (this.selectedContactId && !this.contacts_id.includes(this.selectedContactId)) {
+      this.contacts_id.push(this.selectedContactId);
     }
-    this.selectedContactId = null
+    this.selectedContactId = null;
   }
+
   showContactById(id: number): string {
-    const contact = this.allContacts.find(contact => contact.id == id);
+    const contact = this.allContacts.find(contact => contact.id === id);
     return contact ? contact.contactValue : '';
   }
-  addVariables() {
-    if (this.variableName != null && this.variableName !== "" && this.variableValue != null && this.variableValue !== "") {
 
+  addVariables() {
+    if (this.variableName && this.variableValue) {
       const newVariable: Variable = {
         key: this.variableName,
         value: this.variableValue
-      }
-
-      this.variables.push(newVariable)
-      this.variableName = "";
-      this.variableValue = "";
+      };
+      this.variables.push(newVariable);
+      this.variableName = '';
+      this.variableValue = '';
     }
   }
+
   submit() {
     const data: EmailDataContact = {
       subject: this.subjectToSend,
       variables: this.variables,
       templateId: Number(this.template_id),
       contactIds: this.contacts_id
-    }
+    };
     this.emailService.sendEmailWithContacts(data).subscribe({
-      next: (response) => {
-        this.toastService.sendSuccess("Enviado con exito")
-        this.clean()
+      next: () => {
+        this.toastService.sendSuccess("Enviado con éxito");
+        this.clean();
       },
-      error: (errr) => {
-        this.toastService.sendError("Hubo un error al enviar el correo, pruebe más tarde")
+      error: () => {
+        this.toastService.sendError("Hubo un error al enviar el correo, pruebe más tarde");
       }
-    })
-  }
-  clean() {
-    this.subjectToSend = ""
-    this.variables = []
-    this.template_id = ''
-    this.contacts_id = []
+    });
   }
 
-  //Previsualizacion de template
+  clean() {
+    this.subjectToSend = '';
+    this.variables = [];
+    this.template_id = '';
+    this.contacts_id = [];
+  }
 
   previewSelectedTemplate(): void {
     const selectedTemplate = this.allTemplates.find(t => t.id == parseInt(this.template_id));
@@ -133,6 +131,4 @@ export class SendEmailContactComponent implements OnInit {
   closeModalToRenderHTML() {
     this.showModalToRenderHTML = false;
   }
-
-
 }
