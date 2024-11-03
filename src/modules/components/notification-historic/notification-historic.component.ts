@@ -169,11 +169,9 @@ export class NotificationHistoricComponent implements OnInit {
 
     }
   
-
     if($event['subject'] && $event['subject'].trim() !== ''){
       this.notificationSubjectFilter = $event['subject'];
     }
-
     if($event['recipient'] && $event['recipient'].trim() !== ''){
       this.recipientFilter = $event['recipient'];
     }
