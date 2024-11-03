@@ -1,5 +1,5 @@
 import { Component, ViewChild, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -32,6 +32,7 @@ import { ActiveSearchTerm } from '../../../app/models/contacts/filters/activeSea
   ],
   templateUrl: './contact-list.component.html',
   styleUrls: ['./contact-list.component.css'],
+  providers: [DatePipe]
 })
 export class ContactListComponent implements OnInit {
   private router = inject(Router);
