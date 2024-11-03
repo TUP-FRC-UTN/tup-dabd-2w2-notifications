@@ -1,23 +1,23 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Notification } from '../../../app/models/notifications/notification';
-import { MainContainerComponent } from 'ngx-dabd-grupo01';
+import { MainContainerComponent, Filter, FilterConfigBuilder, TableFiltersComponent } from 'ngx-dabd-grupo01';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { NotificationService } from '../../../app/services/notification.service';
-import {  Subject } from 'rxjs';
 import { NotificationFilter } from '../../../app/models/notifications/filters/notificationFilter';
-import {Filter, FilterConfigBuilder, TableFiltersComponent } from 'ngx-dabd-grupo01'
+//import {Filter, FilterConfigBuilder } from 'ngx-dabd-grupo01'
 
 @Component({
   selector: 'app-notification-historic',
   standalone: true,
-  imports: [CommonModule, NgbPagination, MainContainerComponent, TableFiltersComponent, FormsModule],
+  imports: [CommonModule, NgbPagination,  FormsModule, MainContainerComponent, TableFiltersComponent],
   templateUrl: './notification-historic.component.html',
-  styleUrl: './notification-historic.component.css'
+  styleUrl: './notification-historic.component.css',
+  providers: [DatePipe]
 })
 export class NotificationHistoricComponent implements OnInit {
   notifications: Notification[] = [];
@@ -130,17 +130,16 @@ export class NotificationHistoricComponent implements OnInit {
 
   }
 
-  onFilterChange($event :Record<string, any>){
-    console.log($event);
+  filterChange($event: Record<string, any>) {
+    console.log($event)
   }
 
 
   
-  /*
   onFilterChange(filterType: string){
     this.currentDropdownFilter = filterType;
     this.applyDropdownFilters();
-  } */
+  }
   
   applyDropdownFilters(){
     if(this.currentDropdownFilter !== 'dateFilter'){
