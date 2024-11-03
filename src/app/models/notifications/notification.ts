@@ -1,13 +1,23 @@
 export interface Notification {
     id: number;
     recipient: string;
-    contactId?: number; 
+    contactId?: number;
     subject: string;
     templateId: number;
-    templateName: string; 
+    templateName: string;
     statusSend: string;
-    dateSend: string | Date; 
+    dateSend: string | Date;
     body: string;
-    isRead?: boolean; 
-    dateNotification?: string | Date; 
+    isRead?: boolean;
+    dateNotification?: string | Date;
+}
+
+export interface NotificationModelChart {
+  id: number;
+  recipient: string;
+  subject: string;
+  templateId: number;
+  templateName: string;
+  dateSend: string;
+  statusSend: string;
 }

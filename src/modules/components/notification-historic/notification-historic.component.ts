@@ -76,7 +76,7 @@ export class NotificationHistoricComponent implements OnInit {
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
 
   ngOnInit(): void {
-    
+
     this.loadNotifications();
   }
 
