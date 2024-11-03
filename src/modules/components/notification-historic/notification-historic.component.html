@@ -16,9 +16,11 @@
             id="filter-text-box"
             (input)="onGlobalSearchTextChange(globalSearchTerm)"
           />
-         <app-table-filters [filters]="filterConfig" (filterValueChange)="filterChange($event)"></app-table-filters> 
+         <app-table-filters [filters]="filterConfig" (filterValueChange)="filterChange($event)" (clearFilters)="clearFilters()"></app-table-filters> 
+    
         </div>
       </div>
+      
 
     </div>  
 

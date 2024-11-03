@@ -49,23 +49,26 @@ export class NotificationHistoricComponent implements OnInit {
   dateUntil: string = '';
 
   //Dropdown filters
-  currentDropdownFilter = '';
+
   recipientFilter: string = '';
   notificationSubjectFilter: string = '';
-  filteredSearchTerm = '';
-  showFilteredTextSearchInput: boolean = false;
-  showDatePickerFilter: boolean = false;
+
 
   
 
   filterConfig: Filter[] = new FilterConfigBuilder()
 .textFilter('Asunto', 'subject', "Buscar por asunto...")
 .textFilter('Usuario', "recipient", "Buscar por email de destinatario...")
-.selectFilter('Estado', 'viewed', 'Seleccione un estado', [
+.selectFilter('Estado', 'statusSend', 'Seleccione un estado', [
+  {value: 'ALL', label: 'Todas'},
   {value: 'SENT', label: 'Enviadas'},
   {value: 'VISUALIZED', label: 'Vistas'}
 ])
+.dateFilter("Fecha desde:", "dateFrom", "Fecha:"  )
+.dateFilter("Fecha hasta:", "dateUntil", "Fecha:"  )
 .build();
+
+
 
 
 
@@ -98,7 +101,100 @@ export class NotificationHistoricComponent implements OnInit {
   };
 
 
+
+  /*
+   
+  applyDropdownFilters(){
+    if(this.currentDropdownFilter !== 'dateFilter'){
+      this.showFilteredTextSearchInput = true;
+      this.showDatePickerFilter = false;
+    } else {
+      this.showDatePickerFilter = true;
+      this.showFilteredTextSearchInput = false;
+    }
+
+  }
+    */
+
+  /*
+  
+  onFilteredSearchTextChange(filteredSearchTerm: string) {
+    this.filteredSearchTerm = filteredSearchTerm;
+    if(this.currentDropdownFilter === 'recipientFilter'){
+      this.recipientFilter = filteredSearchTerm;
+    }
+    if(this.currentDropdownFilter === 'subjectFilter'){
+      this.notificationSubjectFilter = filteredSearchTerm;
+    }
+    this.loadNotifications();
+  }
+    */
+
+  /*
+
+  onDatePickerFilterChange(): void {
+    // Validamos que las fechas tengan sentido
+    if (this.dateFrom && this.dateUntil) {
+      const fromDate = new Date(this.dateFrom);
+      const untilDate = new Date(this.dateUntil);
+      
+      if (fromDate > untilDate) {
+        console.error('La fecha "Desde" no puede ser posterior a la fecha "Hasta"');
+        return;
+      }
+    }
+    
+    this.currentPage = 1; 
+    this.loadNotifications();
+  }
+
+  */
+
+  
+ 
+  filterChange($event: Record<string, any>) {
+
+    this.clearFilters();
+    
+    if($event['statusSend'] && $event['statusSend'].trim() !== '' )
+    {
+      if($event['statusSend']==='SENT'){
+         this.statusFilter = 'SENT';
+  
+      } else if ($event['statusSend']==='VISUALIZED' ) {
+        this.statusFilter = 'VISUALIZED'
+      } else {
+        this.statusFilter = 'ALL'
+      }
+
+    }
+  
+
+    if($event['subject'] && $event['subject'].trim() !== ''){
+      this.notificationSubjectFilter = $event['subject'];
+    }
+
+    if($event['recipient'] && $event['recipient'].trim() !== ''){
+      this.recipientFilter = $event['recipient'];
+    }
+
+    if($event['dateFrom'] && $event['dateFrom'].trim() !== ''){
+      this.dateFrom = $event['dateFrom'];
+    }
+
+    
+    if($event['dateUntil'] && $event['dateUntil'].trim() !== ''){
+      this.dateUntil = $event['dateUntil'];
+    }
+
+
+
+    this.loadNotifications();
+  }
+
+
   loadNotifications(): void {
+
     const filter: NotificationFilter = {
       search_term: this.globalSearchTerm,
       viewed: this.statusFilter === 'VISUALIZED' ? true : this.statusFilter === 'SENT' ? false : undefined,
@@ -130,54 +226,14 @@ export class NotificationHistoricComponent implements OnInit {
 
   }
 
-  filterChange($event: Record<string, any>) {
-    console.log($event)
-  }
-
 
   
+  /*
   onFilterChange(filterType: string){
     this.currentDropdownFilter = filterType;
     this.applyDropdownFilters();
-  }
-  
-  applyDropdownFilters(){
-    if(this.currentDropdownFilter !== 'dateFilter'){
-      this.showFilteredTextSearchInput = true;
-      this.showDatePickerFilter = false;
-    } else {
-      this.showDatePickerFilter = true;
-      this.showFilteredTextSearchInput = false;
-    }
-
-  }
-  
-  onFilteredSearchTextChange(filteredSearchTerm: string) {
-    this.filteredSearchTerm = filteredSearchTerm;
-    if(this.currentDropdownFilter === 'recipientFilter'){
-      this.recipientFilter = filteredSearchTerm;
-    }
-    if(this.currentDropdownFilter === 'subjectFilter'){
-      this.notificationSubjectFilter = filteredSearchTerm;
-    }
-    this.loadNotifications();
-  }
-
-  onDatePickerFilterChange(): void {
-    // Validamos que las fechas tengan sentido
-    if (this.dateFrom && this.dateUntil) {
-      const fromDate = new Date(this.dateFrom);
-      const untilDate = new Date(this.dateUntil);
-      
-      if (fromDate > untilDate) {
-        console.error('La fecha "Desde" no puede ser posterior a la fecha "Hasta"');
-        return;
-      }
-    }
-    
-    this.currentPage = 1; 
-    this.loadNotifications();
-  }
+  } */
+ 
 
   
 
@@ -241,15 +297,13 @@ export class NotificationHistoricComponent implements OnInit {
   }
 
   clearFilters(): void {
+    this.notificationSubjectFilter = '';
     this.dateFrom = '';
     this.dateUntil = '';
     this.recipientFilter = '';
+    this.statusFilter = ''
     this.globalSearchTerm = '';
-    this.filteredSearchTerm = '';
     this.currentPage = 1;
-    this.showFilteredTextSearchInput = false;
-    this.showDatePickerFilter = false;
-    this.loadNotifications();
   }
 
   onGlobalSearchTextChange(globalSearch: string): void {
