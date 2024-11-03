@@ -6,7 +6,8 @@ import { NotificationService } from '../../../app/services/notification.service'
 import { NotificationModelChart } from '../../../app/models/notifications/notification';
 import { ChartConfigurationService } from '../../../app/services/chart-configuration.service';
 import { KPIModel } from '../../../app/models/kpi/kpiModel';
-
+import { PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 
 @Component({
@@ -23,6 +24,10 @@ import { KPIModel } from '../../../app/models/kpi/kpiModel';
 
 
 export class NotificationChartComponent implements OnInit {
+
+  private platformId = inject(PLATFORM_ID);
+  isBrowser = isPlatformBrowser(this.platformId);
+
 
   @ViewChild('statusChart') statusChart?: BaseChartDirective;
   @ViewChild('templateChart') templateChart?: BaseChartDirective;
@@ -44,12 +49,14 @@ export class NotificationChartComponent implements OnInit {
 
   notifications: NotificationModelChart[] = []
 
-
   ngOnInit() {
 
     this.getAllNotifications();
 
-    this.filterAndUpdateCharts();
+    if (this.isBrowser) {
+      this.filterAndUpdateCharts();
+    }
+
   }
 
 

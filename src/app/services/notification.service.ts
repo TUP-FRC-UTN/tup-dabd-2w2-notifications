@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { Notification } from '../models/notifications/notification';
+import { Notification, NotificationModelChart } from '../models/notifications/notification';
 import { forkJoin, map, Observable, switchMap } from 'rxjs';
 import { NotificationFilter } from '../models/notifications/filters/notificationFilter';
 import { PageRequest } from '../models/pagination/PageRequest';
@@ -152,7 +152,7 @@ export class NotificationService {
 
   getAllNotificationsNotFiltered(): Observable<NotificationModelChart[]> {
 
-    const url = `${this.apiUrl}/notifications`;
+    const url = `http://localhost:8011/notifications`;
 
 
     return this.http.get<NotificationModelChart[]>(url);
