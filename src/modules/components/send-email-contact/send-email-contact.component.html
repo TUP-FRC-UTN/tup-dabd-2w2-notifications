@@ -1,6 +1,5 @@
-<div class="card mt-5">
-    <div class="card-body">
-        <h1> Notificaciones a varios Contactos </h1> <br>
+<app-main-container title="Notificaciones a varios Contactos" (infoButtonClick)="showInfo()">
+
         <form #form="ngForm" (submit)="submit()">
             <!---->
             <div class="row">
@@ -100,18 +99,70 @@
                 <div class="col-1"><button type="submit" class="btn btn-primary" [disabled]="form.invalid">Enviar</button></div>
             </div>
         </form>
-    </div>
     
-</div>
+</app-main-container>
+
 
 
 <!-- Modal de previsualización -->
-<div class="modal" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
+<div class="modal-email" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
+    <div class="modal-content-email" (click)="$event.stopPropagation()">
         <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
         <iframe #iframePreview style="width: 100%; border: none;"></iframe>
         <div class="mt-3 text-end">
           <button type="button" class="btn btn-secondary" (click)="closeModalToRenderHTML()">Aceptar</button>
         </div>
+    </div>
+  </div>
+
+
+  <!-- Modal de Notificaciones a Varios Contactos -->
+<!-- Modal de Información sobre Envíos de Notificaciones -->
+<div [class.show]="isModalOpen" [style.display]="isModalOpen ? 'block' : 'none'" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ informationModalTitle }}</h5>
+          <button type="button" class="btn-close" (click)="isModalOpen = false"></button>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <!-- Introducción -->
+            <div class="alert alert-info mb-2">
+              <h5 class="alert-heading">Información sobre el Envío de Notificaciones</h5>
+              <p class="mb-0 small">Esta página permite enviar notificaciones a múltiples contactos de forma sencilla y rápida. Es fundamental asegurarse de seleccionar al menos un contacto antes de proceder con el envío.</p>
+            </div>
+  
+            <!-- Descripción de los campos -->
+            <div class="card mb-2">
+              <div class="card-header">
+                <h5 class="mb-0">Descripción de los Campos</h5>
+              </div>
+              <div class="card-body">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">
+                    <strong>Elegir Contactos:</strong> Seleccione los contactos a los que desea enviar la notificación. Puede agregar múltiples contactos antes de enviar.
+                  </li>
+                  <li class="list-group-item">
+                    <strong>Asunto:</strong> Escriba el tema o asunto de la notificación que se enviará.
+                  </li>
+                  <li class="list-group-item">
+                    <strong>Plantillas:</strong> Seleccione una plantilla predefinida para personalizar el mensaje de la notificación.
+                  </li>
+                </ul>
+              </div>
+            </div>
+  
+            <!-- Nota (OPCIONAL) -->
+            <div class="alert alert-warning mb-0">
+              <h5 class="alert-heading">Nota:</h5>
+              <p class="mb-0 small">Asegúrese de que todos los campos estén completos antes de hacer clic en "Enviar". Si no selecciona ningún contacto, no podrá proceder con el envío.</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="isModalOpen = false">Volver</button>
+        </div>
+      </div>
     </div>
   </div>

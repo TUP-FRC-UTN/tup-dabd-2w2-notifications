@@ -189,10 +189,9 @@ tabindex="-1">
         <!-- Body -->
         <div class="mb-3">
           <label for="cuerpo" class="form-label">Cuerpo</label>
-          <input type="text" class="form-control" id="cuerpo" name="cuerpo"
-            [(ngModel)]="editingtemplate.body" required>
+          <textarea class="form-control" id="cuerpo" name="cuerpo"
+            [(ngModel)]="editingtemplate.body" required rows="10"></textarea>
         </div>
-
         <!-- Suscripciones
         <div class="mb-3">
           <label class="form-label">Suscripciones</label>
