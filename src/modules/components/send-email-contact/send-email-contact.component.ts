@@ -9,13 +9,13 @@ import { TemplateModel } from '../../../app/models/templates/templateModel';
 import { Base64Service } from '../../../app/services/base64-service.service';
 import { EmailDataContact } from '../../../app/models/notifications/emailDataContact';
 import { CommonModule } from '@angular/common';
-import { ToastService } from 'ngx-dabd-grupo01';
+import { MainContainerComponent, ToastService } from 'ngx-dabd-grupo01';
 import { EmailService } from '../../../app/services/emailService';
 
 @Component({
   selector: 'app-send-email-contact',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule],
+  imports: [RouterLink, FormsModule, CommonModule,MainContainerComponent],
   templateUrl: './send-email-contact.component.html',
   styleUrl: './send-email-contact.component.css'
 })
@@ -41,7 +41,11 @@ export class SendEmailContactComponent implements OnInit {
   selectedContactId: number | null = null
   variableName: string = ""
   variableValue: string = ""
-
+  isModalOpen: boolean = false;
+  isInformationModalOpen = false;
+  informationModalTitle = '';
+  informationModalMessage = '';
+  
   //Estado para modal de preview template
   showModalToRenderHTML: boolean = false;
 
@@ -134,5 +138,27 @@ export class SendEmailContactComponent implements OnInit {
     this.showModalToRenderHTML = false;
   }
 
+
+  showInformationModal(title: string, message: string) {
+    this.isModalOpen = true;  // Abre el modal
+
+    this.informationModalTitle = title;
+    this.informationModalMessage = message;
+    this.isInformationModalOpen = true;
+  }
+
+  closeInformationModal() {
+    this.isInformationModalOpen = false;
+    this.isModalOpen = false;
+  }
+
+  showInfo() {
+    const message = `
+      <strong>Notificaciones a Varios Contactos</strong><br>
+      Envío de notificaciones a múltiples contactos registrados.<br><br>
+      Debe seleccionar al menos un contacto para continuar.
+    `;
+    this.showInformationModal('Información', message);
+  }
 
 }

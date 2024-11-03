@@ -6,14 +6,14 @@ import { TemplateModel } from '../../../app/models/templates/templateModel';
 import { EmailData } from '../../../app/models/notifications/emailData';
 import { Variable } from '../../../app/models/variables';
 import { Base64Service } from '../../../app/services/base64-service.service';
-import { ToastService } from 'ngx-dabd-grupo01';
+import { MainContainerComponent, ToastService } from 'ngx-dabd-grupo01';
 import { TemplateService } from '../../../app/services/template.service';
 
 
 @Component({
   selector: 'app-send-email',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule,MainContainerComponent],
   templateUrl: './send-email.component.html',
   styleUrl: './send-email.component.css'
 })
@@ -42,6 +42,11 @@ export class SendEmailComponent implements OnInit {
 
   showModalToRenderHTML: boolean = false;
 
+    // Estado del modal
+    isModalOpen = false;  // Controla si el modal está abierto o cerrado
+    informationModalTitle = '';
+    informationModalMessage = '';
+  
 
   ngOnInit(): void {
 
@@ -119,6 +124,24 @@ export class SendEmailComponent implements OnInit {
 
 
 
+  showInformationModal(title: string, message: string) {
+    this.informationModalTitle = title;
+    this.informationModalMessage = message;
+    this.isModalOpen = true;  // Abre el modal
+  }
 
+  closeInformationModal() {
+    this.isModalOpen = false;  // Cierra el modal
+  }
+
+  // Método para mostrar información sobre el envío de notificaciones
+  showInfo() {
+    const message = `
+      <strong>Envío de Notificaciones</strong><br>
+      Esta funcionalidad permite enviar notificaciones a contactos registrados. 
+      Asegúrese de completar todos los campos obligatorios antes de enviar.
+    `;
+    this.showInformationModal('Información', message);
+  }
 
 }
