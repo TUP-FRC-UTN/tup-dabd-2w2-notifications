@@ -1,12 +1,12 @@
-<app-main-container title="Historial de Notificaciones">
+<app-main-container title="Historial de Notificaciones" (infoButtonClick)="showInfo()">
 
 
   <div class="d-flex justify-content-between align-items-center mb-3">
     <!-- Sección de búsqueda y filtros -->
     <div class="btn-group me-5" role="group">
-      <div class="col-sm-12 col-md-8 col-xl-8">
-        <div class="input-group">
-          <span class="input-group-text" id="search-icon">
+      <div class="col-sm-12 col-md-8 col-xl-8" id="general-search">
+        <div class="input-group" style="max-width: 280px">
+          <span class="input-group-text mr-2" id="search-icon">
             <i class="bi bi-search"></i>
           </span>
           <input

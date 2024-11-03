@@ -1,5 +1,5 @@
 import { Component, ViewChild, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -7,8 +7,7 @@ import { ContactService } from '../../../app/services/contact.service';
 import { ContactModel } from '../../../app/models/contacts/contactModel';
 import { Router } from '@angular/router';
 import { NgbPagination, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { MainContainerComponent } from 'ngx-dabd-grupo01';
-import { ToastService } from 'ngx-dabd-grupo01';
+import { MainContainerComponent, ToastService, TableFiltersComponent, Filter, FilterConfigBuilder } from 'ngx-dabd-grupo01';
 import { SubscriptionService } from '../../../app/services/subscription.service';
 import { map } from 'rxjs';
 import * as XLSX from 'xlsx';
@@ -28,10 +27,12 @@ import { ActiveSearchTerm } from '../../../app/models/contacts/filters/activeSea
     NgbPagination,
     NgbDropdownModule,
     MainContainerComponent,
+    TableFiltersComponent,
     TelegramSenderComponent
   ],
   templateUrl: './contact-list.component.html',
   styleUrls: ['./contact-list.component.css'],
+  providers: [DatePipe]
 })
 export class ContactListComponent implements OnInit {
   private router = inject(Router);
@@ -59,7 +60,6 @@ export class ContactListComponent implements OnInit {
   globalSearchTerm = '';
   filteredSearchTerm = '';
 
-  
 
   isActiveContactFilter: boolean | undefined = true;
   selectedContactType: string = '';
@@ -77,9 +77,28 @@ export class ContactListComponent implements OnInit {
   isDetailModalOpen = false;
   selectedContact: ContactModel | null = null;
 
-  //Estado de filtors
-  showInput: boolean = false;
+  //Estado de filtro de texto; global o filtrado
   activeSearchTerm : ActiveSearchTerm = ActiveSearchTerm.GLOBAL;
+
+
+
+
+
+  filterConfig : Filter[] = new FilterConfigBuilder()
+  .textFilter('Refinar búsqueda', 'filteredSearch', 'Buscar...')
+  .selectFilter('Estado', 'status', 'Seleccione un estado', [
+    {value: 'ALL', 'label': 'Todos' },
+    {value: 'ACTIVE', label: 'Activos'},
+    {value: 'INACTIVE', label: 'Inactivos'}
+  ])
+  .selectFilter('Tipo', 'contactType', 'Seleccione un tipo de contacto', [
+    {value: 'EMAIL', label: 'Correo electrónico'},
+    {value: 'PHONE', label: 'Teléfono'},
+    {value: 'SOCIAL_MEDIA_LINK', label: 'Red social'}
+  ])
+  .build();
+
+
 
   // Referencias
   @ViewChild('editForm') editForm!: NgForm;
@@ -94,6 +113,8 @@ export class ContactListComponent implements OnInit {
     this.loadContacts();
   }
 
+
+
   private getEmptyContact(): ContactModel {
     return {
       id: 0,
@@ -105,13 +126,34 @@ export class ContactListComponent implements OnInit {
     };
   }
 
-  filterByContactType(contactType: string): void {
 
-    console.log('contactType ', contactType)
-    this.selectedContactType = contactType;
-    this.showInput = true;
-    this.activeSearchTerm = ActiveSearchTerm.FILTERED;
+
+
+  filterChange($event: Record<string, any>) {
+    this.clearFilters();
+    if($event['status']  && $event['status'].trim() !== '' ) {
+      if($event['status']==='ACTIVE'){
+        this.isActiveContactFilter = true;
+
+     } else if ($event['status']==='INACTIVE' ) {
+       this.isActiveContactFilter = false;
+     } else {
+       this.isActiveContactFilter = undefined;
+     }
+    }
+
+    if($event['contactType']  && $event['contactType'].trim() !== '' ) {
+      this.selectedContactType = $event['contactType']
+    }
+
+    if($event['filteredSearch']  && $event['filteredSearch'].trim() !== '' ) {
+      this.activeSearchTerm = ActiveSearchTerm.FILTERED;
+      this.filteredSearchTerm = $event['filteredSearch']
+    }
+
     this.applyFilters();
+
+
   }
 
   private applyFilters() {
@@ -125,28 +167,14 @@ export class ContactListComponent implements OnInit {
 
 
 
-  filterByStatus(status: 'all' | 'active' | 'inactive') {
-
-    console.log('status ', status)
-    if (status === 'all') {
-      this.isActiveContactFilter = undefined;
-    } else if (status === 'active') {
-      this.isActiveContactFilter = true;
-    } else if (status === 'inactive') {
-      this.isActiveContactFilter = false;
-    }
-    this.applyFilters();
-  }
 
   onGlobalSearchTextChange(searchTerm: string) {
+    this.activeSearchTerm = ActiveSearchTerm.GLOBAL;
     this.globalSearchTerm = searchTerm;
     this.applyFilters();
   }
 
-  onFilteredSearchTextChange(filteredSearchTerm: string) {
-    this.filteredSearchTerm = filteredSearchTerm;
-    this.applyFilters();
-  }
+
 
   
 
@@ -182,14 +210,13 @@ export class ContactListComponent implements OnInit {
 
 
 
-  clearSearch() {
-    this.globalSearchTerm = '';
-    this.filteredSearchTerm = '';
+  clearFilters() {
     this.activeSearchTerm = ActiveSearchTerm.GLOBAL;
+    this.filteredSearchTerm = '';
+    this.globalSearchTerm = '';
     this.selectedContactType = '';
     this.isActiveContactFilter = true;
-    this.showInput = false; // Ocultar input al limpiar
-    this.loadContacts();
+    this.currentPage = 1;
   }
 
   // Paginación
