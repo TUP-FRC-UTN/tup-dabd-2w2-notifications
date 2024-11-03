@@ -22,6 +22,26 @@
             </div>
         </div>
 
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <!-- Sección de búsqueda y filtros -->
+          <div class="btn-group me-5" role="group">
+            <div class="col-sm-12 col-md-8 col-xl-8" id="general-search">
+              <div class="input-group" style="max-width: 280px">
+                <span class="input-group-text mr-3" id="search-icon">
+                  <i class="bi bi-search"></i>
+                </span>
+                <input
+                [(ngModel)]="globalSearchTerm"
+                  type="text"
+                  class="form-control"
+                  id="filter-text-box"
+                  (input)="onGlobalSearchTextChange(globalSearchTerm)"
+                />
+                <app-table-filters [filters]="filterConfig" (filterValueChange)="filterChange($event)" (clearFilters)="getEmailTemplates()"></app-table-filters> 
+              </div>
+            </div>
+          </div>
+        </div>
 
 
         <!-- Tabla -->
