@@ -19,3 +19,9 @@
 ::ng-deep .ng-dropdown-panel .ng-option.ng-option-selected {
   background-color: #f0f0f0;
 }
+.contact-list {
+  max-height: 80px;  /* Ajusta la altura máxima según tus necesidades */
+  overflow-y: auto;  /* Habilita el scroll vertical */
+  border: 1px solid #ddd; /* Opcional: añade un borde para separar visualmente el área */
+  padding-right: 10px; /* Espacio interno para evitar superposición con el scroll */
+}
