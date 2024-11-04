@@ -49,7 +49,6 @@ export class MyNotificationComponent implements OnInit {
 
   //Dropdown filters
 
-  recipientFilter: string = '';
   notificationSubjectFilter: string = '';
 
   private notificationService = inject(NotificationService);
@@ -82,7 +81,6 @@ export class MyNotificationComponent implements OnInit {
 
   filterConfig: Filter[] = new FilterConfigBuilder()
 .textFilter('Asunto', 'subject', "Buscar por asunto...")
-.textFilter('Usuario', "recipient", "Buscar por email de destinatario...")
 .selectFilter('Estado', 'statusSend', 'Seleccione un estado', [
   {value: 'ALL', label: 'Todas'},
   {value: 'SENT', label: 'Enviadas'},
@@ -114,7 +112,6 @@ filterChange(filters: Record<string, any>): void {
   
   this.filteredNotifications = this.notifications.filter(notification => {
     const subjectMatch = !filters['subject'] || notification.subject.toLowerCase().includes(filters['subject'].toLowerCase());
-    const recipientMatch = !filters['recipient'] || notification.recipient.toLowerCase().includes(filters['recipient'].toLowerCase());
     const statusMatch = !filters['statusSend'] || filters['statusSend'] === "ALL" || notification.statusSend === filters['statusSend'];
 
     const notificationDateISO = new Date(notification.dateSend).toISOString().split('T')[0];
@@ -125,7 +122,7 @@ filterChange(filters: Record<string, any>): void {
     const dateUntilMatch = !dateUntilISO || notificationDateISO <= dateUntilISO;
 
   
-    return subjectMatch && recipientMatch && statusMatch && dateFromMatch && dateUntilMatch;
+    return subjectMatch && statusMatch && dateFromMatch && dateUntilMatch;
   });
 
   this.totalItems = this.filteredNotifications.length;
@@ -138,7 +135,6 @@ clearFilters(): void {
   this.notificationSubjectFilter = '';
   this.dateFrom = '';
   this.dateUntil = '';
-  this.recipientFilter = '';
   this.statusFilter = ''
   this.globalSearchTerm = '';
   this.currentPage = 1;
@@ -148,7 +144,6 @@ clearFilters(): void {
 onGlobalSearchTextChange(searchTerm: string) {
   this.filteredNotifications = this.notifications.filter(item =>
     item.statusSend.toLowerCase().includes(searchTerm) ||
-    item.recipient.toLowerCase().includes(searchTerm) ||
     item.subject.toLowerCase().includes(searchTerm)
 
   );
