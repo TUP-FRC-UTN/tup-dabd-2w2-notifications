@@ -10,7 +10,7 @@
         <div class="d-flex align-items-center">
           <ng-select 
             #contactSelect="ngModel"
-            [items]="allContacts"
+            [items]="allContacts" 
             bindLabel="contactValue"
             bindValue="id"
             placeholder=""
@@ -42,6 +42,7 @@
             (click)="addContact()"
           >
             <i class="bi bi-plus"></i>
+
           </button>
         </div>
       </div>
@@ -82,30 +83,30 @@
     }@else {
     <div class="text-danger">Campo Obligatorio</div>
     } }
-    <!--
-            <h6 class="mt-3">Variables</h6>
-            <div class="mb-3">
+    
+            <h6 class="mt-2">Variables</h6>
+            <div class="mb-3 m5-4">
                 <div class="row">
-                    <div class="col-6">
-                        <label class="form-label">Nombre:</label>
+                    <div class="col-5">
+                        <label class="form-label strong mt-3">Nombre:</label>
                         <input type="text" class="form-control" id="nombre" name="nombre" style="max-width: 200px;"
                         [(ngModel)]="variableName"/>
-                        <label class="form-label">Valor:</label>
+                        <label class="form-label mt-2" > Valor:</label>
                         <input type="text" class="form-control" id="valor" name="valor" style="max-width: 200px;"
                         [(ngModel)]="variableValue"/>
                     </div>
-                    <div class="col-6">
-                        <button type="button" class="btn btn-secondary mb-3" (click)="addVariables()">+</button>
+                    <div class="col-3 ms-4 mt-5">
+                        <button type="button" class="btn btn-secondary mb-3" (click)="addVariables()"><i class="bi bi-plus"></i></button>
                         <br>
                         <h6>Tus Variables:</h6>
                         @for (item of variables; track $index) {
-                            <p>Nombre: {{item.key}} Valor: {{item.value}}</p>
+                            <p><strong>Nombre:</strong> {{item.key}} | <strong>Valor</strong>: {{item.value}}</p>
                         }
                     </div>
                 </div>
             </div>
-            -->
-    <h6>Plantillas</h6>
+           
+    <h6 class="mt-3">Plantillas</h6>
     <select
       #plantillas="ngModel"
       class="form-select"
@@ -148,33 +149,29 @@
       <div class="col-1"></div>
       <div class="col-1"></div>
       <div class="col-1"></div>
-      <div class="col-1">
-        <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
-          Enviar
-        </button>
+        <div class="col-1">
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || isLoading || contacts_id.length === 0">
+            <ng-container *ngIf="isLoading; else sendButton">
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Enviando...
+            </ng-container>
+            <ng-template #sendButton>
+              Enviar
+            </ng-template>
+          </button>
+        </div>
       </div>
-    </div>
   </form>
 </app-main-container>
 
-<!-- Modal de previsualización -->
-<div
-  class="modal-email"
-  *ngIf="showModalToRenderHTML"
-  (click)="closeModalToRenderHTML()"
->
-  <div class="modal-content-email" (click)="$event.stopPropagation()">
-    <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
-    <iframe #iframePreview style="width: 100%; border: none"></iframe>
-    <div class="mt-3 text-end">
-      <button
-        type="button"
-        class="btn btn-secondary"
-        (click)="closeModalToRenderHTML()"
-      >
-        Aceptar
-      </button>
-    </div>
+<!-- Modal Notificación -->
+<div class="modal" *ngIf="showModalToRenderHTML" (click)="closeModalToRenderHTML()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+      <span class="close" (click)="closeModalToRenderHTML()">&times;</span>
+      <iframe #iframePreview style="width: 100%; border: none;"></iframe>
+      <div class="mt-3 text-end">
+        <button type="button" class="btn btn-secondary" (click)="closeModalToRenderHTML()">Volver</button>
+      </div>
   </div>
 </div>
 
