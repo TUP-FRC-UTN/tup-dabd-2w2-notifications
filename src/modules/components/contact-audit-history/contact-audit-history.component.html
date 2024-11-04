@@ -1,11 +1,11 @@
-<app-main-container title="Auditoría de Contactos">
+<app-main-container title="Auditoría de Contactos" (infoButtonClick)="showInfo()" >
 
       <div class="d-flex justify-content-between align-items-center mb-3">
         <!-- Grupo de botones izquierdo -->
         <div class="btn-group me-5" role="group">
-          <div class="col-sm-12 col-md-8 col-xl-8" id="general-search">
+          <div class="col-sm-12 col-md-8 col-xl-10" id="general-search">
             <div class="input-group" style="max-width: 280px">
-              <span class="input-group-text mr-2" id="search-icon">
+              <span class="input-group-text mr-3" id="search-icon">
                 <i class="bi bi-search"></i>
               </span>
               <input
