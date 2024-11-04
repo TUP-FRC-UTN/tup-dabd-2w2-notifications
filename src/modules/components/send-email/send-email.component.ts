@@ -41,6 +41,7 @@ export class SendEmailComponent implements OnInit {
   templates: TemplateModel[] = []
 
   showModalToRenderHTML: boolean = false;
+  isLoading: boolean = false;
 
     // Estado del modal
     isModalOpen = false;  // Controla si el modal está abierto o cerrado
@@ -83,6 +84,7 @@ export class SendEmailComponent implements OnInit {
 
 
   enviar(form: Form) {
+    this.isLoading = true
 
     const data: EmailData = {
       recipient: this.emailToSend,
@@ -94,9 +96,11 @@ export class SendEmailComponent implements OnInit {
       next: (data) => {
         this.toastService.sendSuccess("Enviado con exito")
         this.clean()
+        this.isLoading = false
       },
       error: (errr) => {
         this.toastService.sendError("Hubo un error al enviar el correo, pruebe más tarde")
+        this.isLoading = false
       }
     })
   }

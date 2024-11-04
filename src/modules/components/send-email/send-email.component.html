@@ -62,7 +62,17 @@
                 <div class="col-1"></div>
                 <div class="col-1"></div>
                 <div class="col-1"></div>
-                <div class="col-1"><button type="submit" class="btn btn-primary" [disabled]="form.invalid">Enviar</button></div>
+                <div class="col-1">
+                  <button type="submit" class="btn btn-primary" [disabled]="form.invalid || isLoading">
+                    <ng-container *ngIf="isLoading; else sendButton">
+                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                      Enviando...
+                    </ng-container>
+                    <ng-template #sendButton>
+                      Enviar
+                    </ng-template>
+                  </button>
+                </div>
             </div>
 
         </form>
