@@ -96,16 +96,16 @@ export class TemplateEmailComponent {
   isValidHTML(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const html = control.value;
-  
+
       if (!html) {
         return null; // No hay valor, no se aplica la validación
       }
-  
+
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
-  
+
       const isValid = !doc.getElementsByTagName('parsererror').length; // Verifica si hay errores
-  
+
       return isValid ? null : { invalidHtml: true }; // Retorna un objeto de error si es inválido
     };
   }
@@ -113,21 +113,21 @@ export class TemplateEmailComponent {
     openIaModal() {
       this.isIaModalOpen = true;
     }
-  
+
     closeIaModal() {
       this.isIaModalOpen = false;
     }
-  
+
 
     sendToIa() {
-      this.isLoadingIA = true; 
+      this.isLoadingIA = true;
       this.iaService.askTemplateToAI(this.iaInputText).subscribe({
         next: (response) => {
           this.iaResponse = response;
           this.isLoadingIA = false;
         },
         error: (error) => {
-          console.error("Error de IA:", error); 
+          console.error("Error de IA:", error);
           this.toastService.sendError(error);
           this.isLoadingIA = false;
         }
@@ -138,19 +138,19 @@ export class TemplateEmailComponent {
       this.templateBody = this.iaResponse.toString();
       this.closeIaModal();
     }
-    
+
     openPreviewModal() {
       if (this.isValidHtml(this.iaResponse.toString())) {
-        this.previewVisible = true; 
+        this.previewVisible = true;
       } else {
         this.toastService.sendError("El HTML no es válido para la previsualización.");
       }
     }
-  
+
     isValidHtml(html: string): boolean {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
-      return !doc.getElementsByTagName('parsererror').length; 
+      return !doc.getElementsByTagName('parsererror').length;
     }
 
     previewContent(): void {
@@ -167,9 +167,24 @@ export class TemplateEmailComponent {
         };
       }, 5);
     }
-  
+
     closeModalToRenderHTML(): void {
       this.showModalToRenderHTML = false;
     }
-    
+
+    showInfo() {
+      const message = '';
+
+      this.showModal('Información', message);
+    }
+
+    showModal(title: string, message: string) {
+      this.modalTitle = title;
+      this.modalMessage = message;
+      this.isModalOpen = true;
+    }
+
+   
+
+
 }
