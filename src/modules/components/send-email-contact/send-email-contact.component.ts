@@ -61,8 +61,8 @@ export class SendEmailContactComponent implements OnInit {
   addContact() {
     if (this.selectedContactId && !this.contacts_id.includes(this.selectedContactId)) {
       this.contacts_id.push(this.selectedContactId);
+      this.selectedContactId = null;
     }
-    this.selectedContactId = null;
   }
 
   showContactById(id: number): string {

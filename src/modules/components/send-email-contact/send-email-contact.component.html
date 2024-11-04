@@ -7,17 +7,17 @@
                     <label class="form-label">Elegir Contactos:</label>
                     <div class="d-flex align-items-center">
                         <ng-select 
-                            [items]="allContacts" 
-                            bindLabel="contactValue" 
-                            bindValue="id" 
-                            placeholder="Selecciona contactos..."
-                            [(ngModel)]="selectedContactId" 
-                            name="contactSelector"
-                            [multiple]="true" 
-                            [searchable]="true" 
-                            [clearable]="true"
-                            class="form-control">
-                        </ng-select>
+                        [items]="allContacts" 
+                        bindLabel="contactValue" 
+                        bindValue="id" 
+                        placeholder="Selecciona contactos..."
+                        [(ngModel)]="selectedContactId" 
+                        name="contactSelector"
+                        [multiple]="true" 
+                        [searchable]="true" 
+                        [clearable]="true"
+                        class="form-control">
+                    </ng-select>                    
                         <button type="button" class="btn btn-secondary ms-2" (click)="addContact()">+</button>
                     </div>
                 </div>
