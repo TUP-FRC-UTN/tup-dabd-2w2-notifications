@@ -40,7 +40,7 @@ export class SendEmailContactComponent implements OnInit {
 
   allContacts: ContactModel[] = []
   allTemplates: TemplateModel[] = []
-  selectedContactId: number | null = null
+  selectedContactId: number[] | null = null;
   variableName: string = ""
   variableValue: string = ""
   isModalOpen: boolean = false;
@@ -66,12 +66,16 @@ export class SendEmailContactComponent implements OnInit {
       this.allTemplates = data
     })
   }
-  addContact() { //CAMBIOS
-    if (this.selectedContactId) {
-      this.contacts_id.push(this.selectedContactId)
+  addContact() {
+    if (this.selectedContactId && this.selectedContactId.length > 0) {
+      // Agrega cada contacto seleccionado a contacts_id
+      this.contacts_id.push(...this.selectedContactId);
     }
-    this.selectedContactId = null
+    // Limpia selectedContactId después de agregar los contactos
+    this.selectedContactId = [];
   }
+  
+
   showContactById(id: number): string {
     const contact = this.allContacts.find(contact => contact.id == id);
     return contact ? contact.contactValue : '';
