@@ -13,13 +13,12 @@ import autoTable from 'jspdf-autotable';
 
 import { FormsModule, NgForm } from '@angular/forms';
 import { TemplateService } from '../../../app/services/template.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import {Router } from '@angular/router';
 import { TemplateModel } from '../../../app/models/templates/templateModel';
 import { Base64Service } from '../../../app/services/base64-service.service';
 import { NgbPagination, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { MainContainerComponent } from 'ngx-dabd-grupo01';
-import { ToastService } from 'ngx-dabd-grupo01';
+import { MainContainerComponent, ToastService, TableFiltersComponent, Filter, FilterConfigBuilder } from 'ngx-dabd-grupo01';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -32,9 +31,11 @@ import { HttpErrorResponse } from '@angular/common/http';
     RouterModule,
     NgbPagination,
     NgbDropdownModule,
-    MainContainerComponent],
+    MainContainerComponent,
+    TableFiltersComponent],
   templateUrl: './template-list.component.html',
   styleUrl: './template-list.component.css',
+  providers: [DatePipe]
 })
 @Inject('TemplateService')
 @Inject('Base64Service')
@@ -73,9 +74,11 @@ export class TemplateListComponent implements OnInit {
   sizeOptions: number[] = [10, 25, 50];
 
   // Filtros
-  searchTerm = '';
-  isActivetemplateFilter: boolean | undefined = true;
-  selectedtemplateType: string = '';
+  // searchTerm = '';
+   isActivetemplateFilter: boolean | undefined = true;
+  // selectedtemplateType: string = '';
+  globalSearchTerm = '';
+  filteredName = "";
 
   // Estados de modales
   isModalOpen = false;
@@ -118,26 +121,50 @@ export class TemplateListComponent implements OnInit {
       active: true,
     };
   }
-
-  filterByStatus(status: 'all' | 'active' | 'inactive') {
-    if (status === 'all') {
-      this.isActivetemplateFilter = undefined;
-      this.getEmailTemplates()
-    }
-    else if (status === 'active') {
-      this.isActivetemplateFilter = true;
-      this.templateService.getAllTemplates().subscribe(data => {
-        this.templates = data.filter(t => t.active == true)
-      })
-    }
-    else if (status === 'inactive') {
-      this.isActivetemplateFilter = false;
-      this.templateService.getAllTemplates().subscribe(data => {
-        this.templates = data.filter(t => t.active == false)
-      })
-    }
-    
+  onGlobalSearchTextChange(globalSearchTerm : string) {
+    this.onSearchTextChange(globalSearchTerm);
   }
+  filterConfig : Filter[] = new FilterConfigBuilder()
+  .textFilter('Buscar por Nombre', 'filteredName', 'Buscar Nombre...')
+  .selectFilter('Estado', 'status', 'Seleccione un estado', [
+    {value: 'ALL', 'label': 'Todos' },
+    {value: 'ACTIVE', label: 'Activos'},
+    {value: 'INACTIVE', label: 'Inactivos'}
+  ])
+  .build();
+
+  filterChange($event: Record<string, any>) {
+    // Cargar todos los templates si no hay filtros aplicados
+    this.templateService.getAllTemplates().subscribe((data) => {
+        let filteredTemplates = data; // Comienza con la lista completa
+
+        // Filtrar por estado
+        if ($event['status'] && $event['status'].trim() !== '') {
+            if ($event['status'] === 'ACTIVE') {
+                filteredTemplates = filteredTemplates.filter(t => t.active === true);
+            } else if ($event['status'] === 'INACTIVE') {
+                filteredTemplates = filteredTemplates.filter(t => t.active === false);
+            }
+        }
+
+        // Filtrar por nombre, solo si hay un término de búsqueda
+        if ($event['filteredName'] && $event['filteredName'].trim() !== '') {
+            filteredTemplates = filteredTemplates.filter(t =>
+                t.name.toUpperCase().includes($event['filteredName'].toUpperCase())
+            );
+        }
+
+        // Actualizar la lista de templates
+        this.templates = filteredTemplates;
+
+        // Actualizar la paginación
+        this.updatePagination();
+    }, error => {
+        this.toastService.sendError("Error al cargar las plantillas");
+    });
+}
+
+
 
   // Paginación
   initializePagination() {
@@ -351,44 +378,15 @@ export class TemplateListComponent implements OnInit {
   }
 
 
-  clearSearch() {
-    this.searchTerm = '';
-    this.showInput = false; // Ocultar input al limpiar
-    this.getEmailTemplates();
-  }
-
-  onSearchTextChange(searchTerms: string){
-
-    this.searchTerm = searchTerms
-    switch(this.isActivetemplateFilter){
-      case undefined: {
-        this.templateService.getAllTemplates().subscribe((data) => {
-          this.templates = data.filter(t => 
-              t.name.toUpperCase().includes(searchTerms.toUpperCase())
-          );
-        })
-        break
-      }
-      case true: {
-        this.templateService.getAllTemplates().subscribe((data) => {
-          this.templates = data.filter(t => 
-              t.name.toUpperCase().includes(searchTerms.toUpperCase()) && t.active == true
-          );
-        })
-        break
-      }
-      case false: {
-        this.templateService.getAllTemplates().subscribe((data) => {
-          this.templates = data.filter(t => 
-              t.name.toUpperCase().includes(searchTerms.toUpperCase()) && t.active == false
-          );
-        })
-        break
-      }
-    }
-  }
-
-
+  onSearchTextChange(searchTerms: string) {
+    this.templateService.getAllTemplates().subscribe((data) => {
+        this.templates = data.filter(t => {
+            const matchesName = t.name.toUpperCase().includes(searchTerms.toUpperCase());
+            return matchesName 
+        });
+        this.updatePagination(); 
+    });
+}
 
   saveEditedTemplate() {
     if (this.editingtemplate) {
@@ -415,4 +413,11 @@ export class TemplateListComponent implements OnInit {
     const endIndex = startIndex + this.itemsPerPage;
     return this.templates.slice(startIndex, endIndex);
   }
+
+  clearFilters() {
+    this.globalSearchTerm = '';
+    this.isActivetemplateFilter = undefined; 
+    this.getEmailTemplates(); 
+}
+
 }
