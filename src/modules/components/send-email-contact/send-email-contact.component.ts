@@ -11,11 +11,13 @@ import { EmailDataContact } from '../../../app/models/notifications/emailDataCon
 import { CommonModule } from '@angular/common';
 import { MainContainerComponent, ToastService } from 'ngx-dabd-grupo01';
 import { EmailService } from '../../../app/services/emailService';
+import { NgSelectModule } from '@ng-select/ng-select';
+
 
 @Component({
   selector: 'app-send-email-contact',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule,MainContainerComponent],
+  imports: [RouterLink, FormsModule, CommonModule,MainContainerComponent, NgSelectModule],
   templateUrl: './send-email-contact.component.html',
   styleUrl: './send-email-contact.component.css'
 })

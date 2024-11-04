@@ -22,6 +22,7 @@
     "@angular/router": "^18.2.0",
     "@angular/ssr": "^18.2.5",
     "@ng-bootstrap/ng-bootstrap": "^17.0.1",
+    "@ng-select/ng-select": "^13.9.1",
     "@popperjs/core": "^2.11.8",
     "@types/chart.js": "^2.9.41",
     "@types/jsdom": "^21.1.7",
