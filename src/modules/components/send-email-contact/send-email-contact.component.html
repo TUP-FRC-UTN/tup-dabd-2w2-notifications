@@ -6,14 +6,14 @@
     <!---->
     <div class="row">
       <div class="col-6">
-        <label class="form-label">Elegir Contactos:</label>
+        <label class="form-label">Selecciona contactos:</label>
         <div class="d-flex align-items-center">
-          <ng-select
+          <ng-select 
             #contactSelect="ngModel"
             [items]="allContacts"
             bindLabel="contactValue"
             bindValue="id"
-            placeholder="Selecciona contactos..."
+            placeholder=""
             [(ngModel)]="selectedContactId"
             name="contactSelector"
             [multiple]="true"
@@ -22,7 +22,9 @@
             [closeOnSelect]="false"
             [clearOnBackspace]="true"
             [virtualScroll]="true"
-            class="custom-select"
+            [hideSelected]="true"
+            
+            class="form-select"
             [ngClass]="{
               'is-invalid':
                 contactSelect.invalid &&
