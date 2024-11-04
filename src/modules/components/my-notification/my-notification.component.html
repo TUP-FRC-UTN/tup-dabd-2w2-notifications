@@ -1,157 +1,103 @@
 <app-main-container title="Mis Notificaciones">
-    <div class="card-body">
-    
-      <div class="row align-items-center mb-3">
-        <div class="col-sm-12 col-md-8 col-xl-8" id="general-search">
-          <div class="input-group" style="max-width: 280px">
-            <span class="input-group-text" id="search-icon">
-              <i class="bi bi-search"></i>
-            </span>
-            <input
-            [(ngModel)]="searchTerm"
-              type="text"
-              class="form-control"
-              id="filter-text-box"
-              (input)="onSearchTextChange(searchTerm)"
-            />
-          </div>
-        </div>
-    
-          <!-- Botones de exportación -->
-        <div class="col row d-flex justify-content-end mb-3">
-    
-        <div class="col-auto">
-          <button class="btn" (click)="exportToExcel()" style="background-color: #239b56; color: white;" title="Descargar Excel">
-            <i class="bi bi-file-earmark-excel"></i>
-          </button>
-        </div>
-    
-        <div class="col-auto btn-export-pdf">
-          <button class="btn"  (click)="exportToPDF()" style="background-color: red; color: white;" title="Descargar PDF">
-            <i class="bi bi-file-pdf"></i>
-          </button>
-        </div>
-        </div>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- Sección de búsqueda y filtros -->
+    <div class="btn-group me-5" role="group">
+      <div class="col-sm-12 col-md-8 col-xl-10" id="general-search">
+        <div class="input-group">
+          <span class="input-group-text mr-2" id="search-icon">
+            <i class="bi bi-search"></i>
+          </span>
+          <input
+          [(ngModel)]="globalSearchTerm"
+            type="text"
+            class="form-control"
+            id="filter-text-box"
+            (input)="onGlobalSearchTextChange(globalSearchTerm)"
+            placeholder="Buscar..."
+          />
+         <app-table-filters [filters]="filterConfig"  (filterValueChange)="filterChange($event)" (clearFilters)="clearFilters()"></app-table-filters> 
     
         </div>
-    
-    
-    
-    
+      </div>
       
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <!-- Grupo de botones izquierdo -->
-            <div class="btn-group me-5" role="group">
-              <div class="d-flex align-items-center">
-                <div class="btn-group me-2">
-                    <button class="btn btn-outline-danger" (click)="clearFilters()">
-                    <i class="bi bi-trash-fill"></i> Limpiar
-                  </button>
-      
-                  <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-funnel-fill"></i> Filtros
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <h6 class="dropdown-header">Tipo de Filtro</h6>
-                    </li>
-                    <li><a class="dropdown-item" (click)="onFilterChange('Todos')">Todos</a></li>
-                    <li><a class="dropdown-item" (click)="onFilterChange('Estado')">Estado</a></li>
-                    <li><a class="dropdown-item" (click)="onFilterChange('Fecha')">Fecha</a></li>
-                  </ul>
+
+    </div>  
+
+      <!-- Botones de Activo, Inactivo, Todo y "+" en el mismo grupo -->
+      <div class="d-flex align-items-center">
+
+        <!-- Línea vertical y botones de exportación -->
+        <div class="vertical-line mx-3"></div>
+        <button class="btn btn-success me-2" (click)="exportToExcel()">
+          <i class="bi bi-file-earmark-excel"></i>
+        </button>
+        <button class="btn btn-danger me-2" (click)="exportToPDF()">
+          <i class="bi bi-file-earmark-pdf"></i>
+        </button>
+      </div>
+
+    </div>
+
+
+
+  
+      <!-- Tabla -->
+      <div class="table-container">
+        <table class="table table-striped fixed-table" style="border: 1px solid rgba(0, 0, 0, 0.150); border-collapse: collapse;">
+          
+          @if (filteredNotifications.length === 0) {
+          <thead>
+            <tr>
+              <td colspan="5">
+                <div class="text-center p-2">
+                  <div class="alert alert-secondary text-center" role="alert">
+                    No hay notificaciones para mostrar
+                  </div>
                 </div>
-              </div>
-            </div>
-      
-      
-                <!-- Inputs para filtrado -->
-                @if(currentFilter === 'Fecha'){
-                  <div  class="mb-3">
-                      <label for="dateFrom">Desde:</label>
-                      <input type="date" id="dateFrom" [(ngModel)]="dateFrom" (ngModelChange)="filterNotifications()" class="form-control mb-2">
-                      
-                      <label for="dateUntil">Hasta:</label>
-                      <input type="date" id="dateUntil" [(ngModel)]="dateUntil"  (ngModelChange)="filterNotifications()" class="form-control">
-                    </div>
+              </td>
+            </tr>
+          </thead>
+          } @else {
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Asunto</th>
+              <th>Fecha</th>
+              <th>Visualizado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(notification of filteredNotifications; track $index) {
+            <tr>
+                <td title="{{ notification.recipient }}">
+                    {{ notification.recipient.split('@')[0] }}&#64;...
+                  </td>
+              <td>{{notification.subject}}</td>
+              <td>{{ notification.dateSend | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                @if (notification.statusSend === "VISUALIZED") {
+                <p class="mb-0">
+                  <i class="bi bi-check2-circle text-success" style="font-size: 1.5rem;"></i>
+                </p>
+                } @else {
+                <p class="mb-0">
+                  <i class="bi bi-x-circle text-danger" style="font-size: 1.5rem;"></i>
+                </p>
                 }
-                @if(currentFilter === 'Estado'){
-                <div class="mb-3">
-                  <label for="status">Estado:</label>
-                      <select id="status" [(ngModel)]="status" (ngModelChange)="filterNotifications()" class="form-select">
-    
-                    <option value="">Seleccione Estado</option>
-                    <option value="SENT">Pendiente</option>
-                    <option value="VISUALIZED">Visualizado</option>
-                  </select>
-                </div>
-              }
-              @if(currentFilter === 'Usuario'){
-                  <div  class="mb-3">
-                      <label for="userFilter">Usuario:</label>
-                      <input type="text" id="userFilter" [(ngModel)]="emailFilter"
-                      (ngModelChange)="filterNotifications()" class="form-control" placeholder="Ingresa el correo del usuario">
-                    </div>
-                
-              }
-        
-          </div>
-      
-          <!-- Tabla -->
-          <div class="table-container">
-            <table class="table table-striped fixed-table" style="border: 1px solid rgba(0, 0, 0, 0.150); border-collapse: collapse;">
-              
-              @if (filteredNotifications.length === 0) {
-              <thead>
-                <tr>
-                  <td colspan="5">
-                    <div class="text-center p-2">
-                      <div class="alert alert-secondary text-center" role="alert">
-                        No hay notificaciones para mostrar
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </thead>
-              } @else {
-              <thead>
-                <tr>
-                  <th>Usuario</th>
-                  <th>Asunto</th>
-                  <th>Fecha</th>
-                  <th>Visualizado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for(notification of paginatedNotifications; track $index) {
-                <tr>
-                    <td title="{{ notification.recipient }}">
-                        {{ notification.recipient.split('@')[0] }}&#64;...
-                      </td>
-                  <td>{{notification.subject}}</td>
-                  <td>{{notification.dateSend | date: "short"}} </td>
-                  <td>
-                    @if (notification.statusSend === "VISUALIZED") {
-                    <p class="mb-0">
-                      <i class="bi bi-check2-circle text-success" style="font-size: 1.5rem;"></i>
-                    </p>
-                    } @else {
-                    <p class="mb-0">
-                      <i class="bi bi-x-circle text-danger" style="font-size: 1.5rem;"></i>
-                    </p>
-                    }
-                  </td>
-                  <td>
-                    <button class="btn btn-primary" (click)="previewContent(notification)">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                  </td>
-                </tr>
-                }
-              </tbody>
-              }
-            </table>
-          </div>
+              </td>
+              <td>
+                <button class="btn btn-primary" (click)="previewContent(notification)">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </td>
+            </tr>
+            }
+          </tbody>
+          }
+        </table>
+      </div>
+  
       
         
         <!-- Paginación e Info -->
@@ -173,7 +119,7 @@
             </button>
           </div>
         </div>
-      </div>
+      
     </app-main-container>
     
     

@@ -1,8 +1,8 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Notification } from '../../../app/models/notifications/notification';
-import { MainContainerComponent } from 'ngx-dabd-grupo01';
+import { Filter, FilterConfigBuilder, MainContainerComponent, TableFiltersComponent } from 'ngx-dabd-grupo01';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -13,7 +13,8 @@ import { NotificationService } from '../../../app/services/notification.service'
 @Component({
   selector: 'app-my-notification',
   standalone: true,
-  imports: [CommonModule, NgbPagination, MainContainerComponent, FormsModule],
+  imports: [CommonModule, NgbPagination, MainContainerComponent, FormsModule, TableFiltersComponent],
+  providers: [DatePipe],
   templateUrl: './my-notification.component.html',
   styleUrl: './my-notification.component.css'
 })
@@ -41,12 +42,14 @@ export class MyNotificationComponent implements OnInit {
   showModalToRenderHTML: boolean = false;
 
   // Filtros
-  searchTerm = '';
-  status: string = '';
+  globalSearchTerm = '';
+  statusFilter: string = '';
   dateFrom: string = '';
   dateUntil: string = '';
-  emailFilter: string = '';
-  currentFilter: string = 'status';
+
+  //Dropdown filters
+
+  notificationSubjectFilter: string = '';
 
   private notificationService = inject(NotificationService);
   @ViewChild('iframePreview', { static: false }) iframePreview!: ElementRef;
@@ -68,57 +71,83 @@ export class MyNotificationComponent implements OnInit {
         this.filteredNotifications = [...this.notifications];
         this.totalItems = this.filteredNotifications.length;
       });
+  
     this.filteredNotifications = [...this.notifications];
     this.totalItems = this.filteredNotifications.length;
   }
 
-  clearFilters(): void {
-    this.currentFilter = 'Todos';
-    this.dateFrom = '';
-    this.dateUntil = '';
-    this.status = '';
-    this.emailFilter = '';
-    this.searchTerm = '';
-    this.filteredNotifications = [...this.notifications];
-    this.totalItems = this.filteredNotifications.length;
-  }
 
-  filterNotifications(): void {
-    this.filteredNotifications = this.notifications.filter(notification => {
-      let matches = true;
-      if (this.status) {
-        matches = matches && notification.statusSend === this.status.toUpperCase();
-      }
-      if (this.dateFrom) {
-        matches = matches && notification.dateSend >= this.dateFrom;
-      }
-      if (this.dateUntil) {
-        matches = matches && notification.dateSend <= this.dateUntil;
-      }
-      if (this.emailFilter) {
-        matches = matches && notification.recipient.includes(this.emailFilter);
-      }
-      return matches;
-    });
-    this.totalItems = this.filteredNotifications.length;
-  }
+  
 
-  onFilterChange(filter: string) {
-    this.currentFilter = filter;
-    if (filter === 'Usuario') {
-      this.status = '';
-      this.dateFrom = '';
-      this.dateUntil = '';
-    } else if (filter === 'Fecha') {
-      this.status = '';
-      this.emailFilter = '';
-    } else if (filter === 'Estado') {
-      this.emailFilter = '';
-      this.dateFrom = '';
-      this.dateUntil = '';
-    }
-    this.filterNotifications();
-  }
+  filterConfig: Filter[] = new FilterConfigBuilder()
+.textFilter('Asunto', 'subject', "Buscar por asunto...")
+.selectFilter('Estado', 'statusSend', 'Seleccione un estado', [
+  {value: 'ALL', label: 'Todas'},
+  {value: 'SENT', label: 'Enviadas'},
+  {value: 'VISUALIZED', label: 'Vistas'}
+])
+.dateFilter("Fecha desde:", "dateFrom", "Fecha:"  )
+.dateFilter("Fecha hasta:", "dateUntil", "Fecha:"  )
+.build();
+
+formatDateToISOStart = (dateString: string): string => {
+  if (!dateString) return '';
+  // Toma la fecha del datepicker y le agrega el tiempo al inicio del día (00:00:00)
+  const date = new Date(dateString);
+  date.setHours(0, 0, 0, 0);
+  return date.toISOString();
+};
+
+ formatDateToISOEnd = (dateString: string): string => {
+  if (!dateString) return '';
+  // Toma la fecha del datepicker y le agrega el tiempo al final del día (23:59:59)
+  const date = new Date(dateString);
+  date.setHours(23, 59, 59, 999);
+  return date.toISOString();
+};
+
+
+filterChange(filters: Record<string, any>): void {
+
+  
+  this.filteredNotifications = this.notifications.filter(notification => {
+    const subjectMatch = !filters['subject'] || notification.subject.toLowerCase().includes(filters['subject'].toLowerCase());
+    const statusMatch = !filters['statusSend'] || filters['statusSend'] === "ALL" || notification.statusSend === filters['statusSend'];
+
+    const notificationDateISO = new Date(notification.dateSend).toISOString().split('T')[0];
+    const dateFromISO = filters['dateFrom'] ? new Date(filters['dateFrom']).toISOString().split('T')[0] : null;
+    const dateUntilISO = filters['dateUntil'] ? new Date(filters['dateUntil']).toISOString().split('T')[0] : null;
+
+    const dateFromMatch = !dateFromISO || notificationDateISO >= dateFromISO;
+    const dateUntilMatch = !dateUntilISO || notificationDateISO <= dateUntilISO;
+
+  
+    return subjectMatch && statusMatch && dateFromMatch && dateUntilMatch;
+  });
+
+  this.totalItems = this.filteredNotifications.length;
+
+}
+
+
+
+clearFilters(): void {
+  this.notificationSubjectFilter = '';
+  this.dateFrom = '';
+  this.dateUntil = '';
+  this.statusFilter = ''
+  this.globalSearchTerm = '';
+  this.currentPage = 1;
+  this.loadNotifications();
+}
+
+onGlobalSearchTextChange(searchTerm: string) {
+  this.filteredNotifications = this.notifications.filter(item =>
+    item.statusSend.toLowerCase().includes(searchTerm) ||
+    item.subject.toLowerCase().includes(searchTerm)
+
+  );
+}
 
   exportToExcel(): void {
     const data = this.filteredNotifications.map((notification) => ({
@@ -162,18 +191,6 @@ export class MyNotificationComponent implements OnInit {
     //seteamos nombre pdf
     const fileName = `Notificaciones-${dateTime}`;
     doc.save(fileName+".pdf");
-  }
-
-  clearSearch(): void {
-    this.searchTerm = '';
-    this.loadNotifications();
-  }
-
-  onSearchTextChange(searchTerm: string): void {
-    this.searchTerm = searchTerm;
-    this.notificationService.getNotificationByContact().subscribe(data => {
-      this.filteredNotifications = data.filter(n => n.subject.toUpperCase().includes(this.searchTerm.toUpperCase()))
-    })    
   }
 
   initializePagination() {
