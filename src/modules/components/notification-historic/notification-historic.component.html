@@ -76,7 +76,7 @@
                     {{ notification.recipient.split('@')[0] }}&#64;...
                   </td>
               <td>{{notification.subject}}</td>
-              <td>{{notification.dateSend | date: "short"}} </td>
+              <td>{{ notification.dateSend | date: 'dd/MM/yyyy HH:mm' }}</td>
               <td>
                 @if (notification.statusSend === "VISUALIZED") {
                 <p class="mb-0">
