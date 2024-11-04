@@ -46,6 +46,9 @@ export class NotificationChartComponent implements OnInit {
   recipientFilter: string = '';
   notificationSubjectFilter: string = '';
   isDropdownOpen = false;
+  isModalOpen = false;
+  modalTitle = '';
+  modalMessage = '';
 
   statusChartData = this.chartConfigurationService.statusChartData;
   templateChartData = this.chartConfigurationService.templateChartData;
@@ -265,15 +268,19 @@ export class NotificationChartComponent implements OnInit {
   }
 
   showInfo() {
-    const message = `
-      <strong>Sistema de control de notificaciones</strong><br>
-      Aquí puedes visualizar todos las notificaciones del sistema.<br><br>
-      <strong>Iconografía:</strong><br>
-      Visto: <i class="bi bi-check2-circle text-success large-icon"></i><br>
-      No visto: <i class="bi bi-x-circle text-danger large-icon"></i><br>
-      Ver: <i class="bi bi-eye text-info" style="font-size: 1.3rem; color:info"></i>
-    `;
+    const message = '';
 
+    this.showModal('Información', message);
+  }
+  
+  showModal(title: string, message: string) {
+    this.modalTitle = title;
+    this.modalMessage = message;
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
   }
 
 
