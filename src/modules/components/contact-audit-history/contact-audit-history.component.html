@@ -65,7 +65,7 @@
             @for(auditItem of paginatedContacts; track auditItem.auditId) {
             <tr>
 
-              <td>{{auditItem.revisionDate}}</td>
+              <td>{{auditItem.revisionDate  | date:'dd/MM/yyyy HH:mm:ss'}}</td>
               <td>{{auditItem.revisionType}}</td>
               <td>{{auditItem.contactType}}</td>
               <td>{{auditItem.value}}</td>
