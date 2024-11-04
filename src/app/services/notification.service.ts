@@ -85,7 +85,7 @@ export class NotificationService {
    if (filter.from) params = params.set('from', filter.from);
    if (filter.until) params = params.set('until', filter.until);
    if (filter.contact_id) params = params.set('contact_id', filter.contact_id.toString());
-   if (filter.search_term) params = params.set('search_term', filter.search_term);
+   if (filter.search_term) params = params.set('searchTerm', filter.search_term);
 
    params = params.set('page', (pageRequest.page ?? 0).toString());
    params = params.set('size', (pageRequest.size ?? 10).toString());
