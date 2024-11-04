@@ -6,8 +6,9 @@ import { NotificationService } from '../../../app/services/notification.service'
 import { NotificationModelChart } from '../../../app/models/notifications/notification';
 import { ChartConfigurationService } from '../../../app/services/chart-configuration.service';
 import { KPIModel } from '../../../app/models/kpi/kpiModel';
-import { PLATFORM_ID, Inject } from '@angular/core';
+import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { MainContainerComponent } from 'ngx-dabd-grupo01';
 
 
 @Component({
@@ -16,7 +17,8 @@ import { isPlatformBrowser } from '@angular/common';
   imports: [
     NgChartsModule,
     FormsModule,
-    CommonModule
+    CommonModule,
+    MainContainerComponent
   ],
   templateUrl: './notification-chart.component.html',
   styleUrl: './notification-chart.component.css'
@@ -25,25 +27,41 @@ import { isPlatformBrowser } from '@angular/common';
 
 export class NotificationChartComponent implements OnInit {
 
-  private platformId = inject(PLATFORM_ID);
-  isBrowser = isPlatformBrowser(this.platformId);
-
-
   @ViewChild('statusChart') statusChart?: BaseChartDirective;
   @ViewChild('templateChart') templateChart?: BaseChartDirective;
   @ViewChild('dailyChart') dailyChart?: BaseChartDirective;
 
+  private platformId = inject(PLATFORM_ID);
   notificationService = inject(NotificationService);
   chartConfigurationService = inject(ChartConfigurationService);
+  isBrowser = isPlatformBrowser(this.platformId);
+
 
   dateFrom: string = '';
   dateUntil: string = '';
+  searchSubject: string = '';
+  searchEmail: string = '';
+  selectedStatus: 'ALL' | 'SENT' | 'VISUALIZED' = 'ALL';
+  statusFilter: string = '';
+  recipientFilter: string = '';
+  notificationSubjectFilter: string = '';
+  isDropdownOpen = false;
+  isModalOpen = false;
+  modalTitle = '';
+  modalMessage = '';
+
   statusChartData = this.chartConfigurationService.statusChartData;
   templateChartData = this.chartConfigurationService.templateChartData;
   dailyChartData = this.chartConfigurationService.dailyChartData;
   statusChartOptions = this.chartConfigurationService.statusChartOptions;
   templateChartOptions = this.chartConfigurationService.templateChartOptions;
   dailyChartOptions = this.chartConfigurationService.dailyChartOptions;
+
+
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
 
   kpis!: KPIModel;
 
@@ -71,12 +89,26 @@ export class NotificationChartComponent implements OnInit {
   }
 
 
-
-  filterNotifications() {
+  applyFilters() {
     this.filterAndUpdateCharts();
+    this.isDropdownOpen = false;
+  }
+
+
+  getActiveFiltersCount(): number {
+    let count = 0;
+    if (this.searchSubject) count++;
+    if (this.searchEmail) count++;
+    if (this.selectedStatus !== 'ALL') count++;
+    if (this.dateFrom) count++;
+    if (this.dateUntil) count++;
+    return count;
   }
 
   resetFilters() {
+    this.searchSubject = '';
+    this.searchEmail = '';
+    this.selectedStatus = 'ALL';
     this.dateFrom = '';
     this.dateUntil = '';
     this.filterAndUpdateCharts();
@@ -85,6 +117,24 @@ export class NotificationChartComponent implements OnInit {
   private filterAndUpdateCharts(): void {
 
     let filteredData = [...this.notifications];
+
+    if (this.searchSubject) {
+      filteredData = filteredData.filter(notification =>
+        notification.subject.toLowerCase().includes(this.searchSubject.toLowerCase())
+      );
+    }
+
+    if (this.searchEmail) {
+      filteredData = filteredData.filter(notification =>
+        notification.recipient.toLowerCase().includes(this.searchEmail.toLowerCase())
+      );
+    }
+
+    if (this.selectedStatus !== 'ALL') {
+      filteredData = filteredData.filter(notification =>
+        notification.statusSend === this.selectedStatus
+      );
+    }
 
     if (this.dateFrom || this.dateUntil) {
       filteredData = this.notifications.filter(notification => {
@@ -215,6 +265,22 @@ export class NotificationChartComponent implements OnInit {
         count: peakHour[1]
       }
     };
+  }
+
+  showInfo() {
+    const message = '';
+
+    this.showModal('Información', message);
+  }
+  
+  showModal(title: string, message: string) {
+    this.modalTitle = title;
+    this.modalMessage = message;
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
   }
 
 
