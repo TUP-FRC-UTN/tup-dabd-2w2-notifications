@@ -37,6 +37,7 @@ export class NotificationChartComponent implements OnInit {
   isBrowser = isPlatformBrowser(this.platformId);
 
 
+  today: string = new Date().toISOString().split('T')[0];
   dateFrom: string = '';
   dateUntil: string = '';
   searchSubject: string = '';
@@ -297,6 +298,5 @@ export class NotificationChartComponent implements OnInit {
     const day = date.getDate().toString().padStart(2, '0') 
     return `${year}-${month}-${day}`
   }
-
 
 }

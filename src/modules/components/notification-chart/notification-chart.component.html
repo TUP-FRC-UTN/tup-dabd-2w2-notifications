@@ -56,7 +56,7 @@
           <!-- Fecha hasta -->
           <div class="mb-3">
             <label class="form-label">Fecha hasta:</label>
-            <input type="date" class="form-control" [(ngModel)]="dateUntil">
+            <input type="date" class="form-control" [(ngModel)]="dateUntil" [max]="today">
           </div>
 
           <!-- Action Buttons -->
