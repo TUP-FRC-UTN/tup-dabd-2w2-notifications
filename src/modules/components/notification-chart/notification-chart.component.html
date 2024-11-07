@@ -4,9 +4,77 @@
 
     @if (isBrowser) {
     <div class="container-fluid p-4">
+
+
+      <!-- Filtro de búsqueda (Moved to top) -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="btn-group me-5" role="group">
+          <button class="btn btn-outline-info position-relative" type="button" (click)="toggleDropdown()">
+            <div class="icon-container">
+              <i class="bi bi-funnel-fill"></i>
+              <i class="bi bi-caret-down-fill"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                {{ getActiveFiltersCount() }}
+              </span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Dropdown -->
+      <div class="dropdown">
+        <div class="dropdown-menu dropdown-menu-end p-3" [ngClass]="{'show': isDropdownOpen}">
+          <!-- Asunto -->
+          <div class="mb-3">
+            <label class="form-label">Asunto</label>
+            <input type="text" class="form-control" placeholder="Buscar por asunto..." [(ngModel)]="searchSubject">
+          </div>
+
+          <!-- Usuario -->
+          <div class="mb-3">
+            <label class="form-label">Usuario</label>
+            <input type="text" class="form-control" placeholder="Buscar por email de destinatario..."
+              [(ngModel)]="searchEmail">
+          </div>
+
+          <!-- Estado -->
+          <div class="mb-3">
+            <label class="form-label">Estado</label>
+            <select class="form-select" [(ngModel)]="selectedStatus">
+              <option value="ALL">Todas</option>
+              <option value="SENT">Enviadas</option>
+              <option value="VISUALIZED">Vistas</option>
+            </select>
+          </div>
+
+          <!-- Fecha desde -->
+          <div class="mb-3">
+            <label class="form-label">Fecha desde:</label>
+            <input type="date" class="form-control" [(ngModel)]="dateFrom">
+          </div>
+
+          <!-- Fecha hasta -->
+          <div class="mb-3">
+            <label class="form-label">Fecha hasta:</label>
+            <input type="date" class="form-control" [(ngModel)]="dateUntil">
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-danger w-50" (click)="resetFilters()">
+              <i class="bi bi-trash"></i>
+            </button>
+            <button class="btn btn-outline-primary w-50" (click)="applyFilters()">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
       <!-- KPIs Row -->
       <div class="row mb-4">
-        <h2 class="h4 mb-3">KPIs</h2>
+        <!-- <h2 class="h4 mb-3">KPIs</h2> -->
         <!-- Success Rate KPI -->
         <div class="col-md-3 mb-3">
           <div class="card">
@@ -77,11 +145,11 @@
         <div style="margin-bottom: 15px;">
 
 
-            <h2 class="h4 mb-3">Graficos</h2>
+            <!-- <h2 class="h4 mb-3">Graficos</h2> -->
 
 
         </div>
-        <div class="btn-group me-5" role="group">
+        <!-- <div class="btn-group me-5" role="group">
           <button class="btn btn-outline-info position-relative" type="button" (click)="toggleDropdown()">
             <div class="icon-container">
               <i class="bi bi-funnel-fill"></i>
@@ -91,58 +159,11 @@
               </span>
             </div>
           </button>
-        </div>
+        </div> -->
 
 
       <!-- Filter Dropdown -->
-      <div class="dropdown">
-        <div class="dropdown-menu dropdown-menu-end p-3" [ngClass]="{'show': isDropdownOpen}">
-          <!-- Asunto -->
-          <div class="mb-3">
-            <label class="form-label">Asunto</label>
-            <input type="text" class="form-control" placeholder="Buscar por asunto..." [(ngModel)]="searchSubject">
-          </div>
-
-          <!-- Usuario -->
-          <div class="mb-3">
-            <label class="form-label">Usuario</label>
-            <input type="text" class="form-control" placeholder="Buscar por email de destinatario..."
-              [(ngModel)]="searchEmail">
-          </div>
-
-          <!-- Estado -->
-          <div class="mb-3">
-            <label class="form-label">Estado</label>
-            <select class="form-select" [(ngModel)]="selectedStatus">
-              <option value="ALL">Todas</option>
-              <option value="SENT">Enviadas</option>
-              <option value="VISUALIZED">Vistas</option>
-            </select>
-          </div>
-
-          <!-- Fecha desde -->
-          <div class="mb-3">
-            <label class="form-label">Fecha desde:</label>
-            <input type="date" class="form-control" [(ngModel)]="dateFrom">
-          </div>
-
-          <!-- Fecha hasta -->
-          <div class="mb-3">
-            <label class="form-label">Fecha hasta:</label>
-            <input type="date" class="form-control" [(ngModel)]="dateUntil">
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="d-flex gap-2">
-            <button class="btn btn-outline-danger w-50" (click)="resetFilters()">
-              <i class="bi bi-trash"></i>
-            </button>
-            <button class="btn btn-outline-primary w-50" (click)="applyFilters()">
-              <i class="bi bi-search"></i>
-            </button>
-          </div>
-        </div>
-      </div>
+      
 
       <br>
 
