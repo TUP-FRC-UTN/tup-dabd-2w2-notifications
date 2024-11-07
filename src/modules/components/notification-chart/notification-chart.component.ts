@@ -37,6 +37,7 @@ export class NotificationChartComponent implements OnInit {
   isBrowser = isPlatformBrowser(this.platformId);
 
 
+  today: string = new Date().toISOString().split('T')[0];
   dateFrom: string = '';
   dateUntil: string = '';
   searchSubject: string = '';
@@ -68,6 +69,14 @@ export class NotificationChartComponent implements OnInit {
   notifications: NotificationModelChart[] = []
 
   ngOnInit() {
+
+    //SETEO DE LOS FILTRO POR FECHAS DE SEIS MESES ATRAS HASTA HOY
+    const today = new Date()
+    const fiveMothsAgo = new Date()
+    fiveMothsAgo.setMonth(today.getMonth() - 6)
+    this.dateFrom = this.formatDate(fiveMothsAgo)
+    this.dateUntil = this.formatDate(today)
+    //SETEO DE LOS FILTRO POR FECHAS DE SEIS MESES ATRAS HASTA HOY
 
     this.getAllNotifications();
 
@@ -283,5 +292,11 @@ export class NotificationChartComponent implements OnInit {
     this.isModalOpen = false;
   }
 
+  private formatDate(date: Date): string {
+    const year = date.getFullYear()
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    const day = date.getDate().toString().padStart(2, '0') 
+    return `${year}-${month}-${day}`
+  }
 
 }

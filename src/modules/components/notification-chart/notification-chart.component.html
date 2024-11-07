@@ -4,83 +4,10 @@
 
     @if (isBrowser) {
     <div class="container-fluid p-4">
-      <!-- KPIs Row -->
-      <div class="row mb-4">
-        <h2 class="h4 mb-3">KPIs</h2>
-        <!-- Success Rate KPI -->
-        <div class="col-md-3 mb-3">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex align-items-center mb-2">
-                <div class="icon-circle bg-success text-white me-3">
-                  <i class="bi bi-check-circle"></i>
-                </div>
-                <h6 class="card-subtitle text-muted mb-0">Tasa de Visualización</h6>
-              </div>
-              <h2 class="card-title mb-0 text-success">{{kpis.pendingRate | number:'1.0-1'}}%</h2>
-              <small class="text-muted">Notificaciones Visualizadas</small>
-            </div>
-          </div>
-        </div>
-
-        <!-- Daily Average KPI -->
-        <div class="col-md-3 mb-3">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex align-items-center mb-2">
-                <div class="icon-circle bg-primary text-white me-3">
-                  <i class="bi bi-graph-up"></i>
-                </div>
-                <h6 class="card-subtitle text-muted mb-0">Promedio Diario</h6>
-              </div>
-              <h2 class="card-title mb-0">{{kpis.dailyAverage | number:'1.0-1'}}</h2>
-              <small class="text-muted">Notificaciones por día</small>
-            </div>
-          </div>
-        </div>
-
-        <!-- Most Used Template KPI -->
-        <div class="col-md-3 mb-3">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex align-items-center mb-2">
-                <div class="icon-circle bg-warning text-white me-3">
-                  <i class="bi bi-file-text"></i>
-                </div>
-                <h6 class="card-subtitle text-muted mb-0">Plantilla más Usada</h6>
-              </div>
-              <h2 class="card-title mb-0">{{kpis.mostUsedTemplate.count}}</h2>
-              <small class="text-muted">{{kpis.mostUsedTemplate.name}}</small>
-            </div>
-          </div>
-        </div>
-
-        <!-- Peak Hour KPI -->
-        <div class="col-md-3 mb-3">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex align-items-center mb-2">
-                <div class="icon-circle bg-info text-white me-3">
-                  <i class="bi bi-clock"></i>
-                </div>
-                <h6 class="card-subtitle text-muted mb-0">Hora Pico</h6>
-              </div>
-              <h2 class="card-title mb-0">{{kpis.peakHour.hour}}:00</h2>
-              <small class="text-muted">{{kpis.peakHour.count}} notificaciones</small>
-            </div>
-          </div>
-        </div>
-      </div>
 
 
-
-        <div style="margin-bottom: 15px;">
-
-
-            <h2 class="h4 mb-3">Graficos</h2>
-
-
-        </div>
+      <!-- Filtro de búsqueda (Moved to top) -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="btn-group me-5" role="group">
           <button class="btn btn-outline-info position-relative" type="button" (click)="toggleDropdown()">
             <div class="icon-container">
@@ -92,7 +19,7 @@
             </div>
           </button>
         </div>
-
+      </div>
 
       <!-- Filter Dropdown -->
       <div class="dropdown">
@@ -129,7 +56,7 @@
           <!-- Fecha hasta -->
           <div class="mb-3">
             <label class="form-label">Fecha hasta:</label>
-            <input type="date" class="form-control" [(ngModel)]="dateUntil">
+            <input type="date" class="form-control" [(ngModel)]="dateUntil" [max]="today">
           </div>
 
           <!-- Action Buttons -->
@@ -144,6 +71,85 @@
         </div>
       </div>
 
+
+      <!-- KPIs Row -->
+      <div class="row mb-4">
+        <!-- <h2 class="h4 mb-3">KPIs</h2> -->
+        <!-- Success Rate KPI -->
+        <div class="col-md-3 mb-3">
+          <div class="card">
+            <div class="card-body" style="height: 150px; width: 100%;">
+              <div class="d-flex align-items-center mb-2">
+                <div class="icon-circle bg-success text-white me-3">
+                  <i class="bi bi-check-circle"></i>
+                </div>
+                <h6 class="card-subtitle text-muted mb-0">Tasa de Visualización</h6>
+              </div>
+              <h2 class="card-title mb-0 text-success">{{kpis.pendingRate | number:'1.0-1'}}%</h2>
+              <small class="text-muted">Notificaciones Visualizadas</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Daily Average KPI -->
+        <div class="col-md-3 mb-3">
+          <div class="card">
+            <div class="card-body" style="height: 150px; width: 100%;">
+              <div class="d-flex align-items-center mb-2">
+                <div class="icon-circle bg-primary text-white me-3">
+                  <i class="bi bi-graph-up"></i>
+                </div>
+                <h6 class="card-subtitle text-muted mb-0">Promedio Diario</h6>
+              </div>
+              <h2 class="card-title mb-0">{{kpis.dailyAverage | number:'1.0-1'}}</h2>
+              <small class="text-muted">Notificaciones por día</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Most Used Template KPI -->
+        <div class="col-md-3 mb-3">
+          <div class="card">
+            <div class="card-body" style="height: 150px; width: 100%;">
+              <div class="d-flex align-items-center mb-2">
+                <div class="icon-circle bg-warning text-white me-3">
+                  <i class="bi bi-file-text"></i>
+                </div>
+                <h6 class="card-subtitle text-muted mb-0">Plantilla más Usada</h6>
+              </div>
+              <h2 class="card-title mb-0">{{kpis.mostUsedTemplate.count}}</h2>
+              <small class="text-muted">{{kpis.mostUsedTemplate.name}}</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Peak Hour KPI -->
+        <div class="col-md-3 mb-3">
+          <div class="card">
+            <div class="card-body" style="height: 150px; width: 100%;">
+              <div class="d-flex align-items-center mb-2">
+                <div class="icon-circle bg-info text-white me-3">
+                  <i class="bi bi-clock"></i>
+                </div>
+                <h6 class="card-subtitle text-muted mb-0">Hora Pico</h6>
+              </div>
+              <h2 class="card-title mb-0">{{kpis.peakHour.hour}}:00</h2>
+              <small class="text-muted">{{kpis.peakHour.count}} notificaciones</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+        <div style="margin-bottom: 15px;">
+
+
+            <!-- <h2 class="h4 mb-3">Graficos</h2> -->
+
+
+        </div>
+      
       <br>
 
       <!-- Charts -->
