@@ -367,10 +367,19 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Enviar Correo</h5>
+        <h5 class="modal-title">Enviar Correo a Contactos</h5>
         <button type="button" class="btn-close" (click)="closeEmailModal()"></button>
       </div>
       <div class="modal-body">
+        <div name="allSelectedContacts">
+          <p>Tus contactos seleccionados:</p>
+          <ul>
+            @for(c of selectedContacts; track $index) {
+              <li> {{c}} </li>
+            }
+          </ul>
+          
+        </div>
         <form>
           <div class="mb-3">
             <label for="emailSubject" class="form-label">Asunto</label>
