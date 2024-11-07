@@ -80,6 +80,34 @@ export class ContactListComponent implements OnInit {
   //Estado de filtro de texto; global o filtrado
   activeSearchTerm : ActiveSearchTerm = ActiveSearchTerm.GLOBAL;
 
+  //Envio a varios contactos
+  selectedContacts : string[] = []
+  minimunContacts : boolean = false
+
+  selectContact(contactValue: string, event: Event) {
+    const inputElement = event.target as HTMLInputElement
+    
+    if (inputElement && inputElement.checked !== undefined) {
+      const isSelected = inputElement.checked;
+  
+      // Si el checkbox está seleccionado, agregar el contacto al array
+      if (isSelected) {        
+        this.selectedContacts.push(contactValue);
+        
+      } else {
+        // Si el checkbox está desmarcado, eliminar el contacto del array
+        
+        const index = this.selectedContacts.indexOf(contactValue);
+        if (index > -1) {
+          this.selectedContacts.splice(index, 1);
+        }
+      }
+    }
+  
+    this.minimunContacts = this.selectedContacts.length >= 2;
+  }
+  
+
 
 
 

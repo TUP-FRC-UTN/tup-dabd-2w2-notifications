@@ -68,6 +68,7 @@
         } @else {
         <thead>
           <tr>
+            <th></th>
             <th>Contacto</th>
             <th>Tipo de Contacto</th>
             <th>Estado</th>
@@ -77,6 +78,7 @@
         <tbody>
           @for(contact of contacts; track contact.id) {
           <tr>
+            <td> <input type="checkbox" (change)="selectContact(contact.contactValue, $event)"> </td>
             <td>{{contact.contactValue}}</td>
             <td>{{contact.contactType}}</td>
 
