@@ -86,7 +86,7 @@
         <tbody>
           @for(contact of contacts; track contact.id) {
           <tr>
-            <td> <input type="checkbox" (change)="selectContact(contact.contactValue, $event)"> </td>
+            <td> <input type="checkbox" (change)="selectContact(contact.id, $event)"> </td>
             <td>{{contact.contactValue}}</td>
             <td>{{contact.contactType}}</td>
 
@@ -375,7 +375,7 @@
           <p>Tus contactos seleccionados:</p>
           <ul>
             @for(c of selectedContacts; track $index) {
-              <li> {{c}} </li>
+              <li> {{showNameById(c)}} </li>
             }
           </ul>
           
@@ -383,12 +383,16 @@
         <form>
           <div class="mb-3">
             <label for="emailSubject" class="form-label">Asunto</label>
-            <input type="text" class="form-control" id="emailSubject" [(ngModel)]="emailSubject">
+            <input #subject="ngModel" type="text" class="form-control" id="emailSubject" name="subject" [(ngModel)]="emailSubject">
           </div>
 
           <div class="mb-3">
-            <label for="emailBody" class="form-label">Cuerpo del mensaje</label>
-            <textarea class="form-control" id="emailBody" rows="3" [(ngModel)]="emailBody"></textarea>
+            <label for="emailBody" class="form-label">Plantilla</label>
+            <select #template="ngModel" name="template" class="form-select" [(ngModel)]="selectedTemplate">
+              @for(t of allTemplates; track $index) {
+                <option [value]="t.id"> {{t.name}} </option>
+              }
+            </select>
           </div>
         </form>
       </div>

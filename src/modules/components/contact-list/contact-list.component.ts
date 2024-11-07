@@ -16,6 +16,10 @@ import autoTable from 'jspdf-autotable';
 import { PaginatedContacts } from '../../../app/models/contacts/paginated/PaginatedContact';
 import { TelegramSenderComponent } from '../telegram-sender/telegram-sender.component';
 import { ActiveSearchTerm } from '../../../app/models/contacts/filters/activeSearchTerm';
+import { TemplateModel } from '../../../app/models/templates/templateModel';
+import { EmailService } from '../../../app/services/emailService';
+import { TemplateService } from '../../../app/services/template.service';
+import { EmailDataContact } from '../../../app/models/notifications/emailDataContact';
 
 @Component({
   selector: 'app-contact-list',
@@ -81,13 +85,22 @@ export class ContactListComponent implements OnInit {
   activeSearchTerm : ActiveSearchTerm = ActiveSearchTerm.GLOBAL;
 
   //Envio a varios contactos
-  selectedContacts : string[] = []
+  emailService = inject(EmailService)
+  templateService = inject(TemplateService)
+  selectedContacts : number[] = []
   minimunContacts : boolean = false
   isEmailModalOpen : boolean = false
   emailSubject : string = ""
   emailBody : string = ""
+  allTemplates : TemplateModel[] = []
+  selectedTemplate : number = 0
 
-  selectContact(contactValue: string, event: Event) {
+  loadTemplates() {
+    this.templateService.getAllTemplates().subscribe(data => {
+      this.allTemplates = data
+    })
+  }
+  selectContact(contactId: number, event: Event) {
     const inputElement = event.target as HTMLInputElement
     
     if (inputElement && inputElement.checked !== undefined) {
@@ -95,12 +108,12 @@ export class ContactListComponent implements OnInit {
   
       // Si el checkbox está seleccionado, agregar el contacto al array
       if (isSelected) {        
-        this.selectedContacts.push(contactValue);
+        this.selectedContacts.push(contactId);
         
       } else {
         // Si el checkbox está desmarcado, eliminar el contacto del array
         
-        const index = this.selectedContacts.indexOf(contactValue);
+        const index = this.selectedContacts.indexOf(contactId);
         if (index > -1) {
           this.selectedContacts.splice(index, 1);
         }
@@ -116,7 +129,30 @@ export class ContactListComponent implements OnInit {
     this.isEmailModalOpen = false
   }
   sendEmail() {
-    
+    const data : EmailDataContact = {
+      subject: this.emailSubject,
+      variables: [],
+      templateId: this.selectedTemplate,
+      contactIds: this.selectedContacts
+    }    
+    this.emailService.sendEmailWithContacts(data).subscribe({
+      next: () => {
+        this.isEmailModalOpen = false
+        this.loadContacts()
+        this.toastService.sendSuccess("Enviado correctamente a los contactos")
+      },
+      error: (error) => {
+        console.error(error)
+        this.isEmailModalOpen = false
+        this.loadContacts()
+        this.toastService.sendError("Hubo un error al enviar a los contactos")
+      }
+    })
+  }
+  showNameById(id: number) {
+    let name
+    name = this.contacts.find(c => c.id === id)?.contactValue
+    return name
   }
   
 
@@ -151,6 +187,7 @@ export class ContactListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadContacts();
+    this.loadTemplates()
   }
 
 
