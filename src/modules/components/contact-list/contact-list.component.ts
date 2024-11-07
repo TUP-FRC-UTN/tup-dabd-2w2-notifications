@@ -83,6 +83,9 @@ export class ContactListComponent implements OnInit {
   //Envio a varios contactos
   selectedContacts : string[] = []
   minimunContacts : boolean = false
+  isEmailModalOpen : boolean = false
+  emailSubject : string = ""
+  emailBody : string = ""
 
   selectContact(contactValue: string, event: Event) {
     const inputElement = event.target as HTMLInputElement
@@ -105,6 +108,15 @@ export class ContactListComponent implements OnInit {
     }
   
     this.minimunContacts = this.selectedContacts.length >= 2;
+  }
+  openEmailModal() {
+    this.isEmailModalOpen = true
+  }
+  closeEmailModal() {
+    this.isEmailModalOpen = false
+  }
+  sendEmail() {
+    
   }
   
 
