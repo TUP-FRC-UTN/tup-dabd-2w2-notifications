@@ -47,6 +47,14 @@
           </svg>
         </button>
 
+        @if (minimunContacts) {
+
+          <button type="button" class="btn btn-outline-white me-2" style="background-color: #bcd8e5;" (click)="openEmailModal()"> 
+            <i class="bi bi-envelope"></i>
+          </button>
+
+        }
+
     </div>
     </div>
 
@@ -68,6 +76,7 @@
         } @else {
         <thead>
           <tr>
+            <th></th>
             <th>Contacto</th>
             <th>Tipo de Contacto</th>
             <th>Estado</th>
@@ -77,6 +86,7 @@
         <tbody>
           @for(contact of contacts; track contact.id) {
           <tr>
+            <td> <input type="checkbox" (change)="selectContact(contact.id, $event)"> </td>
             <td>{{contact.contactValue}}</td>
             <td>{{contact.contactType}}</td>
 
@@ -347,6 +357,48 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeTelegramModal()">Volver</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Enviar Correo -->
+<div [class.show]="isEmailModalOpen" [style.display]="isEmailModalOpen ? 'block' : 'none'" class="modal fade" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Enviar Correo a Contactos</h5>
+        <button type="button" class="btn-close" (click)="closeEmailModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div name="allSelectedContacts">
+          <p>Tus contactos seleccionados:</p>
+          <ul>
+            @for(c of selectedContacts; track $index) {
+              <li> {{showNameById(c)}} </li>
+            }
+          </ul>
+          
+        </div>
+        <form>
+          <div class="mb-3">
+            <label for="emailSubject" class="form-label">Asunto</label>
+            <input #subject="ngModel" type="text" class="form-control" id="emailSubject" name="subject" [(ngModel)]="emailSubject">
+          </div>
+
+          <div class="mb-3">
+            <label for="emailBody" class="form-label">Plantilla</label>
+            <select #template="ngModel" name="template" class="form-select" [(ngModel)]="selectedTemplate">
+              @for(t of allTemplates; track $index) {
+                <option [value]="t.id"> {{t.name}} </option>
+              }
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeEmailModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="sendEmail()">Enviar</button>
       </div>
     </div>
   </div>
