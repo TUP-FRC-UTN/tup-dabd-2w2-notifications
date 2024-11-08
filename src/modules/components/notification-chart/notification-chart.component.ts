@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, inject, OnInit, ViewChild } from '@angular/core';
 import { NgChartsModule, BaseChartDirective } from 'ng2-charts';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -9,6 +9,7 @@ import { KPIModel } from '../../../app/models/kpi/kpiModel';
 import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { MainContainerComponent } from 'ngx-dabd-grupo01';
+import { IaService } from '../../../app/services/ia-service';
 
 
 @Component({
@@ -35,7 +36,7 @@ export class NotificationChartComponent implements OnInit {
   notificationService = inject(NotificationService);
   chartConfigurationService = inject(ChartConfigurationService);
   isBrowser = isPlatformBrowser(this.platformId);
-
+  iaService = inject(IaService);
 
   today: string = new Date().toISOString().split('T')[0];
   dateFrom: string = '';
@@ -59,6 +60,9 @@ export class NotificationChartComponent implements OnInit {
   dailyChartOptions = this.chartConfigurationService.dailyChartOptions;
 
 
+  isTooltipOpen = false; 
+  isLoading = false;
+  iaResponse = ''; 
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
@@ -69,21 +73,16 @@ export class NotificationChartComponent implements OnInit {
   notifications: NotificationModelChart[] = []
 
   ngOnInit() {
-
-    //SETEO DE LOS FILTRO POR FECHAS DE SEIS MESES ATRAS HASTA HOY
-    const today = new Date()
-    const fiveMothsAgo = new Date()
-    fiveMothsAgo.setMonth(today.getMonth() - 6)
-    this.dateFrom = this.formatDate(fiveMothsAgo)
-    this.dateUntil = this.formatDate(today)
-    //SETEO DE LOS FILTRO POR FECHAS DE SEIS MESES ATRAS HASTA HOY
-
-    this.getAllNotifications();
-
-    if (this.isBrowser) {
-      this.filterAndUpdateCharts();
-    }
-
+    this.getAllNotifications(); // Carga de datos inicial
+  
+    this.notificationService.getAllNotificationsNotFiltered().subscribe((data) => {
+      this.notifications = data;
+  
+      // Asegurate de que los gráficos se actualizan después de cargar los datos.
+      if (this.isBrowser) {
+        this.filterAndUpdateCharts();
+      }
+    });
   }
 
 
@@ -262,7 +261,7 @@ export class NotificationChartComponent implements OnInit {
       .reduce((a, b) => a[1] > b[1] ? a : b, [0, 0]);
 
     this.kpis = {
-      successRate: (sent / total) * 100,
+      viewedRate: (sent / total) * 100,
       pendingRate: (pending / total) * 100,
       dailyAverage: total / uniqueDays,
       mostUsedTemplate: {
@@ -299,4 +298,38 @@ export class NotificationChartComponent implements OnInit {
     return `${year}-${month}-${day}`
   }
 
+
+  exportDashboardData(): string {
+    const data = {
+      kpis: this.kpis,
+      statusChartData: this.statusChartData,
+      templateChartData: this.templateChartData,
+      dailyChartData: this.dailyChartData,
+      notifications: this.notifications
+    };
+    return JSON.stringify(data);
+  }
+
+
+  toggleTooltip() {
+    this.isTooltipOpen = !this.isTooltipOpen;
+    if (this.isTooltipOpen) {
+      this.fetchIaResponse();
+    }
+  }
+  
+  fetchIaResponse() {
+    console.log(this.exportDashboardData());
+    this.isLoading = true; // Mostrar spinner
+    this.iaService.analyzdeDashboard(this.exportDashboardData()).subscribe({
+      next: (response) => {
+        this.iaResponse = response; // Cambia según el formato de tu API
+        this.isLoading = false; // Ocultar spinner
+      },
+      error: () => {
+        this.iaResponse = 'Error al obtener respuesta del asistente.';
+        this.isLoading = false;
+      }
+    });
+  }
 }

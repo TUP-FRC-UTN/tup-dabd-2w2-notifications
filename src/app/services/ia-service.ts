@@ -19,5 +19,11 @@ import { Observable } from "rxjs";
     askTemplateToAI(request: string): Observable<string> {
       const url = `${this.apiUrl}/openAI/template`;
       return this.http.post<string>(url, request, { responseType: 'text' as 'json' }); 
-  }
+    }
+
+    analyzdeDashboard(request: string): Observable<string> {
+      const url = `${this.apiUrl}/openAI/dashboard`;
+      return this.http.post<string>(url, request, { responseType: 'text' as 'json' }); 
+    }
+   
   }

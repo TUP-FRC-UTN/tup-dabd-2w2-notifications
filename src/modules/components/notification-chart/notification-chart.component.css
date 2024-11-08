@@ -236,3 +236,49 @@
 .modal {
   z-index: 1050;
 }
+
+.tooltip-wrapper {
+  position: relative; /* Relativo al botón */
+}
+
+.tooltip-container {
+  position: absolute;
+  top: 100%; /* Aparece justo debajo del botón */
+  right: 0; /* Alineado al borde derecho del botón */
+  transform: translateY(10px); /* Desplazamiento para dar la sensación de "salida" */
+  width: 300px; /* Ajustar ancho del tooltip */
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 15px;
+}
+
+.tooltip-container::before {
+  content: '';
+  position: absolute;
+  top: -5px; /* Punto justo en la parte superior del tooltip */
+  right: 15px; /* Ajuste para que la flecha apunte hacia el botón */
+  transform: translateY(-100%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #ccc transparent;
+}
+
+.tooltip-container::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: 15px;
+  transform: translateY(-100%);
+  border-width: 4px;
+  border-style: solid;
+  border-color: transparent transparent #fff transparent;
+}
+
+.spinner-border {
+  display: block;
+  margin: 0 auto;
+}
+
