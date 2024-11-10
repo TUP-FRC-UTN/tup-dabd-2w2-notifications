@@ -258,8 +258,32 @@ export class NotificationChartComponent implements OnInit {
       hourCount.set(hour, (hourCount.get(hour) || 0) + 1);
     });
 
+    const contactCount = new Map<string, number>();
+    data.forEach(n => {
+      contactCount.set(n.recipient, (contactCount.get(n.recipient) || 0) + 1);
+    });
+    const mostFrequentContact = Array.from(contactCount.entries())
+      .reduce((a, b) => a[1] > b[1] ? a : b, ['', 0]);
+
     const peakHour = Array.from(hourCount.entries())
       .reduce((a, b) => a[1] > b[1] ? a : b, [0, 0]);
+
+    const visualizedNotifications = data.filter(n => n.statusSend === 'VISUALIZED');
+    let totalResponseTime = 0;
+
+    visualizedNotifications.forEach(notification => {
+      const sendTime = new Date(this.convertToISODate(notification.dateSend));
+      const viewTime = new Date(this.convertToISODate(notification.dateVisualized));
+      const responseTime = viewTime.getTime() - sendTime.getTime();
+      totalResponseTime += responseTime;
+    });
+
+    const averageResponseTimeMs = visualizedNotifications.length > 0 ?
+      totalResponseTime / visualizedNotifications.length : 0;
+
+    const averageResponseTimeHours = averageResponseTimeMs / (1000 * 60 * 60);
+    const hours = Math.floor(averageResponseTimeHours);
+    const minutes = Math.floor((averageResponseTimeHours - hours) * 60);
 
     this.kpis = {
       successRate: (sent / total) * 100,
@@ -272,6 +296,14 @@ export class NotificationChartComponent implements OnInit {
       peakHour: {
         hour: peakHour[0],
         count: peakHour[1]
+      },
+      mostFrequentContact: {
+        email: mostFrequentContact[0],
+        count: mostFrequentContact[1]
+      },
+      averageResponseTime: {
+        hours: hours,
+        minutes: minutes
       }
     };
   }
@@ -281,7 +313,7 @@ export class NotificationChartComponent implements OnInit {
 
     this.showModal('Información', message);
   }
-  
+
   showModal(title: string, message: string) {
     this.modalTitle = title;
     this.modalMessage = message;
@@ -295,8 +327,17 @@ export class NotificationChartComponent implements OnInit {
   private formatDate(date: Date): string {
     const year = date.getFullYear()
     const month = (date.getMonth() + 1).toString().padStart(2, '0')
-    const day = date.getDate().toString().padStart(2, '0') 
+    const day = date.getDate().toString().padStart(2, '0')
     return `${year}-${month}-${day}`
+  }
+
+  formatResponseTime(hours: number, minutes: number): string {
+    if (hours === 0) {
+      return `${minutes} min`;
+    } else if (minutes === 0) {
+      return `${hours}h`;
+    }
+    return `${hours}h ${minutes}min`;
   }
 
 }

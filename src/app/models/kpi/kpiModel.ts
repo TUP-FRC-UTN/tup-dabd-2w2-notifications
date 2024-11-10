@@ -10,4 +10,13 @@ export interface KPIModel {
     hour: number;
     count: number;
   };
+  mostFrequentContact: {
+    email: string;
+    count: number;
+  };
+  averageResponseTime: {
+    hours: number;
+    minutes: number;
+  };
+
 }
