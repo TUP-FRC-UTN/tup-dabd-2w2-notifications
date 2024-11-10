@@ -1,6 +1,7 @@
 /* Card Styles */
 .card {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgb(0,0,0,0.4);
+
   border: none;
   border-radius: 8px;
   background-color: #fff;
@@ -184,7 +185,8 @@
 }
 
 .card {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 8px rgb(0,0,0,0.4);
+
   border: none;
 }
 

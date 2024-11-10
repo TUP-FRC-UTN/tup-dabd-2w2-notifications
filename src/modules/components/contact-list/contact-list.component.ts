@@ -94,9 +94,10 @@ export class ContactListComponent implements OnInit {
   emailBody : string = ""
   allTemplates : TemplateModel[] = []
   selectedTemplate : number = 0
+  allSelected: boolean = false
 
   loadTemplates() {
-    this.templateService.getAllTemplates().subscribe(data => {
+    this.templateService.getAllTemplatesWithoutVariables().subscribe(data => {
       this.allTemplates = data
     })
   }
@@ -154,7 +155,25 @@ export class ContactListComponent implements OnInit {
     name = this.contacts.find(c => c.id === id)?.contactValue
     return name
   }
-  
+  selectAllContacts() {
+    if (!this.allSelected) {
+      this.minimunContacts = true
+      this.allSelected = true
+      this.selectedContacts = this.contacts.map(contact => contact.id);
+    } else {
+      this.minimunContacts = false
+      this.allSelected = false
+      this.selectedContacts = [];
+    }
+    this.updateSelectAllStatus();
+  }
+  updateSelectAllStatus() {
+    this.allSelected = this.contacts.length === this.selectedContacts.length;
+  }
+  isContactSelected(contactId: number): boolean {
+    return this.selectedContacts.includes(contactId);
+  }
+  //Envio a varios contactos
 
 
 
