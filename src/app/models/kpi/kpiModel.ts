@@ -1,6 +1,6 @@
 export interface KPIModel {
-  viewedRate: number;
   pendingRate: number;
+  viewedRate: number;
   dailyAverage: number;
   mostUsedTemplate: {
     name: string;

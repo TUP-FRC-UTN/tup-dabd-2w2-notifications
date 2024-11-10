@@ -296,8 +296,8 @@ private filterAndUpdateCharts(): void {
 
 
     this.kpis = {
-      viewedRate: (sent / total) * 100,
-      pendingRate: (pending / total) * 100,
+      pendingRate: (sent / total) * 100,
+      viewedRate: (pending / total) * 100,
       dailyAverage: total / uniqueDays,
       mostUsedTemplate: {
         name: mostUsedTemplate[0],
