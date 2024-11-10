@@ -156,11 +156,13 @@ export class ContactListComponent implements OnInit {
     return name
   }
   selectAllContacts() {
-    if (this.allSelected) {
-      // Si se seleccionan todos, agregamos todos los IDs al array selectedContacts
+    if (!this.allSelected) {
+      this.minimunContacts = true
+      this.allSelected = true
       this.selectedContacts = this.contacts.map(contact => contact.id);
     } else {
-      // Si se deseleccionan todos, vaciamos el array selectedContacts
+      this.minimunContacts = false
+      this.allSelected = false
       this.selectedContacts = [];
     }
     this.updateSelectAllStatus();
@@ -168,10 +170,6 @@ export class ContactListComponent implements OnInit {
   updateSelectAllStatus() {
     this.allSelected = this.contacts.length === this.selectedContacts.length;
   }
-
-  /**
-   * Este método comprueba si un contacto está seleccionado.
-   */
   isContactSelected(contactId: number): boolean {
     return this.selectedContacts.includes(contactId);
   }
