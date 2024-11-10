@@ -14,9 +14,10 @@ export interface KPIModel {
     email: string;
     count: number;
   };
-  averageResponseTime: {
-    hours: number;
-    minutes: number;
+  mostActiveDay: {
+    day: string;
+    count: number;
+    percentage: number;
   };
 
 }

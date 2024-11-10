@@ -268,22 +268,26 @@ export class NotificationChartComponent implements OnInit {
     const peakHour = Array.from(hourCount.entries())
       .reduce((a, b) => a[1] > b[1] ? a : b, [0, 0]);
 
-    const visualizedNotifications = data.filter(n => n.statusSend === 'VISUALIZED');
-    let totalResponseTime = 0;
+    const weekdayCount = new Map<string, number>();
+    const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
-    visualizedNotifications.forEach(notification => {
-      const sendTime = new Date(this.convertToISODate(notification.dateSend));
-      const viewTime = new Date(this.convertToISODate(notification.dateVisualized));
-      const responseTime = viewTime.getTime() - sendTime.getTime();
-      totalResponseTime += responseTime;
+    data.forEach(notification => {
+      const [day, month, year] = notification.dateSend.split(' ')[0].split('/');
+      const date = new Date(year, month - 1, day);
+      const weekday = weekdays[date.getDay()];
+      weekdayCount.set(weekday, (weekdayCount.get(weekday) || 0) + 1);
     });
 
-    const averageResponseTimeMs = visualizedNotifications.length > 0 ?
-      totalResponseTime / visualizedNotifications.length : 0;
+    let maxCount = 0;
+    let mostActiveDay = '';
 
-    const averageResponseTimeHours = averageResponseTimeMs / (1000 * 60 * 60);
-    const hours = Math.floor(averageResponseTimeHours);
-    const minutes = Math.floor((averageResponseTimeHours - hours) * 60);
+    weekdayCount.forEach((count, day) => {
+      if (count > maxCount) {
+        maxCount = count;
+        mostActiveDay = day;
+      }
+    });
+
 
     this.kpis = {
       successRate: (sent / total) * 100,
@@ -301,9 +305,10 @@ export class NotificationChartComponent implements OnInit {
         email: mostFrequentContact[0],
         count: mostFrequentContact[1]
       },
-      averageResponseTime: {
-        hours: hours,
-        minutes: minutes
+      mostActiveDay: {
+        day: mostActiveDay,
+        count: maxCount,
+        percentage: (maxCount / total) * 100
       }
     };
   }
