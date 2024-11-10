@@ -10,6 +10,7 @@ import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { IaService } from '../../../app/services/ia-service';
+import { ChartData } from 'chart.js';
 
 
 @Component({
@@ -31,7 +32,9 @@ export class NotificationChartComponent implements OnInit {
   @ViewChild('statusChart') statusChart?: BaseChartDirective;
   @ViewChild('templateChart') templateChart?: BaseChartDirective;
   @ViewChild('dailyChart') dailyChart?: BaseChartDirective;
+  @ViewChild('weeklyChart') weeklyChart?: BaseChartDirective;
 
+  
   private platformId = inject(PLATFORM_ID);
   notificationService = inject(NotificationService);
   chartConfigurationService = inject(ChartConfigurationService);
@@ -122,41 +125,43 @@ export class NotificationChartComponent implements OnInit {
     this.filterAndUpdateCharts();
   }
 
-  private filterAndUpdateCharts(): void {
+private filterAndUpdateCharts(): void {
+  let filteredData = [...this.notifications];
 
-    let filteredData = [...this.notifications];
-
-    if (this.searchSubject) {
-      filteredData = filteredData.filter(notification =>
-        notification.subject.toLowerCase().includes(this.searchSubject.toLowerCase())
-      );
-    }
-
-    if (this.searchEmail) {
-      filteredData = filteredData.filter(notification =>
-        notification.recipient.toLowerCase().includes(this.searchEmail.toLowerCase())
-      );
-    }
-
-    if (this.selectedStatus !== 'ALL') {
-      filteredData = filteredData.filter(notification =>
-        notification.statusSend === this.selectedStatus
-      );
-    }
-
-    if (this.dateFrom || this.dateUntil) {
-      filteredData = this.notifications.filter(notification => {
-        const notificationDate = new Date(this.convertToISODate(notification.dateSend));
-        const fromDate = this.dateFrom ? new Date(this.dateFrom) : null;
-        const untilDate = this.dateUntil ? new Date(this.dateUntil) : null;
-
-        return (!fromDate || notificationDate >= fromDate) &&
-          (!untilDate || notificationDate <= untilDate);
-      });
-    }
-
-    this.updateChartsWithData(filteredData);
+  // Filtros existentes
+  if (this.searchSubject) {
+    filteredData = filteredData.filter(notification =>
+      notification.subject.toLowerCase().includes(this.searchSubject.toLowerCase())
+    );
   }
+
+  if (this.searchEmail) {
+    filteredData = filteredData.filter(notification =>
+      notification.recipient.toLowerCase().includes(this.searchEmail.toLowerCase())
+    );
+  }
+
+  if (this.selectedStatus !== 'ALL') {
+    filteredData = filteredData.filter(notification =>
+      notification.statusSend === this.selectedStatus
+    );
+  }
+
+  if (this.dateFrom || this.dateUntil) {
+    filteredData = this.notifications.filter(notification => {
+      const notificationDate = new Date(this.convertToISODate(notification.dateSend));
+      const fromDate = this.dateFrom ? new Date(this.dateFrom) : null;
+      const untilDate = this.dateUntil ? new Date(this.dateUntil) : null;
+
+      return (!fromDate || notificationDate >= fromDate) &&
+        (!untilDate || notificationDate <= untilDate);
+    });
+  }
+
+  this.updateChartsWithData(filteredData);
+
+  this.updateWeeklyChartData(filteredData);
+}
 
   private convertToISODate(dateString: string): string {
     const [date, time] = dateString.split(' ');
@@ -345,37 +350,93 @@ export class NotificationChartComponent implements OnInit {
   }
 
 
-  exportDashboardData(): string {
-    const data = {
-      kpis: this.kpis,
-      statusChartData: this.statusChartData,
-      templateChartData: this.templateChartData,
-      dailyChartData: this.dailyChartData,
-      notifications: this.notifications
-    };
-    return JSON.stringify(data);
-  }
 
 
-  toggleTooltip() {
-    this.isTooltipOpen = !this.isTooltipOpen;
-    if (this.isTooltipOpen) {
-      this.fetchIaResponse();
+  weeklyChartData: ChartData = {
+    labels: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+    datasets: [{
+      data: [],  
+      label: 'Notificaciones por Día',
+      backgroundColor: '#FF6384',
+      borderColor: '#FF6384',
+      borderWidth: 1,
+      fill: false
+    }]
+  };
+
+weeklyChartOptions = {
+  responsive: true,
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: 'Día de la Semana'
+      }
+    },
+    y: {
+      title: {
+        display: true,
+        text: 'Cantidad de Notificaciones'
+      },
+      beginAtZero: true
     }
   }
-  
-  fetchIaResponse() {
-    console.log(this.exportDashboardData());
-    this.isLoading = true; // Mostrar spinner
-    this.iaService.analyzdeDashboard(this.exportDashboardData()).subscribe({
-      next: (response) => {
-        this.iaResponse = response; // Cambia según el formato de tu API
-        this.isLoading = false; // Ocultar spinner
-      },
-      error: () => {
-        this.iaResponse = 'Error al obtener respuesta del asistente.';
-        this.isLoading = false;
-      }
-    });
+};
+
+private updateWeeklyChartData(data: any[]): void {
+  const weekdayCount = new Map<string, number>();
+  const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+  data.forEach(notification => {
+    const [day, month, year] = notification.dateSend.split(' ')[0].split('/');
+    const date = new Date(year, month - 1, day);
+    const weekday = weekdays[date.getDay()];
+    weekdayCount.set(weekday, (weekdayCount.get(weekday) || 0) + 1);
+  });
+
+  this.weeklyChartData.datasets[0].data = weekdays.map(day => weekdayCount.get(day) || 0);
+
+  setTimeout(() => {
+    if (this.weeklyChart) {
+      this.weeklyChart.update(); // Solo actualiza si el gráfico existe
+    }
+  });
+}
+
+
+exportDashboardData(): string {
+  const data = {
+    kpis: this.kpis,
+    statusChartData: this.statusChartData,
+    templateChartData: this.templateChartData,
+    dailyChartData: this.dailyChartData,
+    notifications: this.notifications,
+  };
+  return JSON.stringify(data);
+}
+
+
+toggleTooltip() {
+  this.isTooltipOpen = !this.isTooltipOpen;
+  if (this.isTooltipOpen) {
+    this.fetchIaResponse();
   }
+}
+
+fetchIaResponse() {
+  console.log(this.exportDashboardData());
+  this.isLoading = true; // Mostrar spinner
+  this.iaService.analyzdeDashboard(this.exportDashboardData()).subscribe({
+    next: (response) => {
+      this.iaResponse = response; // Cambia según el formato de tu API
+      this.isLoading = false; // Ocultar spinner
+    },
+    error: () => {
+      this.iaResponse = 'Error al obtener respuesta del asistente.';
+      this.isLoading = false;
+    }
+  });
+}
+
+
 }

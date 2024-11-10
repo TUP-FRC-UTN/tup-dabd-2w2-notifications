@@ -1,6 +1,6 @@
 <app-main-container title="Estadisticas de Notificaciones" (infoButtonClick)="showInfo()">
 
-  <div class="d-flex justify-content-end tooltip-wrapper mb-5">
+  <div class="d-flex justify-content-end tooltip-wrapper mb-2">
     <button type="button" class="btn btn-outline-primary" (click)="toggleTooltip()">
       Asistente IA
       <i class="bi bi-stars"></i>
@@ -41,9 +41,6 @@
       </div>
 
 
- 
-      
-      
 
       <!-- Filter Dropdown -->
       <div class="dropdown">
@@ -99,9 +96,10 @@
 <!-- KPIs Row -->
 <div class="row mb-4">
   <!-- Success Rate KPI -->
-  <div class="col-md-2 mb-3">
+  <div class="col-md-6 mb-3">
     <div class="card">
       <div class="card-body" style="height: 150px; width: 100%;">
+
         <div class="d-flex align-items-center mb-2">
           <div class="icon-circle bg-success text-white me-3">
             <i class="bi bi-check-circle"></i>
@@ -115,7 +113,7 @@
   </div>
 
   <!-- Daily Average KPI -->
-  <div class="col-md-2 mb-3">
+  <div class="col-md-6 mb-3">
     <div class="card">
       <div class="card-body" style="height: 150px; width: 100%;">
         <div class="d-flex align-items-center mb-2">
@@ -131,7 +129,7 @@
   </div>
 
   <!-- Most Used Template KPI -->
-  <div class="col-md-2 mb-3">
+  <div class="col-md-3 mb-3">
     <div class="card">
       <div class="card-body" style="height: 150px; width: 100%;">
         <div class="d-flex align-items-center mb-2">
@@ -147,7 +145,7 @@
   </div>
 
   <!-- Peak Hour KPI -->
-  <div class="col-md-2 mb-3">
+  <div class="col-md-3 mb-3">
     <div class="card">
       <div class="card-body" style="height: 150px; width: 100%;">
         <div class="d-flex align-items-center mb-2">
@@ -163,22 +161,21 @@
   </div>
 
   <!-- Most Frequent Contact KPI -->
-  <div class="col-md-2 mb-3">
+  <div class="col-md-3 mb-3">
     <div class="card">
       <div class="card-body" style="height: 150px; width: 100%;">
         <div class="d-flex align-items-center mb-2">
           <div class="icon-circle bg-danger text-white me-3">
             <i class="bi bi-person"></i>
           </div>
-          <h6 class="card-subtitle text-muted mb-0">Contacto Frecuente</h6>
+          <h6 class="card-subtitle text-muted mb-0 ">Contacto más Frecuente</h6>
         </div>
-        <h2 class="card-title mb-0">{{kpis.mostFrequentContact.count}}</h2>
-        <small class="text-muted text-truncate d-block">{{kpis.mostFrequentContact.email}}</small>
+        <small class="text-muted text-truncate d-block mt-4">{{kpis.mostFrequentContact.email}}</small>
       </div>
     </div>
   </div>
 
-  <div class="col-md-2 mb-3">
+  <div class="col-md-3 mb-3">
     <div class="card">
       <div class="card-body" style="height: 150px; width: 100%;">
         <div class="d-flex align-items-center mb-2">
@@ -197,58 +194,60 @@
 
 
         <div style="margin-bottom: 15px;">
-
-
-            <!-- <h2 class="h4 mb-3">Graficos</h2> -->
-
-
         </div>
-
       <br>
-
-      <!-- Charts -->
+      <!-- Charts Row -->
       <div class="row">
         <!-- Daily Notifications Chart -->
-        <div class="col-12 mb-4">
+        <div class="col-md-8 mb-4">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title text-center">Notificaciones por Día</h5>
               <div class="chart-container">
-                <canvas baseChart #dailyChart="base-chart" [data]="dailyChartData" [options]="dailyChartOptions"
-                  [type]="'line'">
-                </canvas>
+                <canvas baseChart #dailyChart="base-chart" [data]="dailyChartData" [options]="dailyChartOptions" [type]="'line'"></canvas>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Status Chart -->
-        <div class="col-md-6 mb-4">
-          <div class="card h-100">
+        <div class="col-md-4 mb-4">
+          <div class="card">
             <div class="card-body">
               <h5 class="card-title text-center">Estado de Notificaciones</h5>
               <div class="chart-container">
-                <canvas baseChart #statusChart="base-chart" [data]="statusChartData" [options]="statusChartOptions"
-                  [type]="'pie'">
-                </canvas>
+                <canvas baseChart #statusChart="base-chart" [data]="statusChartData" [options]="statusChartOptions" [type]="'pie'"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly Activity Chart -->
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title text-center">Actividad Semanal</h5>
+              <div class="chart-container">
+                <canvas baseChart #weeklyChart="base-chart" [data]="weeklyChartData" [options]="weeklyChartOptions" [type]="'bar'"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Template Usage Chart -->
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title text-center">Uso de Plantillas</h5>
+              <div class="chart-container">
+                <canvas baseChart #templateChart="base-chart" [data]="templateChartData" [options]="templateChartOptions" [type]="'bar'"></canvas>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Template Usage Chart -->
-        <div class="col-md-6 mb-4">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title text-center">Uso de Plantillas</h5>
-              <div class="chart-container">
-                <canvas baseChart #templateChart="base-chart" [data]="templateChartData"
-                  [options]="templateChartOptions" [type]="'bar'">
-                </canvas>
-              </div>
-            </div>
-          </div>
-        </div>
+
       </div>
     </div>
 

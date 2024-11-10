@@ -22,10 +22,10 @@
 /* Chart Styles */
 .chart-container {
   position: relative;
-  height: 300px;
+  height: 250px;  /* Reducir la altura de los gráficos */
   width: 100%;
   margin: 0 auto;
-}
+} 
 
 /* Form Styles */
 .form-control {
@@ -168,13 +168,8 @@
 
 .chart-container {
   position: relative;
-  height: 300px;
+  height: 200px;
   width: 100%;
-}
-
-/* Para el gráfico de línea, queremos que sea más alto */
-.col-12 .chart-container {
-  height: 400px;
 }
 
 .card-title {
