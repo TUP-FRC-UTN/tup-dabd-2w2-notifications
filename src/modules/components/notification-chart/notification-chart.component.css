@@ -236,6 +236,12 @@
   z-index: 1050;
 }
 
+.hover-underline:hover {
+  text-decoration: underline;
+  color: inherit; 
+}
+
+
 
 .bg-violet {
   background-color: #8b5cf6;

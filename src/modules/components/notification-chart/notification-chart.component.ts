@@ -11,6 +11,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { IaService } from '../../../app/services/ia-service';
 import { ChartData } from 'chart.js';
+import { RouterModule } from '@angular/router';
 
 
 @Component({
@@ -20,7 +21,8 @@ import { ChartData } from 'chart.js';
     NgChartsModule,
     FormsModule,
     CommonModule,
-    MainContainerComponent
+    MainContainerComponent,
+    RouterModule
   ],
   templateUrl: './notification-chart.component.html',
   styleUrl: './notification-chart.component.css'

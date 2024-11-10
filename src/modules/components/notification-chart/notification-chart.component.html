@@ -202,8 +202,11 @@
         <div class="col-md-8 mb-4">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title text-center">Notificaciones por Día</h5>
-              <div class="chart-container">
+              <h5 class="card-title text-center hover-underline">
+                <a [routerLink]="['/notifications-historic']" class="hover-underline"  style="text-decoration: none; color: inherit;">
+                  Notificaciones por Día
+                </a>
+              </h5>              <div class="chart-container">
                 <canvas baseChart #dailyChart="base-chart" [data]="dailyChartData" [options]="dailyChartOptions" [type]="'line'"></canvas>
               </div>
             </div>
@@ -214,7 +217,10 @@
         <div class="col-md-4 mb-4">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title text-center">Estado de Notificaciones</h5>
+              <a [routerLink]="['/notifications-historic']" style="text-decoration: none; color: inherit;">
+
+              <h5 class="card-title text-center hover-underline">Estado de Notificaciones</h5>
+              </a>
               <div class="chart-container">
                 <canvas baseChart #statusChart="base-chart" [data]="statusChartData" [options]="statusChartOptions" [type]="'pie'"></canvas>
               </div>
@@ -239,7 +245,10 @@
         <div class="col-md-6 mb-4">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title text-center">Uso de Plantillas</h5>
+              <a [routerLink]="['/templates']" style="text-decoration: none; color: inherit;">
+
+              <h5 class="card-title text-center hover-underline">Uso de Plantillas</h5>
+              </a>
               <div class="chart-container">
                 <canvas baseChart #templateChart="base-chart" [data]="templateChartData" [options]="templateChartOptions" [type]="'bar'"></canvas>
               </div>
