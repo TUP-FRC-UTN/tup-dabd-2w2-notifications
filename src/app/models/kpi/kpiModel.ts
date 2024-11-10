@@ -1,5 +1,5 @@
 export interface KPIModel {
-  successRate: number;
+  viewedRate: number;
   pendingRate: number;
   dailyAverage: number;
   mostUsedTemplate: {
