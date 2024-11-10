@@ -21,6 +21,11 @@ export class TemplateService {
       map(x => x.map(y => this.transformToTemplate(y)))
     );
   }
+  getAllTemplatesWithoutVariables() : Observable<TemplateModel[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/email-templates?has_placeholders=false`).pipe(
+      map(x => x.map(y => this.transformToTemplate(y)))
+    )
+  }
 
   sendTemplate(template: NewTemplate): Observable<TemplateModel> {
     const base64Body = btoa(unescape(encodeURIComponent(template.body)));

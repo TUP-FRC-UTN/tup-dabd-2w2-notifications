@@ -97,7 +97,7 @@ export class ContactListComponent implements OnInit {
   allSelected: boolean = false
 
   loadTemplates() {
-    this.templateService.getAllTemplates().subscribe(data => {
+    this.templateService.getAllTemplatesWithoutVariables().subscribe(data => {
       this.allTemplates = data
     })
   }
