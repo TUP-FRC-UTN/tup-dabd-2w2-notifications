@@ -258,8 +258,36 @@ export class NotificationChartComponent implements OnInit {
       hourCount.set(hour, (hourCount.get(hour) || 0) + 1);
     });
 
+    const contactCount = new Map<string, number>();
+    data.forEach(n => {
+      contactCount.set(n.recipient, (contactCount.get(n.recipient) || 0) + 1);
+    });
+    const mostFrequentContact = Array.from(contactCount.entries())
+      .reduce((a, b) => a[1] > b[1] ? a : b, ['', 0]);
+
     const peakHour = Array.from(hourCount.entries())
       .reduce((a, b) => a[1] > b[1] ? a : b, [0, 0]);
+
+    const weekdayCount = new Map<string, number>();
+    const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+    data.forEach(notification => {
+      const [day, month, year] = notification.dateSend.split(' ')[0].split('/');
+      const date = new Date(year, month - 1, day);
+      const weekday = weekdays[date.getDay()];
+      weekdayCount.set(weekday, (weekdayCount.get(weekday) || 0) + 1);
+    });
+
+    let maxCount = 0;
+    let mostActiveDay = '';
+
+    weekdayCount.forEach((count, day) => {
+      if (count > maxCount) {
+        maxCount = count;
+        mostActiveDay = day;
+      }
+    });
+
 
     this.kpis = {
       successRate: (sent / total) * 100,
@@ -272,6 +300,15 @@ export class NotificationChartComponent implements OnInit {
       peakHour: {
         hour: peakHour[0],
         count: peakHour[1]
+      },
+      mostFrequentContact: {
+        email: mostFrequentContact[0],
+        count: mostFrequentContact[1]
+      },
+      mostActiveDay: {
+        day: mostActiveDay,
+        count: maxCount,
+        percentage: (maxCount / total) * 100
       }
     };
   }
@@ -281,7 +318,7 @@ export class NotificationChartComponent implements OnInit {
 
     this.showModal('Información', message);
   }
-  
+
   showModal(title: string, message: string) {
     this.modalTitle = title;
     this.modalMessage = message;
@@ -295,8 +332,17 @@ export class NotificationChartComponent implements OnInit {
   private formatDate(date: Date): string {
     const year = date.getFullYear()
     const month = (date.getMonth() + 1).toString().padStart(2, '0')
-    const day = date.getDate().toString().padStart(2, '0') 
+    const day = date.getDate().toString().padStart(2, '0')
     return `${year}-${month}-${day}`
+  }
+
+  formatResponseTime(hours: number, minutes: number): string {
+    if (hours === 0) {
+      return `${minutes} min`;
+    } else if (minutes === 0) {
+      return `${hours}h`;
+    }
+    return `${hours}h ${minutes}min`;
   }
 
 }

@@ -10,4 +10,14 @@ export interface KPIModel {
     hour: number;
     count: number;
   };
+  mostFrequentContact: {
+    email: string;
+    count: number;
+  };
+  mostActiveDay: {
+    day: string;
+    count: number;
+    percentage: number;
+  };
+
 }
