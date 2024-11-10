@@ -76,7 +76,7 @@
         } @else {
         <thead>
           <tr>
-            <th></th>
+            <th> <input type="checkbox" [(ngModel)]="allSelected" (click)="selectAllContacts()" [checked]="allSelected"> </th>
             <th>Contacto</th>
             <th>Tipo de Contacto</th>
             <th>Estado</th>
@@ -86,7 +86,7 @@
         <tbody>
           @for(contact of contacts; track contact.id) {
           <tr>
-            <td> <input type="checkbox" (change)="selectContact(contact.id, $event)"> </td>
+            <td> <input type="checkbox" (change)="selectContact(contact.id, $event)" [checked]="isContactSelected(contact.id)"> </td>
             <td>{{contact.contactValue}}</td>
             <td>{{contact.contactType}}</td>
 
@@ -372,12 +372,12 @@
       </div>
       <div class="modal-body">
         <div name="allSelectedContacts">
-          <p>Tus contactos seleccionados:</p>
-          <ul>
+          <p>Tus contactos seleccionados: {{selectedContacts.length}}</p>
+          <!-- <ul>
             @for(c of selectedContacts; track $index) {
               <li> {{showNameById(c)}} </li>
             }
-          </ul>
+          </ul> -->
           
         </div>
         <form>

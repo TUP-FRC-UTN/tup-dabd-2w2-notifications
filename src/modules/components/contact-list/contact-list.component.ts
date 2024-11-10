@@ -94,6 +94,7 @@ export class ContactListComponent implements OnInit {
   emailBody : string = ""
   allTemplates : TemplateModel[] = []
   selectedTemplate : number = 0
+  allSelected: boolean = false
 
   loadTemplates() {
     this.templateService.getAllTemplates().subscribe(data => {
@@ -154,7 +155,27 @@ export class ContactListComponent implements OnInit {
     name = this.contacts.find(c => c.id === id)?.contactValue
     return name
   }
-  
+  selectAllContacts() {
+    if (this.allSelected) {
+      // Si se seleccionan todos, agregamos todos los IDs al array selectedContacts
+      this.selectedContacts = this.contacts.map(contact => contact.id);
+    } else {
+      // Si se deseleccionan todos, vaciamos el array selectedContacts
+      this.selectedContacts = [];
+    }
+    this.updateSelectAllStatus();
+  }
+  updateSelectAllStatus() {
+    this.allSelected = this.contacts.length === this.selectedContacts.length;
+  }
+
+  /**
+   * Este método comprueba si un contacto está seleccionado.
+   */
+  isContactSelected(contactId: number): boolean {
+    return this.selectedContacts.includes(contactId);
+  }
+  //Envio a varios contactos
 
 
 
