@@ -78,18 +78,24 @@ export class NotificationChartComponent implements OnInit {
   notifications: NotificationModelChart[] = []
 
   ngOnInit() {
-    this.getAllNotifications(); // Carga de datos inicial
+    this.getAllNotifications();
   
     this.notificationService.getAllNotificationsNotFiltered().subscribe((data) => {
       this.notifications = data;
   
-      // Asegurate de que los gráficos se actualizan después de cargar los datos.
+      const today = new Date();
+      this.dateFrom = this.formatDate(today);
+  
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      this.dateUntil = this.formatDate(tomorrow);
+  
       if (this.isBrowser) {
-        this.filterAndUpdateCharts();
+        this.filterAndUpdateCharts(); 
       }
     });
   }
-
+  
 
   getAllNotifications() {
 
