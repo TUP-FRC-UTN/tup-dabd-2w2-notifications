@@ -99,7 +99,8 @@ export class SendEmailComponent implements OnInit {
         this.isLoading = false
       },
       error: (errr) => {
-        this.toastService.sendError("Hubo un error al enviar el correo, pruebe más tarde")
+        if (errr.status === 400) this.toastService.sendError("Las variables no coinciden. Por favor, verifique y vuelva a intentar.");
+        else this.toastService.sendError("Hubo un error al enviar el correo, pruebe más tarde")
         this.isLoading = false
       }
     })

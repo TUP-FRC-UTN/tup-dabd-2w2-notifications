@@ -87,11 +87,12 @@ export class NotificationChartComponent implements OnInit {
       this.dateFrom = this.formatDate(today);
   
       const tomorrow = new Date(today);
-      tomorrow.setDate(today.getDate() + 1);
+      today.setDate(today.getDate() + 2);
+      tomorrow.setDate(today.getDate()); // Sumar un día adicional
       this.dateUntil = this.formatDate(tomorrow);
   
       if (this.isBrowser) {
-        this.filterAndUpdateCharts(); 
+        this.filterAndUpdateCharts();
       }
     });
   }
