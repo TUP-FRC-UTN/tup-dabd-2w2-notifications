@@ -397,8 +397,12 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeEmailModal()">Cancelar</button>
-        <button type="button" class="btn btn-primary" (click)="sendEmail()">Enviar</button>
+        <button type="button" class="btn btn-secondary" (click)="closeEmailModal()" [disabled]="isLoading">Cancelar</button>
+        
+        <button type="button" class="btn btn-primary" (click)="sendEmail()" [disabled]="isLoading">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <span *ngIf="!isLoading">Enviar</span>
+        </button>
       </div>
     </div>
   </div>

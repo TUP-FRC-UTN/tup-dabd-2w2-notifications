@@ -45,6 +45,7 @@ export class ContactListComponent implements OnInit {
   suscriptionService: SubscriptionService = inject(SubscriptionService);
   isTelegramModalOpen = false;
 
+  isLoading: boolean = false;
   availableSubscriptions: string[] = [];
 
   getSuscriptions() {
@@ -130,6 +131,7 @@ export class ContactListComponent implements OnInit {
     this.isEmailModalOpen = false
   }
   sendEmail() {
+    this.isLoading = true;
     const data : EmailDataContact = {
       subject: this.emailSubject,
       variables: [],
@@ -141,12 +143,15 @@ export class ContactListComponent implements OnInit {
         this.isEmailModalOpen = false
         this.loadContacts()
         this.toastService.sendSuccess("Enviado correctamente a los contactos")
+        this.isLoading = false;
       },
       error: (error) => {
         console.error(error)
         this.isEmailModalOpen = false
         this.loadContacts()
         this.toastService.sendError("Hubo un error al enviar a los contactos")
+        this.isLoading = false;
+
       }
     })
   }
