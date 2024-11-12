@@ -13,13 +13,12 @@ import autoTable from 'jspdf-autotable';
 
 import { FormsModule, NgForm } from '@angular/forms';
 import { TemplateService } from '../../../app/services/template.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import {Router } from '@angular/router';
 import { TemplateModel } from '../../../app/models/templates/templateModel';
 import { Base64Service } from '../../../app/services/base64-service.service';
 import { NgbPagination, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { MainContainerComponent } from 'ngx-dabd-grupo01';
-import { ToastService } from 'ngx-dabd-grupo01';
+import { MainContainerComponent, ToastService, TableFiltersComponent, Filter, FilterConfigBuilder } from 'ngx-dabd-grupo01';
 import { RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -32,9 +31,11 @@ import { HttpErrorResponse } from '@angular/common/http';
     RouterModule,
     NgbPagination,
     NgbDropdownModule,
-    MainContainerComponent],
+    MainContainerComponent,
+    TableFiltersComponent],
   templateUrl: './template-list.component.html',
   styleUrl: './template-list.component.css',
+  providers: [DatePipe]
 })
 @Inject('TemplateService')
 @Inject('Base64Service')
@@ -73,9 +74,11 @@ export class TemplateListComponent implements OnInit {
   sizeOptions: number[] = [10, 25, 50];
 
   // Filtros
-  searchTerm = '';
-  isActivetemplateFilter: boolean | undefined = true;
-  selectedtemplateType: string = '';
+  // searchTerm = '';
+   isActivetemplateFilter: boolean | undefined = true;
+  // selectedtemplateType: string = '';
+  globalSearchTerm = '';
+  filteredName = "";
 
   // Estados de modales
   isModalOpen = false;
@@ -118,29 +121,50 @@ export class TemplateListComponent implements OnInit {
       active: true,
     };
   }
+  onGlobalSearchTextChange(globalSearchTerm : string) {
+    this.onSearchTextChange(globalSearchTerm);
+  }
+  filterConfig : Filter[] = new FilterConfigBuilder()
+  .textFilter('Buscar por Nombre', 'filteredName', 'Buscar Nombre...')
+  .selectFilter('Estado', 'status', 'Seleccione un estado', [
+    {value: 'ALL', 'label': 'Todos' },
+    {value: 'ACTIVE', label: 'Activos'},
+    {value: 'INACTIVE', label: 'Inactivos'}
+  ])
+  .build();
 
-  filterByStatus(status: 'all' | 'active' | 'inactive') {
-    if (status === 'all') {
-      this.isActivetemplateFilter = undefined;
-      this.templates = this.mocktemplates
-    }
-    else if (status === 'active') {
-      this.isActivetemplateFilter = true;
-      this.templates = this.templates.filter(t => t.active == true)
-    }
-    else if (status === 'inactive') {
-      this.isActivetemplateFilter = false;
-      this.templates = this.templates.filter(t => t.active == false)
-    }
-    this.getEmailTemplates();
-  }
-  filterByName() {
-    this.templates = this.templates.filter(t => t.name.toUpperCase() === this.searchTerm.toUpperCase())
-    /*this.emailService.getEmailTemplates().subscribe(data => {
-      this.templates = data.filter(template => template.name === this.searchTerm)
-    })*/
-    this.showInput = false
-  }
+  filterChange($event: Record<string, any>) {
+    // Cargar todos los templates si no hay filtros aplicados
+    this.templateService.getAllTemplates().subscribe((data) => {
+        let filteredTemplates = data; // Comienza con la lista completa
+
+        // Filtrar por estado
+        if ($event['status'] && $event['status'].trim() !== '') {
+            if ($event['status'] === 'ACTIVE') {
+                filteredTemplates = filteredTemplates.filter(t => t.active === true);
+            } else if ($event['status'] === 'INACTIVE') {
+                filteredTemplates = filteredTemplates.filter(t => t.active === false);
+            }
+        }
+
+        // Filtrar por nombre, solo si hay un término de búsqueda
+        if ($event['filteredName'] && $event['filteredName'].trim() !== '') {
+            filteredTemplates = filteredTemplates.filter(t =>
+                t.name.toUpperCase().includes($event['filteredName'].toUpperCase())
+            );
+        }
+
+        // Actualizar la lista de templates
+        this.templates = filteredTemplates;
+
+        // Actualizar la paginación
+        this.updatePagination();
+    }, error => {
+        this.toastService.sendError("Error al cargar las plantillas");
+    });
+}
+
+
 
   // Paginación
   initializePagination() {
@@ -251,7 +275,7 @@ export class TemplateListComponent implements OnInit {
     this.templates = this.mocktemplates;
     this.templateService.getAllTemplates().subscribe({
       next: (data) => {
-        data.map(d => d.active = true);
+        //data.map(d => d.active = true);
         this.templates = [...this.templates, ...data].sort((a, b) =>
           a.name.toLowerCase().localeCompare(b.name.toLowerCase())
         );
@@ -264,15 +288,14 @@ export class TemplateListComponent implements OnInit {
   }
   deleteTemplate(deleteTemplate: TemplateModel) {
 
-    const index = this.templates.findIndex(template => template.id === deleteTemplate.id);
-
-    if (index !== -1) { 
-        this.templates[index].active = false
-        this.templates.splice(index, 1);
+    this.templateService.deleteTemplate(deleteTemplate.id).subscribe({
+      next: (response) => {
         this.toastService.sendSuccess("Plantilla eliminada correctamente")
-    } else {
-        this.toastService.sendError("Plantilla no encontrada")
-    }
+      },
+      error: (error) => {
+        this.toastService.sendError("Error al eliminar plantila")
+      }
+    })
 }
 
 
@@ -283,7 +306,6 @@ export class TemplateListComponent implements OnInit {
   exportToExcel() {
     this.templateService.getAllTemplates().subscribe(templates => {
       const data = templates.map(template => ({
-          'ID': template.id,
           'Nombre': template.name,
           'Cuerpo': template.body,
           'Activo': template.active ? 'Activo' : 'Inactivo',
@@ -310,18 +332,16 @@ export class TemplateListComponent implements OnInit {
     this.templateService.getAllTemplates().subscribe(templates => {
         autoTable(doc, {
             startY: 30,
-            head: [['ID', 'Nombre', 'Cuerpo', 'Activo']],
+            head: [['Nombre', 'Cuerpo', 'Activo']],
             body: templates.map(template => [
-                template.id,
                 template.name,
                 template.body,
                 template.active ? 'Activo' : 'Inactivo'
             ]),
             columnStyles: { //para que no se rompa por si el body es muy grande
-                0: { cellWidth: 15 }, // ID
-                1: { cellWidth: 40 }, // Nombre
-                2: { cellWidth: 100 }, // Body
-                3: { cellWidth: 20 }, // Activo
+                0: { cellWidth: 40 }, // Nombre
+                1: { cellWidth: 100 }, // Body
+                2: { cellWidth: 20 }, // Activo
             },
             styles: { overflow: 'linebreak' },
         });
@@ -358,18 +378,15 @@ export class TemplateListComponent implements OnInit {
   }
 
 
-  clearSearch() {
-    this.searchTerm = '';
-    this.showInput = false; // Ocultar input al limpiar
-    this.getEmailTemplates();
-  }
-
-  onSearchTextChange(){
-
-    this.showInput = true;
-  }
-
-
+  onSearchTextChange(searchTerms: string) {
+    this.templateService.getAllTemplates().subscribe((data) => {
+        this.templates = data.filter(t => {
+            const matchesName = t.name.toUpperCase().includes(searchTerms.toUpperCase());
+            return matchesName 
+        });
+        this.updatePagination(); 
+    });
+}
 
   saveEditedTemplate() {
     if (this.editingtemplate) {
@@ -396,4 +413,11 @@ export class TemplateListComponent implements OnInit {
     const endIndex = startIndex + this.itemsPerPage;
     return this.templates.slice(startIndex, endIndex);
   }
+
+  clearFilters() {
+    this.globalSearchTerm = '';
+    this.isActivetemplateFilter = undefined; 
+    this.getEmailTemplates(); 
+}
+
 }
