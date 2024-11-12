@@ -64,6 +64,9 @@ export class NotificationChartComponent implements OnInit {
   templateChartOptions = this.chartConfigurationService.templateChartOptions;
   dailyChartOptions = this.chartConfigurationService.dailyChartOptions;
 
+  availableTemplates: string[] = []; // Lista de plantillas disponibles
+  selectedTemplate: string = ''; // Plantilla seleccionada por el usuario
+  
 
   isTooltipOpen = false; 
   isLoading = false;
@@ -83,12 +86,15 @@ export class NotificationChartComponent implements OnInit {
     this.notificationService.getAllNotificationsNotFiltered().subscribe((data) => {
       this.notifications = data;
   
+      // Obtener todas las plantillas únicas
+      this.availableTemplates = Array.from(new Set(data.map(notification => notification.templateName)));
+  
       const today = new Date();
       this.dateFrom = this.formatDate(today);
   
       const tomorrow = new Date(today);
       today.setDate(today.getDate() + 2);
-      tomorrow.setDate(today.getDate()); // Sumar un día adicional
+      tomorrow.setDate(today.getDate());
       this.dateUntil = this.formatDate(tomorrow);
   
       if (this.isBrowser) {
@@ -96,6 +102,7 @@ export class NotificationChartComponent implements OnInit {
       }
     });
   }
+  
   
 
   getAllNotifications() {
@@ -131,46 +138,52 @@ export class NotificationChartComponent implements OnInit {
     this.selectedStatus = 'ALL';
     this.dateFrom = '';
     this.dateUntil = '';
+    this.selectedTemplate ='ALL';
     this.filterAndUpdateCharts();
   }
 
-private filterAndUpdateCharts(): void {
-  let filteredData = [...this.notifications];
-
-  // Filtros existentes
-  if (this.searchSubject) {
-    filteredData = filteredData.filter(notification =>
-      notification.subject.toLowerCase().includes(this.searchSubject.toLowerCase())
-    );
+  private filterAndUpdateCharts(): void {
+    let filteredData = [...this.notifications];
+  
+    if (this.dateFrom || this.dateUntil) {
+      filteredData = filteredData.filter(notification => {
+        const notificationDate = new Date(this.convertToISODate(notification.dateSend));
+        const fromDate = this.dateFrom ? new Date(this.dateFrom) : null;
+        const untilDate = this.dateUntil ? new Date(this.dateUntil) : null;
+  
+        return (!fromDate || notificationDate >= fromDate) &&
+               (!untilDate || notificationDate <= untilDate);
+      });
+    }
+  
+    if (this.searchSubject) {
+      filteredData = filteredData.filter(notification =>
+        notification.subject.toLowerCase().includes(this.searchSubject.toLowerCase())
+      );
+    }
+  
+    if (this.searchEmail) {
+      filteredData = filteredData.filter(notification =>
+        notification.recipient.toLowerCase().includes(this.searchEmail.toLowerCase())
+      );
+    }
+  
+    if (this.selectedStatus !== 'ALL') {
+      filteredData = filteredData.filter(notification =>
+        notification.statusSend === this.selectedStatus
+      );
+    }
+  
+    if (this.selectedTemplate) {
+      filteredData = filteredData.filter(notification =>
+        notification.templateName === this.selectedTemplate
+      );
+    }
+  
+    this.updateChartsWithData(filteredData);
+    this.updateWeeklyChartData(filteredData);
   }
-
-  if (this.searchEmail) {
-    filteredData = filteredData.filter(notification =>
-      notification.recipient.toLowerCase().includes(this.searchEmail.toLowerCase())
-    );
-  }
-
-  if (this.selectedStatus !== 'ALL') {
-    filteredData = filteredData.filter(notification =>
-      notification.statusSend === this.selectedStatus
-    );
-  }
-
-  if (this.dateFrom || this.dateUntil) {
-    filteredData = this.notifications.filter(notification => {
-      const notificationDate = new Date(this.convertToISODate(notification.dateSend));
-      const fromDate = this.dateFrom ? new Date(this.dateFrom) : null;
-      const untilDate = this.dateUntil ? new Date(this.dateUntil) : null;
-
-      return (!fromDate || notificationDate >= fromDate) &&
-        (!untilDate || notificationDate <= untilDate);
-    });
-  }
-
-  this.updateChartsWithData(filteredData);
-
-  this.updateWeeklyChartData(filteredData);
-}
+  
 
   private convertToISODate(dateString: string): string {
     const [date, time] = dateString.split(' ');
@@ -249,59 +262,67 @@ private filterAndUpdateCharts(): void {
 
 
   private calculateKPIs(data: any[]): void {
-
     const total = data.length;
-
+  
     const sent = data.filter(n => n.statusSend === 'SENT').length;
     const pending = data.filter(n => n.statusSend === 'VISUALIZED').length;
-
+  
     const uniqueDays = new Set(data.map(n => n.dateSend.split(' ')[0])).size;
-
+  
     const templateCount = new Map<string, number>();
-
     data.forEach(n => {
       templateCount.set(n.templateName, (templateCount.get(n.templateName) || 0) + 1);
     });
-    const mostUsedTemplate = Array.from(templateCount.entries())
-      .reduce((a, b) => a[1] > b[1] ? a : b, ['', 0]);
-
+  
+    let mostUsedTemplate: [string, number];
+  
+    if (this.selectedTemplate) {
+      // Si hay filtro por plantilla, mostrar cuántas veces se utilizó
+      const count = templateCount.get(this.selectedTemplate) || 0;
+      mostUsedTemplate = [this.selectedTemplate, count];
+    } else {
+      // Si no hay filtro por plantilla, mostrar la plantilla más usada
+      mostUsedTemplate = Array.from(templateCount.entries())
+        .reduce((a, b) => a[1] > b[1] ? a : b, ['', 0]);
+    }
+  
     const hourCount = new Map<number, number>();
     data.forEach(n => {
       const hour = parseInt(n.dateSend.split(' ')[1].split(':')[0]);
       hourCount.set(hour, (hourCount.get(hour) || 0) + 1);
     });
-
+  
     const contactCount = new Map<string, number>();
     data.forEach(n => {
       contactCount.set(n.recipient, (contactCount.get(n.recipient) || 0) + 1);
     });
+  
     const mostFrequentContact = Array.from(contactCount.entries())
       .reduce((a, b) => a[1] > b[1] ? a : b, ['', 0]);
-
+  
     const peakHour = Array.from(hourCount.entries())
       .reduce((a, b) => a[1] > b[1] ? a : b, [0, 0]);
-
+  
     const weekdayCount = new Map<string, number>();
     const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-
+  
     data.forEach(notification => {
       const [day, month, year] = notification.dateSend.split(' ')[0].split('/');
       const date = new Date(year, month - 1, day);
       const weekday = weekdays[date.getDay()];
       weekdayCount.set(weekday, (weekdayCount.get(weekday) || 0) + 1);
     });
-
+  
     let maxCount = 0;
     let mostActiveDay = '';
-
+  
     weekdayCount.forEach((count, day) => {
       if (count > maxCount) {
         maxCount = count;
         mostActiveDay = day;
       }
     });
-
-
+  
     this.kpis = {
       pendingRate: (sent / total) * 100,
       viewedRate: (pending / total) * 100,
@@ -325,7 +346,7 @@ private filterAndUpdateCharts(): void {
       }
     };
   }
-
+  
   showInfo() {
     const message = '';
 
