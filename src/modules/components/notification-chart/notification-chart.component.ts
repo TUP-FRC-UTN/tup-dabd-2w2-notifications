@@ -1,5 +1,5 @@
-import { Component, Inject, inject, OnInit, ViewChild } from '@angular/core';
-import { NgChartsModule, BaseChartDirective } from 'ng2-charts';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { BaseChartDirective } from 'ng2-charts';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../app/services/notification.service';
@@ -10,7 +10,7 @@ import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { IaService } from '../../../app/services/ia-service';
-import { ChartData } from 'chart.js';
+import { ChartData,ChartConfiguration  } from 'chart.js';
 import { RouterModule } from '@angular/router';
 
 
@@ -18,9 +18,9 @@ import { RouterModule } from '@angular/router';
   selector: 'app-notification-chart',
   standalone: true,
   imports: [
-    NgChartsModule,
     FormsModule,
     CommonModule,
+    BaseChartDirective,
     MainContainerComponent,
     RouterModule
   ],
@@ -31,12 +31,20 @@ import { RouterModule } from '@angular/router';
 
 export class NotificationChartComponent implements OnInit {
 
+
+
+  filterNotifications(){
+
+
+}
+
+
   @ViewChild('statusChart') statusChart?: BaseChartDirective;
   @ViewChild('templateChart') templateChart?: BaseChartDirective;
   @ViewChild('dailyChart') dailyChart?: BaseChartDirective;
   @ViewChild('weeklyChart') weeklyChart?: BaseChartDirective;
 
-  
+
   private platformId = inject(PLATFORM_ID);
   notificationService = inject(NotificationService);
   chartConfigurationService = inject(ChartConfigurationService);
@@ -66,11 +74,11 @@ export class NotificationChartComponent implements OnInit {
 
   availableTemplates: string[] = []; // Lista de plantillas disponibles
   selectedTemplate: string = ''; // Plantilla seleccionada por el usuario
-  
 
-  isTooltipOpen = false; 
+
+  isTooltipOpen = false;
   isLoading = false;
-  iaResponse = ''; 
+  iaResponse = '';
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
@@ -82,28 +90,28 @@ export class NotificationChartComponent implements OnInit {
 
   ngOnInit() {
     this.getAllNotifications();
-  
+
     this.notificationService.getAllNotificationsNotFiltered().subscribe((data) => {
       this.notifications = data;
-  
+
       // Obtener todas las plantillas únicas
       this.availableTemplates = Array.from(new Set(data.map(notification => notification.templateName)));
-  
+
       const today = new Date();
       this.dateFrom = this.formatDate(today);
-  
+
       const tomorrow = new Date(today);
       today.setDate(today.getDate() + 2);
       tomorrow.setDate(today.getDate());
       this.dateUntil = this.formatDate(tomorrow);
-  
+
       if (this.isBrowser) {
         this.filterAndUpdateCharts();
       }
     });
   }
-  
-  
+
+
 
   getAllNotifications() {
 
@@ -144,46 +152,46 @@ export class NotificationChartComponent implements OnInit {
 
   private filterAndUpdateCharts(): void {
     let filteredData = [...this.notifications];
-  
+
     if (this.dateFrom || this.dateUntil) {
       filteredData = filteredData.filter(notification => {
         const notificationDate = new Date(this.convertToISODate(notification.dateSend));
         const fromDate = this.dateFrom ? new Date(this.dateFrom) : null;
         const untilDate = this.dateUntil ? new Date(this.dateUntil) : null;
-  
+
         return (!fromDate || notificationDate >= fromDate) &&
                (!untilDate || notificationDate <= untilDate);
       });
     }
-  
+
     if (this.searchSubject) {
       filteredData = filteredData.filter(notification =>
         notification.subject.toLowerCase().includes(this.searchSubject.toLowerCase())
       );
     }
-  
+
     if (this.searchEmail) {
       filteredData = filteredData.filter(notification =>
         notification.recipient.toLowerCase().includes(this.searchEmail.toLowerCase())
       );
     }
-  
+
     if (this.selectedStatus !== 'ALL') {
       filteredData = filteredData.filter(notification =>
         notification.statusSend === this.selectedStatus
       );
     }
-  
+
     if (this.selectedTemplate) {
       filteredData = filteredData.filter(notification =>
         notification.templateName === this.selectedTemplate
       );
     }
-  
+
     this.updateChartsWithData(filteredData);
     this.updateWeeklyChartData(filteredData);
   }
-  
+
 
   private convertToISODate(dateString: string): string {
     const [date, time] = dateString.split(' ');
@@ -263,19 +271,19 @@ export class NotificationChartComponent implements OnInit {
 
   private calculateKPIs(data: any[]): void {
     const total = data.length;
-  
+
     const sent = data.filter(n => n.statusSend === 'SENT').length;
     const pending = data.filter(n => n.statusSend === 'VISUALIZED').length;
-  
+
     const uniqueDays = new Set(data.map(n => n.dateSend.split(' ')[0])).size;
-  
+
     const templateCount = new Map<string, number>();
     data.forEach(n => {
       templateCount.set(n.templateName, (templateCount.get(n.templateName) || 0) + 1);
     });
-  
+
     let mostUsedTemplate: [string, number];
-  
+
     if (this.selectedTemplate) {
       // Si hay filtro por plantilla, mostrar cuántas veces se utilizó
       const count = templateCount.get(this.selectedTemplate) || 0;
@@ -285,44 +293,44 @@ export class NotificationChartComponent implements OnInit {
       mostUsedTemplate = Array.from(templateCount.entries())
         .reduce((a, b) => a[1] > b[1] ? a : b, ['', 0]);
     }
-  
+
     const hourCount = new Map<number, number>();
     data.forEach(n => {
       const hour = parseInt(n.dateSend.split(' ')[1].split(':')[0]);
       hourCount.set(hour, (hourCount.get(hour) || 0) + 1);
     });
-  
+
     const contactCount = new Map<string, number>();
     data.forEach(n => {
       contactCount.set(n.recipient, (contactCount.get(n.recipient) || 0) + 1);
     });
-  
+
     const mostFrequentContact = Array.from(contactCount.entries())
       .reduce((a, b) => a[1] > b[1] ? a : b, ['', 0]);
-  
+
     const peakHour = Array.from(hourCount.entries())
       .reduce((a, b) => a[1] > b[1] ? a : b, [0, 0]);
-  
+
     const weekdayCount = new Map<string, number>();
     const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-  
+
     data.forEach(notification => {
       const [day, month, year] = notification.dateSend.split(' ')[0].split('/');
       const date = new Date(year, month - 1, day);
       const weekday = weekdays[date.getDay()];
       weekdayCount.set(weekday, (weekdayCount.get(weekday) || 0) + 1);
     });
-  
+
     let maxCount = 0;
     let mostActiveDay = '';
-  
+
     weekdayCount.forEach((count, day) => {
       if (count > maxCount) {
         maxCount = count;
         mostActiveDay = day;
       }
     });
-  
+
     this.kpis = {
       pendingRate: (sent / total) * 100,
       viewedRate: (pending / total) * 100,
@@ -346,7 +354,7 @@ export class NotificationChartComponent implements OnInit {
       }
     };
   }
-  
+
   showInfo() {
     const message = '';
 
@@ -385,7 +393,7 @@ export class NotificationChartComponent implements OnInit {
   weeklyChartData: ChartData = {
     labels: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
     datasets: [{
-      data: [],  
+      data: [],
       label: 'Notificaciones por Día',
       backgroundColor: '#FF6384',
       borderColor: '#FF6384',
