@@ -10,7 +10,7 @@ import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { IaService } from '../../../app/services/ia-service';
 import { ChartData, ChartOptions } from 'chart.js';
 import { RouterModule } from '@angular/router';
-import {Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { SubscriptionService } from '../../../app/services/subscription.service';
 import { ContactTypeMetricService } from '../../../app/services/dashboard/charts/contact-type-metric.service';
 import { NotificationStatusMetricService } from '../../../app/services/dashboard/charts/notification-status-metric.service';
@@ -20,6 +20,7 @@ import { SubscriptionOptionalAnalysisMetricService } from '../../../app/services
 import { NotificationKPIViewedModel } from '../../../app/models/notifications/notification';
 import { KpiViewedRateService } from '../../../app/services/dashboard/kpi/kpi-viewed-rate.service';
 import { KpiDailyAverageService } from '../../../app/services/dashboard/kpi/kpi-dayli-average.service';
+import { KpiPeakTimeService, PeakHourStats } from '../../../app/services/dashboard/kpi/kpi-peak-time.service';
 
 
 @Component({
@@ -49,7 +50,8 @@ export class NotificationChartComponent implements OnInit {
     private subscriptionRetentionMetricService: SubscriptionRetentionMetricService,
     private subscriptionOptionalAnalysisMetricService: SubscriptionOptionalAnalysisMetricService,
     private kpiViewedRateService: KpiViewedRateService,
-    private kpiDailyAverageService: KpiDailyAverageService
+    private kpiDailyAverageService: KpiDailyAverageService,
+    private kpiPeakTimeService: KpiPeakTimeService
 
   ) {
 
@@ -85,6 +87,7 @@ export class NotificationChartComponent implements OnInit {
   viewedCount: number = 0;
   totalCount: number = 0;
   dailyAverage: number = 0;
+  peakHour: PeakHourStats;
 
 
   //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
@@ -183,13 +186,13 @@ export class NotificationChartComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe();
 
-      this.subscriptionOptionalAnalysisMetricService.getChartData()
+    this.subscriptionOptionalAnalysisMetricService.getChartData()
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
         this.chartDataSubscriptionOptionalAnalysis = data;
       });
 
-      this.kpiViewedRateService.getViewedStats()
+    this.kpiViewedRateService.getViewedStats()
       .pipe(takeUntil(this.destroy$))
       .subscribe(stats => {
         this.viewedRate = stats.viewedRate;
@@ -197,11 +200,18 @@ export class NotificationChartComponent implements OnInit {
         this.totalCount = stats.total;
       });
 
-      this.kpiDailyAverageService.getDailyAverage()
+    this.kpiDailyAverageService.getDailyAverage()
       .pipe(takeUntil(this.destroy$))
       .subscribe(average => {
         this.dailyAverage = average;
       });
+
+    this.kpiPeakTimeService.getPeakHourStats()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(stats => {
+        this.peakHour = stats;
+      });
+
 
 
     this.loadData();
@@ -256,14 +266,20 @@ export class NotificationChartComponent implements OnInit {
       dateUntil: this.dateUntil
     });
 
+    this.kpiPeakTimeService.updateDateFilter({
+      dateFrom: this.dateFrom,
+      dateUntil: this.dateUntil
+    });
+
   }
 
   loadData(): void {
     this.kpiViewedRateService.loadNotificationStats();
     this.kpiDailyAverageService.loadNotifications();
+    this.kpiPeakTimeService.loadNotifications();
   }
 
-//END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
+  //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
 
   private calculateKPIs(data: any[]): void {
     const total = data.length;
