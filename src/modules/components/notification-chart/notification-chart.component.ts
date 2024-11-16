@@ -21,6 +21,7 @@ import { ContactTypeMetricService } from '../../../app/services/dashboard/charts
 import { NotificationStatusMetricService } from '../../../app/services/dashboard/charts/notification-status-metric.service';
 import { NotificationWeeklyMetricService } from '../../../app/services/dashboard/charts/notification-weekly-metric.service';
 import { SubscriptionRetentionMetricService } from '../../../app/services/dashboard/charts/suscription-retention-metric.service';
+import { SubscriptionOptionalAnalysisMetricService } from '../../../app/services/dashboard/charts/suscription-optional-analysis-metric.service';
 
 
 @Component({
@@ -40,11 +41,15 @@ import { SubscriptionRetentionMetricService } from '../../../app/services/dashbo
 
 export class NotificationChartComponent implements OnInit {
 
+
+  //START REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
+
   constructor(
     private contactTypeMetricService: ContactTypeMetricService,
     private notificationStatusMetricService: NotificationStatusMetricService,
     private weeklyMetricService: NotificationWeeklyMetricService,
-    private subscriptionRetentionMetricService: SubscriptionRetentionMetricService
+    private subscriptionRetentionMetricService: SubscriptionRetentionMetricService,
+    private subscriptionOptionalAnalysisMetricService: SubscriptionOptionalAnalysisMetricService
 
   ) {
 
@@ -52,9 +57,10 @@ export class NotificationChartComponent implements OnInit {
     this.chartOptionsNotificationStatus = this.notificationStatusMetricService.getChartOptions();
     this.chartOptionsNotificationWeekly = this.weeklyMetricService.getChartOptions();
     this.chartOptionsSuscriptionRetention = this.weeklyMetricService.getChartOptions();
+    this.chartOptionsSubscriptionOptionalAnalysis = this.subscriptionOptionalAnalysisMetricService.getChartOptions();
+
 
   }
-
 
 
   private destroy$ = new Subject<void>();
@@ -67,6 +73,8 @@ export class NotificationChartComponent implements OnInit {
   chartOptionsNotificationWeekly!: ChartOptions<'bar'>;
   chartDataSuscriptionRetention!: ChartData<'bar'>;
   chartOptionsSuscriptionRetention: ChartOptions<'bar'>;
+  chartDataSubscriptionOptionalAnalysis!: ChartData<'bar'>;
+  chartOptionsSubscriptionOptionalAnalysis: ChartOptions<'bar'>;
 
   today = new Date().toISOString().split('T')[0];
   isDropdownOpen = false;
@@ -74,21 +82,19 @@ export class NotificationChartComponent implements OnInit {
   dateUntil: string | null = null;
   selectedStatus: 'ALL' | 'SENT' | 'VISUALIZED' = 'ALL';
 
+
+  //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
+
   private platformId = inject(PLATFORM_ID);
   isBrowser = isPlatformBrowser(this.platformId);
   notificationService = inject(NotificationService);
-  chartConfigurationService = inject(ChartConfigurationService);
   iaService = inject(IaService);
   subscriptionService = inject(SubscriptionService);
 
 
-  recipientFilter: string = '';
-  notificationSubjectFilter: string = '';
-
   isModalOpen = false;
   modalTitle = '';
   modalMessage = '';
-
 
 
   retentionKPIs: RetentionKPIs = {
@@ -110,8 +116,6 @@ export class NotificationChartComponent implements OnInit {
   kpis!: KPIModel;
 
   notifications: NotificationModelChart[] = []
-  contacts: ContactModel[] = []
-
 
   getAllNotifications() {
 
@@ -143,6 +147,8 @@ export class NotificationChartComponent implements OnInit {
       }
     });
 
+    //START REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
+
     this.contactTypeMetricService.getContactTypeChartData()
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
@@ -173,8 +179,18 @@ export class NotificationChartComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe();
 
+      this.subscriptionOptionalAnalysisMetricService.getChartData()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        this.chartDataSubscriptionOptionalAnalysis = data;
+      });
+
+    //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
 
   }
+
+  //START REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
+
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -200,6 +216,7 @@ export class NotificationChartComponent implements OnInit {
     this.notificationStatusMetricService.resetFilters();
   }
 
+//END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
 
   private calculateKPIs(data: any[]): void {
     const total = data.length;
@@ -290,124 +307,6 @@ export class NotificationChartComponent implements OnInit {
     return `${year}-${month}-${day}`
   }
 
-  formatResponseTime(hours: number, minutes: number): string {
-    if (hours === 0) {
-      return `${minutes} min`;
-    } else if (minutes === 0) {
-      return `${hours}h`;
-    }
-    return `${hours}h ${minutes}min`;
-  }
-
-
-
-
-
-  subscriptionAnalysisData: ChartData = {
-    labels: [], // Nombres de suscripciones
-    datasets: [
-      {
-        data: [], // Cantidad de usuarios suscritos
-        label: 'Suscritos',
-        backgroundColor: '#36A2EB',
-        borderColor: '#36A2EB',
-        borderWidth: 1
-      },
-      {
-        data: [], // Cantidad de usuarios desuscritos
-        label: 'Desuscritos',
-        backgroundColor: '#FF6384',
-        borderColor: '#FF6384',
-        borderWidth: 1
-      }
-    ]
-  };
-
-  subscriptionAnalysisOptions: ChartConfiguration['options'] = {
-    indexAxis: 'y',
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: true,
-        text: 'Análisis de Suscripciones Opcionales'
-      }
-    },
-    scales: {
-      x: {
-        stacked: false,
-        grid: {
-          display: true
-        },
-        title: {
-          display: true,
-          text: 'Cantidad de Usuarios'
-        },
-        border: {
-          display: true
-        }
-      },
-      y: {
-        stacked: false,
-        grid: {
-          display: false
-        },
-        title: {
-          display: true,
-          text: 'Tipos de Suscripción'
-        },
-        border: {
-          display: true
-        }
-      }
-    },
-    maintainAspectRatio: false
-  };
-
-
-
-
-
-
-
-  // Método para procesar los datos
-  processSubscriptionData(contacts: any[], subscriptionTypes: any[]) {
-    // Filtrar solo las suscripciones opcionales
-    const optionalSubs = subscriptionTypes
-      .filter(sub => sub.isUnsubscribable)
-      .map(sub => sub.name);
-
-    const subscriptionStats: Record<string, SubscriptionStat> = optionalSubs.reduce((acc, subName) => {
-      acc[subName] = { subscribed: 0, unsubscribed: 0, total: contacts.length };
-      return acc;
-    }, {} as Record<string, SubscriptionStat>);
-
-    // Ahora el sort estará correctamente tipado
-    const sortedStats = Object.entries(subscriptionStats)
-      .sort(([, a], [, b]) => b.subscribed - a.subscribed);
-
-
-    // Contar suscripciones
-    contacts.forEach(contact => {
-      optionalSubs.forEach(subName => {
-        if (contact.subscriptions.includes(subName)) {
-          subscriptionStats[subName].subscribed++;
-        } else {
-          subscriptionStats[subName].unsubscribed++;
-        }
-      });
-    });
-
-    // Actualizar datos del gráfico
-    this.subscriptionAnalysisData.labels = sortedStats.map(([name]) => name);
-    this.subscriptionAnalysisData.datasets[0].data = sortedStats.map(([, stats]) => stats.subscribed);
-    this.subscriptionAnalysisData.datasets[1].data = sortedStats.map(([, stats]) => stats.unsubscribed);
-  }
-
-
-
 
 
   exportDashboardData(): string {
@@ -445,9 +344,6 @@ export class NotificationChartComponent implements OnInit {
 
 
 
-
-
-
   private calculateRetentionKPIs(metrics: RetentionMetric[]): RetentionKPIs {
     return {
       averageRetention: metrics.reduce((acc, m) => acc + m.retentionRate, 0) / metrics.length,
@@ -457,54 +353,6 @@ export class NotificationChartComponent implements OnInit {
     };
   }
 
-  processRetentionData(contacts: any[], subscriptionTypes: any[]) {
-    // Para los KPIs y el gráfico de tasa de retención (verde)
-    // const retentionMetrics = this.calculateRetentionMetrics(contacts, subscriptionTypes);
-    // this.retentionKPIs = this.calculateRetentionKPIs(retentionMetrics);
-    // this.updateRetentionChart(retentionMetrics);
 
-    // Para el gráfico de análisis (azul/rojo)
-    const analysisMetrics = this.calculateSubscriptionAnalysis(contacts, subscriptionTypes);
-    this.updateSubscriptionAnalysisChart(analysisMetrics);
-  }
 
-  private calculateSubscriptionAnalysis(contacts: any[], subscriptionTypes: any[]) {
-    const optionalSubs = subscriptionTypes
-      .filter(sub => sub.isUnsubscribable)
-      .map(sub => sub.name);
-
-    return optionalSubs.map(subName => {
-      const subscribedUsers = contacts.filter(contact =>
-        contact.subscriptions.includes(subName)
-      ).length;
-
-      return {
-        subscriptionName: subName,
-        subscribed: subscribedUsers,
-        unsubscribed: contacts.length - subscribedUsers
-      };
-    });
-  }
-
-  private updateSubscriptionAnalysisChart(metrics: any[]) {
-    this.subscriptionAnalysisData = {
-      labels: metrics.map(m => this.subscriptionService.getSubscriptionNameInSpanish(m.subscriptionName)),
-      datasets: [
-        {
-          data: metrics.map(m => m.subscribed),
-          label: 'Suscritos',
-          backgroundColor: '#36A2EB',
-          borderColor: '#36A2EB',
-          borderWidth: 1
-        },
-        {
-          data: metrics.map(m => m.unsubscribed),
-          label: 'Desuscritos',
-          backgroundColor: '#FF6384',
-          borderColor: '#FF6384',
-          borderWidth: 1
-        }
-      ]
-    };
-  }
 }
