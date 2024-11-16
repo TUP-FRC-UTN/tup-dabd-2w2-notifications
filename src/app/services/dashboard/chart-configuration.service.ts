@@ -7,39 +7,32 @@ import { ChartConfiguration, ChartData, ChartOptions } from 'chart.js';
 export class ChartConfigurationService {
 
   private readonly defaultPieChartOptions: ChartOptions<'pie'> = {
-    // Hace que el gráfico sea responsive
+
     responsive: true,
 
-    // Permite que el gráfico ajuste su tamaño sin mantener la relación de aspecto
     maintainAspectRatio: false,
 
-    // Configuración de plugins (legend, tooltip, etc)
     plugins: {
-      // Configuración de la leyenda
       legend: {
-        // Posición de la leyenda ('top', 'left', 'bottom', 'right')
         position: 'bottom',
         labels: {
-          // Usa puntos en lugar de rectángulos en la leyenda
           usePointStyle: true,
-          // Espaciado entre elementos de la leyenda
           padding: 20,
           font: {
-            size: 12 // Tamaño de la fuente
+            size: 12
           }
         }
       },
 
-      // Configuración del título
+
       title: {
-        display: false // No mostrar título
+        display: false
       },
 
-      // Configuración del tooltip (el popup que aparece al hacer hover)
+
       tooltip: {
         enabled: true,
         callbacks: {
-          // Personaliza el texto que aparece en el tooltip
           label: (context) => {
             const label = context.label || '';
             const value = context.parsed;
@@ -48,11 +41,9 @@ export class ChartConfigurationService {
         }
       }
     },
-
-    // Configuración de animaciones
     animation: {
-      animateScale: true,  // Anima el escalado del gráfico
-      animateRotate: true  // Anima la rotación del gráfico
+      animateScale: true,
+      animateRotate: true
     }
   };
 
@@ -84,7 +75,7 @@ export class ChartConfigurationService {
   };
 
   public statusChartData: ChartConfiguration<'pie'>['data'] = {
-    labels: ['Enviados', 'Visualizados' /*, 'No Leída'*/],
+    labels: ['Enviados', 'Visualizados'],
     datasets: [{
       data: [0, 0, 0],
       backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56']

@@ -49,7 +49,7 @@
                         <i class="bi bi-funnel-fill fs-5"></i>
                         <i class="bi bi-caret-down-fill ms-1 small"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                          {{ getActiveFiltersCount() }}
+                          {{ 2 }}
                         </span>
                       </div>
                     </button>
@@ -200,8 +200,8 @@
             <div class="card-body">
               <h5 class="card-title text-center">Tipos de Contacto</h5>
               <div class="chart-container">
-                <canvas baseChart #contactTypeChart="base-chart" [data]="chartData"
-                  [options]="chartOptions" [type]="'pie'">
+                <canvas baseChart #contactTypeChart="base-chart" [data]="chartDataContactType"
+                  [options]="chartOptionsContactType" [type]="'pie'">
                 </canvas>
               </div>
             </div>
@@ -215,7 +215,7 @@
                 <h5 class="card-title text-center hover-underline">Estado de Notificaciones</h5>
               </a>
               <div class="chart-container">
-                <canvas baseChart #statusChart="base-chart" [data]="statusChartData" [options]="statusChartOptions"
+                <canvas baseChart #statusChart="base-chart" [data]="chartDataNotificationStatus" [options]="chartOptionsNotificationStatus"
                   [type]="'pie'">
                 </canvas>
               </div>

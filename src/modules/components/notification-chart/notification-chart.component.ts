@@ -6,7 +6,7 @@ import { NotificationService } from '../../../app/services/notification.service'
 import { ContactService } from '../../../app/services/contact.service';
 import { NotificationModelChart } from '../../../app/models/notifications/notification';
 import { ContactModel } from '../../../app/models/contacts/contactModel';
-import { ChartConfigurationService } from '../../../app/services/chart-configuration.service';
+import { ChartConfigurationService } from '../../../app/services/dashboard/chart-configuration.service';
 import { KPIModel, RetentionKPIs, RetentionMetric } from '../../../app/models/kpi/kpiModel';
 import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
@@ -17,7 +17,8 @@ import { RouterModule } from '@angular/router';
 import { forkJoin, Subject, takeUntil } from 'rxjs';
 import { SubscriptionService } from '../../../app/services/subscription.service';
 import { SubscriptionStat } from '../../../app/models/suscriptions/subscription'
-import { ContactTypeMetricService } from '../../../app/services/contact-type-metric.service';
+import { ContactTypeMetricService } from '../../../app/services/dashboard/contact-type-metric.service';
+import { NotificationStatusMetricService } from '../../../app/services/dashboard/notification-status-metric.service';
 
 
 @Component({
@@ -37,19 +38,28 @@ import { ContactTypeMetricService } from '../../../app/services/contact-type-met
 
 export class NotificationChartComponent implements OnInit {
 
-  constructor(private contactTypeMetricService: ContactTypeMetricService) {
-    this.chartOptions = this.contactTypeMetricService.getContactTypeChartOptions();
+  constructor(private contactTypeMetricService: ContactTypeMetricService, private notificationStatusMetricService: NotificationStatusMetricService) {
+    this.chartOptionsContactType = this.contactTypeMetricService.getContactTypeChartOptions();
+    this.chartOptionsNotificationStatus = this.notificationStatusMetricService.getChartOptions();
   }
 
 
-  @ViewChild('statusChart') statusChart?: BaseChartDirective;
+
   @ViewChild('dailyChart') dailyChart?: BaseChartDirective;
   @ViewChild('weeklyChart') weeklyChart?: BaseChartDirective;
 
   private destroy$ = new Subject<void>();
 
-  chartData!: ChartData<'pie'>;
-  chartOptions: ChartOptions<'pie'>;
+  chartDataContactType!: ChartData<'pie'>;
+  chartOptionsContactType: ChartOptions<'pie'>;
+  chartDataNotificationStatus!: ChartData<'pie'>;
+  chartOptionsNotificationStatus: ChartOptions<'pie'>;
+
+  today = new Date().toISOString().split('T')[0];
+  isDropdownOpen = false;
+  dateFrom: string | null = null;
+  dateUntil: string | null = null;
+  selectedStatus: 'ALL' | 'SENT' | 'VISUALIZED' = 'ALL';
 
   private platformId = inject(PLATFORM_ID);
   isBrowser = isPlatformBrowser(this.platformId);
@@ -60,22 +70,16 @@ export class NotificationChartComponent implements OnInit {
   subscriptionService = inject(SubscriptionService);
 
 
-  today: string = new Date().toISOString().split('T')[0];
-  dateFrom: string = '';
-  dateUntil: string = '';
   searchSubject: string = '';
   searchEmail: string = '';
-  selectedStatus: 'ALL' | 'SENT' | 'VISUALIZED' = 'ALL';
-  statusFilter: string = '';
   recipientFilter: string = '';
   notificationSubjectFilter: string = '';
-  isDropdownOpen = false;
+
   isModalOpen = false;
   modalTitle = '';
   modalMessage = '';
 
-  statusChartData = this.chartConfigurationService.statusChartData;
-  statusChartOptions = this.chartConfigurationService.statusChartOptions;
+
 
   retentionKPIs: RetentionKPIs = {
     averageRetention: 0,
@@ -133,14 +137,22 @@ export class NotificationChartComponent implements OnInit {
       this.dateUntil = this.formatDate(tomorrow);
 
       if (this.isBrowser) {
-        this.filterAndUpdateCharts();
+        this.calculateKPIs(data);
       }
     });
 
     this.contactTypeMetricService.getContactTypeChartData()
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
-        this.chartData = data;
+        this.chartDataContactType = data;
+      });
+
+    this.notificationStatusMetricService.loadNotifications();
+
+    this.notificationStatusMetricService.getChartData()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        this.chartDataNotificationStatus = data;
       });
 
 
@@ -152,110 +164,83 @@ export class NotificationChartComponent implements OnInit {
   }
 
 
-  applyFilters() {
-    this.filterAndUpdateCharts();
+  applyFilters(): void {
+    this.notificationStatusMetricService.updateFilters({
+      dateFrom: this.dateFrom,
+      dateUntil: this.dateUntil,
+      selectedStatus: this.selectedStatus
+    });
     this.isDropdownOpen = false;
   }
 
 
-  getActiveFiltersCount(): number {
-    let count = 0;
-    if (this.searchSubject) count++;
-    if (this.searchEmail) count++;
-    if (this.selectedStatus !== 'ALL') count++;
-    if (this.dateFrom) count++;
-    if (this.dateUntil) count++;
-    return count;
-  }
 
-  resetFilters() {
-    this.searchSubject = '';
-    this.searchEmail = '';
+  resetFilters(): void {
+    this.dateFrom = null;
+    this.dateUntil = null;
     this.selectedStatus = 'ALL';
-    this.dateFrom = '';
-    this.dateUntil = '';
-    this.filterAndUpdateCharts();
+    this.notificationStatusMetricService.resetFilters();
   }
 
-  private filterAndUpdateCharts(): void {
-    let filteredData = [...this.notifications];
+  // private filterAndUpdateCharts(): void {
+  //   let filteredData = [...this.notifications];
 
-    if (this.dateFrom || this.dateUntil) {
-      filteredData = filteredData.filter(notification => {
-        const notificationDate = new Date(this.convertToISODate(notification.dateSend));
-        const fromDate = this.dateFrom ? new Date(this.dateFrom) : null;
-        const untilDate = this.dateUntil ? new Date(this.dateUntil) : null;
+  //   if (this.dateFrom || this.dateUntil) {
+  //     filteredData = filteredData.filter(notification => {
+  //       const notificationDate = new Date(this.convertToISODate(notification.dateSend));
+  //       const fromDate = this.dateFrom ? new Date(this.dateFrom) : null;
+  //       const untilDate = this.dateUntil ? new Date(this.dateUntil) : null;
 
-        return (!fromDate || notificationDate >= fromDate) &&
-          (!untilDate || notificationDate <= untilDate);
-      });
-    }
+  //       return (!fromDate || notificationDate >= fromDate) &&
+  //         (!untilDate || notificationDate <= untilDate);
+  //     });
+  //   }
 
-    if (this.searchSubject) {
-      filteredData = filteredData.filter(notification =>
-        notification.subject.toLowerCase().includes(this.searchSubject.toLowerCase())
-      );
-    }
+  //   if (this.searchSubject) {
+  //     filteredData = filteredData.filter(notification =>
+  //       notification.subject.toLowerCase().includes(this.searchSubject.toLowerCase())
+  //     );
+  //   }
 
-    if (this.searchEmail) {
-      filteredData = filteredData.filter(notification =>
-        notification.recipient.toLowerCase().includes(this.searchEmail.toLowerCase())
-      );
-    }
+  //   if (this.searchEmail) {
+  //     filteredData = filteredData.filter(notification =>
+  //       notification.recipient.toLowerCase().includes(this.searchEmail.toLowerCase())
+  //     );
+  //   }
 
-    if (this.selectedStatus !== 'ALL') {
-      filteredData = filteredData.filter(notification =>
-        notification.statusSend === this.selectedStatus
-      );
-    }
-
-
-    this.updateChartsWithData(filteredData);
-    this.updateWeeklyChartData(filteredData);
-  }
+  //   if (this.selectedStatus !== 'ALL') {
+  //     filteredData = filteredData.filter(notification =>
+  //       notification.statusSend === this.selectedStatus
+  //     );
+  //   }
 
 
-  private convertToISODate(dateString: string): string {
-    const [date, time] = dateString.split(' ');
-    const [day, month, year] = date.split('/');
-    return `${year}-${month}-${day}T${time}`;
-  }
+  //   this.updateChartsWithData(filteredData);
+  //   this.updateWeeklyChartData(filteredData);
+  // }
 
-  private updateChartsWithData(data: any[]): void {
 
-    const statusCount = {
-      SENT: 0,
-      VISUALIZED: 0
-    };
+  // private convertToISODate(dateString: string): string {
+  //   const [date, time] = dateString.split(' ');
+  //   const [day, month, year] = date.split('/');
+  //   return `${year}-${month}-${day}T${time}`;
+  // }
 
-    data.forEach(notification => {
-      statusCount[notification.statusSend as keyof typeof statusCount]++;
-    });
+  // private updateChartsWithData(data: any[]): void {
 
-    this.statusChartData = {
-      ...this.chartConfigurationService.statusChartData,
-      datasets: [{
-        ...this.chartConfigurationService.statusChartData.datasets[0],
-        data: [statusCount.SENT, statusCount.VISUALIZED]
-      }]
-    };
+  //   // const statusCount = {
+  //   //   SENT: 0,
+  //   //   VISUALIZED: 0
+  //   // };
+
+  //   // data.forEach(notification => {
+  //   //   statusCount[notification.statusSend as keyof typeof statusCount]++;
+  //   // });
 
 
 
-    const dailyCount = new Map<string, number>();
-    data.forEach(notification => {
-      const date = notification.dateSend.split(' ')[0];
-      const count = dailyCount.get(date) || 0;
-      dailyCount.set(date, count + 1);
-    });
 
-    setTimeout(() => {
-      this.statusChart?.update();
-      this.dailyChart?.update();
-    });
-
-    this.calculateKPIs(data);
-  }
+  // }
 
 
   private calculateKPIs(data: any[]): void {
@@ -517,7 +502,6 @@ export class NotificationChartComponent implements OnInit {
   exportDashboardData(): string {
     const data = {
       kpis: this.kpis,
-      statusChartData: this.statusChartData,
       notifications: this.notifications,
     };
     return JSON.stringify(data);
