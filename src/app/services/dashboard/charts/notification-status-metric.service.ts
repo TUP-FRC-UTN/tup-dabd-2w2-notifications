@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ChartData, ChartOptions } from 'chart.js';
 import { ChartConfigurationService } from './chart-configuration.service';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../notification.service';
 
 export interface FilterCriteria {
   dateFrom: string | null;

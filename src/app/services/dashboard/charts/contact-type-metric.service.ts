@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 import { ChartData, ChartOptions } from 'chart.js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ContactModel } from '../../models/contacts/contactModel';
+import { ContactModel } from '../../../models/contacts/contactModel';
 import { ChartConfigurationService } from './chart-configuration.service';
-import { ContactService } from '../contact.service';
+import { ContactService } from '../../contact.service';
 
 interface ContactTypeCounts {
   'Correo electrónico': number;

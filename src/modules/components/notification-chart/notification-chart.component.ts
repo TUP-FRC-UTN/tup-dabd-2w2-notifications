@@ -6,7 +6,7 @@ import { NotificationService } from '../../../app/services/notification.service'
 import { ContactService } from '../../../app/services/contact.service';
 import { NotificationModelChart } from '../../../app/models/notifications/notification';
 import { ContactModel } from '../../../app/models/contacts/contactModel';
-import { ChartConfigurationService } from '../../../app/services/dashboard/chart-configuration.service';
+import { ChartConfigurationService } from '../../../app/services/dashboard/charts/chart-configuration.service';
 import { KPIModel, RetentionKPIs, RetentionMetric } from '../../../app/models/kpi/kpiModel';
 import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
@@ -17,8 +17,9 @@ import { RouterModule } from '@angular/router';
 import { forkJoin, Subject, takeUntil } from 'rxjs';
 import { SubscriptionService } from '../../../app/services/subscription.service';
 import { SubscriptionStat } from '../../../app/models/suscriptions/subscription'
-import { ContactTypeMetricService } from '../../../app/services/dashboard/contact-type-metric.service';
-import { NotificationStatusMetricService } from '../../../app/services/dashboard/notification-status-metric.service';
+import { ContactTypeMetricService } from '../../../app/services/dashboard/charts/contact-type-metric.service';
+import { NotificationStatusMetricService } from '../../../app/services/dashboard/charts/notification-status-metric.service';
+import { NotificationWeeklyMetricService } from '../../../app/services/dashboard/charts/notification-weekly-metric.service';
 
 
 @Component({
@@ -38,15 +39,19 @@ import { NotificationStatusMetricService } from '../../../app/services/dashboard
 
 export class NotificationChartComponent implements OnInit {
 
-  constructor(private contactTypeMetricService: ContactTypeMetricService, private notificationStatusMetricService: NotificationStatusMetricService) {
+  constructor(
+    private contactTypeMetricService: ContactTypeMetricService,
+    private notificationStatusMetricService: NotificationStatusMetricService,
+    private weeklyMetricService: NotificationWeeklyMetricService
+
+  ) {
+
     this.chartOptionsContactType = this.contactTypeMetricService.getContactTypeChartOptions();
     this.chartOptionsNotificationStatus = this.notificationStatusMetricService.getChartOptions();
+    this.chartOptionsNotificationWeekly = this.weeklyMetricService.getChartOptions();
   }
 
 
-
-  @ViewChild('dailyChart') dailyChart?: BaseChartDirective;
-  @ViewChild('weeklyChart') weeklyChart?: BaseChartDirective;
 
   private destroy$ = new Subject<void>();
 
@@ -54,6 +59,8 @@ export class NotificationChartComponent implements OnInit {
   chartOptionsContactType: ChartOptions<'pie'>;
   chartDataNotificationStatus!: ChartData<'pie'>;
   chartOptionsNotificationStatus: ChartOptions<'pie'>;
+  chartDataNotificationWeekly!: ChartData<'bar'>;
+  chartOptionsNotificationWeekly!: ChartOptions<'bar'>;
 
   today = new Date().toISOString().split('T')[0];
   isDropdownOpen = false;
@@ -155,6 +162,12 @@ export class NotificationChartComponent implements OnInit {
         this.chartDataNotificationStatus = data;
       });
 
+      this.weeklyMetricService.getChartData()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        this.chartDataNotificationWeekly = data;
+      });
+
 
   }
 
@@ -181,66 +194,6 @@ export class NotificationChartComponent implements OnInit {
     this.selectedStatus = 'ALL';
     this.notificationStatusMetricService.resetFilters();
   }
-
-  // private filterAndUpdateCharts(): void {
-  //   let filteredData = [...this.notifications];
-
-  //   if (this.dateFrom || this.dateUntil) {
-  //     filteredData = filteredData.filter(notification => {
-  //       const notificationDate = new Date(this.convertToISODate(notification.dateSend));
-  //       const fromDate = this.dateFrom ? new Date(this.dateFrom) : null;
-  //       const untilDate = this.dateUntil ? new Date(this.dateUntil) : null;
-
-  //       return (!fromDate || notificationDate >= fromDate) &&
-  //         (!untilDate || notificationDate <= untilDate);
-  //     });
-  //   }
-
-  //   if (this.searchSubject) {
-  //     filteredData = filteredData.filter(notification =>
-  //       notification.subject.toLowerCase().includes(this.searchSubject.toLowerCase())
-  //     );
-  //   }
-
-  //   if (this.searchEmail) {
-  //     filteredData = filteredData.filter(notification =>
-  //       notification.recipient.toLowerCase().includes(this.searchEmail.toLowerCase())
-  //     );
-  //   }
-
-  //   if (this.selectedStatus !== 'ALL') {
-  //     filteredData = filteredData.filter(notification =>
-  //       notification.statusSend === this.selectedStatus
-  //     );
-  //   }
-
-
-  //   this.updateChartsWithData(filteredData);
-  //   this.updateWeeklyChartData(filteredData);
-  // }
-
-
-  // private convertToISODate(dateString: string): string {
-  //   const [date, time] = dateString.split(' ');
-  //   const [day, month, year] = date.split('/');
-  //   return `${year}-${month}-${day}T${time}`;
-  // }
-
-  // private updateChartsWithData(data: any[]): void {
-
-  //   // const statusCount = {
-  //   //   SENT: 0,
-  //   //   VISUALIZED: 0
-  //   // };
-
-  //   // data.forEach(notification => {
-  //   //   statusCount[notification.statusSend as keyof typeof statusCount]++;
-  //   // });
-
-
-
-
-  // }
 
 
   private calculateKPIs(data: any[]): void {
@@ -344,17 +297,6 @@ export class NotificationChartComponent implements OnInit {
 
 
 
-  weeklyChartData: ChartData = {
-    labels: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
-    datasets: [{
-      data: [],
-      label: 'Notificaciones por Día',
-      backgroundColor: 'rgba(149, 160, 217, 1)',
-      borderColor: 'rgba(149, 160, 217, 1)',
-      borderWidth: 1,
-      fill: false
-    }]
-  };
 
   subscriptionAnalysisData: ChartData = {
     labels: [], // Nombres de suscripciones
@@ -418,48 +360,11 @@ export class NotificationChartComponent implements OnInit {
     },
     maintainAspectRatio: false
   };
-  weeklyChartOptions = {
-    responsive: true,
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: 'Día de la Semana'
-        }
-      },
-      y: {
-        title: {
-          display: true,
-          text: 'Cantidad de Notificaciones'
-        },
-        beginAtZero: true
-      }
-    }
-  };
 
 
 
 
 
-  private updateWeeklyChartData(data: any[]): void {
-    const weekdayCount = new Map<string, number>();
-    const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-
-    data.forEach(notification => {
-      const [day, month, year] = notification.dateSend.split(' ')[0].split('/');
-      const date = new Date(year, month - 1, day);
-      const weekday = weekdays[date.getDay()];
-      weekdayCount.set(weekday, (weekdayCount.get(weekday) || 0) + 1);
-    });
-
-    this.weeklyChartData.datasets[0].data = weekdays.map(day => weekdayCount.get(day) || 0);
-
-    setTimeout(() => {
-      if (this.weeklyChart) {
-        this.weeklyChart.update(); // Solo actualiza si el gráfico existe
-      }
-    });
-  }
 
   // Método para procesar los datos
   processSubscriptionData(contacts: any[], subscriptionTypes: any[]) {
