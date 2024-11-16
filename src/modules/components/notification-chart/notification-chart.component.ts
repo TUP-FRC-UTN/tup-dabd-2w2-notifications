@@ -21,6 +21,7 @@ import { NotificationKPIViewedModel } from '../../../app/models/notifications/no
 import { KpiViewedRateService } from '../../../app/services/dashboard/kpi/kpi-viewed-rate.service';
 import { KpiDailyAverageService } from '../../../app/services/dashboard/kpi/kpi-dayli-average.service';
 import { KpiPeakTimeService, PeakHourStats } from '../../../app/services/dashboard/kpi/kpi-peak-time.service';
+import { FrequentContactStats, KpiMostFrequentContactService } from '../../../app/services/dashboard/kpi/kpi-most-frequent-contact.service';
 
 
 @Component({
@@ -51,7 +52,8 @@ export class NotificationChartComponent implements OnInit {
     private subscriptionOptionalAnalysisMetricService: SubscriptionOptionalAnalysisMetricService,
     private kpiViewedRateService: KpiViewedRateService,
     private kpiDailyAverageService: KpiDailyAverageService,
-    private kpiPeakTimeService: KpiPeakTimeService
+    private kpiPeakTimeService: KpiPeakTimeService,
+    private kpiMostFrequentContactService: KpiMostFrequentContactService
 
   ) {
 
@@ -88,6 +90,7 @@ export class NotificationChartComponent implements OnInit {
   totalCount: number = 0;
   dailyAverage: number = 0;
   peakHour: PeakHourStats;
+  frequentContact: FrequentContactStats
 
 
   //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
@@ -212,6 +215,11 @@ export class NotificationChartComponent implements OnInit {
         this.peakHour = stats;
       });
 
+    this.kpiMostFrequentContactService.getFrequentContactStats()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(stats => {
+        this.frequentContact = stats;
+      });
 
 
     this.loadData();
@@ -250,6 +258,7 @@ export class NotificationChartComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+
     if (changes['dateFrom'] || changes['dateUntil']) {
       this.updateDateFilter();
     }
@@ -271,12 +280,18 @@ export class NotificationChartComponent implements OnInit {
       dateUntil: this.dateUntil
     });
 
+    this.kpiMostFrequentContactService.updateDateFilter({
+      dateFrom: this.dateFrom,
+      dateUntil: this.dateUntil
+    });
+
   }
 
   loadData(): void {
     this.kpiViewedRateService.loadNotificationStats();
     this.kpiDailyAverageService.loadNotifications();
     this.kpiPeakTimeService.loadNotifications();
+    this.kpiMostFrequentContactService.loadNotifications();
   }
 
   //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
