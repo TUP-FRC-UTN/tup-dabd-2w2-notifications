@@ -19,6 +19,7 @@ import { SubscriptionRetentionMetricService } from '../../../app/services/dashbo
 import { SubscriptionOptionalAnalysisMetricService } from '../../../app/services/dashboard/charts/suscription-optional-analysis-metric.service';
 import { NotificationKPIViewedModel } from '../../../app/models/notifications/notification';
 import { KpiViewedRateService } from '../../../app/services/dashboard/kpi/kpi-viewed-rate.service';
+import { KpiDailyAverageService } from '../../../app/services/dashboard/kpi/kpi-dayli-average.service';
 
 
 @Component({
@@ -47,7 +48,8 @@ export class NotificationChartComponent implements OnInit {
     private weeklyMetricService: NotificationWeeklyMetricService,
     private subscriptionRetentionMetricService: SubscriptionRetentionMetricService,
     private subscriptionOptionalAnalysisMetricService: SubscriptionOptionalAnalysisMetricService,
-    private kpiViewedRateService: KpiViewedRateService
+    private kpiViewedRateService: KpiViewedRateService,
+    private kpiDailyAverageService: KpiDailyAverageService
 
   ) {
 
@@ -82,6 +84,7 @@ export class NotificationChartComponent implements OnInit {
   viewedRate: number = 0;
   viewedCount: number = 0;
   totalCount: number = 0;
+  dailyAverage: number = 0;
 
 
   //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
@@ -194,6 +197,13 @@ export class NotificationChartComponent implements OnInit {
         this.totalCount = stats.total;
       });
 
+      this.kpiDailyAverageService.getDailyAverage()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(average => {
+        this.dailyAverage = average;
+      });
+
+
     this.loadData();
 
     //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
@@ -240,10 +250,17 @@ export class NotificationChartComponent implements OnInit {
       dateFrom: this.dateFrom,
       dateUntil: this.dateUntil
     });
+
+    this.kpiDailyAverageService.updateDateFilter({
+      dateFrom: this.dateFrom,
+      dateUntil: this.dateUntil
+    });
+
   }
 
   loadData(): void {
     this.kpiViewedRateService.loadNotificationStats();
+    this.kpiDailyAverageService.loadNotifications();
   }
 
 //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
