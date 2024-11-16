@@ -20,6 +20,7 @@ import { SubscriptionStat } from '../../../app/models/suscriptions/subscription'
 import { ContactTypeMetricService } from '../../../app/services/dashboard/charts/contact-type-metric.service';
 import { NotificationStatusMetricService } from '../../../app/services/dashboard/charts/notification-status-metric.service';
 import { NotificationWeeklyMetricService } from '../../../app/services/dashboard/charts/notification-weekly-metric.service';
+import { SubscriptionRetentionMetricService } from '../../../app/services/dashboard/charts/suscription-retention-metric.service';
 
 
 @Component({
@@ -42,13 +43,16 @@ export class NotificationChartComponent implements OnInit {
   constructor(
     private contactTypeMetricService: ContactTypeMetricService,
     private notificationStatusMetricService: NotificationStatusMetricService,
-    private weeklyMetricService: NotificationWeeklyMetricService
+    private weeklyMetricService: NotificationWeeklyMetricService,
+    private subscriptionRetentionMetricService: SubscriptionRetentionMetricService
 
   ) {
 
     this.chartOptionsContactType = this.contactTypeMetricService.getContactTypeChartOptions();
     this.chartOptionsNotificationStatus = this.notificationStatusMetricService.getChartOptions();
     this.chartOptionsNotificationWeekly = this.weeklyMetricService.getChartOptions();
+    this.chartOptionsSuscriptionRetention = this.weeklyMetricService.getChartOptions();
+
   }
 
 
@@ -61,6 +65,8 @@ export class NotificationChartComponent implements OnInit {
   chartOptionsNotificationStatus: ChartOptions<'pie'>;
   chartDataNotificationWeekly!: ChartData<'bar'>;
   chartOptionsNotificationWeekly!: ChartOptions<'bar'>;
+  chartDataSuscriptionRetention!: ChartData<'bar'>;
+  chartOptionsSuscriptionRetention: ChartOptions<'bar'>;
 
   today = new Date().toISOString().split('T')[0];
   isDropdownOpen = false;
@@ -71,14 +77,11 @@ export class NotificationChartComponent implements OnInit {
   private platformId = inject(PLATFORM_ID);
   isBrowser = isPlatformBrowser(this.platformId);
   notificationService = inject(NotificationService);
-  contactService = inject(ContactService);
   chartConfigurationService = inject(ChartConfigurationService);
   iaService = inject(IaService);
   subscriptionService = inject(SubscriptionService);
 
 
-  searchSubject: string = '';
-  searchEmail: string = '';
   recipientFilter: string = '';
   notificationSubjectFilter: string = '';
 
@@ -120,17 +123,9 @@ export class NotificationChartComponent implements OnInit {
 
   }
 
-  getAllContacts() {
-    this.contactService.getAllContacts().subscribe((data) => {
-      this.contacts = data;
-    });
-  }
 
   ngOnInit() {
 
-    this.loadContactsAndSubscriptions();
-
-    this.getAllContacts();
     this.getAllNotifications();
     this.notificationService.getAllNotificationsNotFiltered().subscribe((data) => {
       this.notifications = data;
@@ -162,11 +157,21 @@ export class NotificationChartComponent implements OnInit {
         this.chartDataNotificationStatus = data;
       });
 
-      this.weeklyMetricService.getChartData()
+    this.weeklyMetricService.getChartData()
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
         this.chartDataNotificationWeekly = data;
       });
+
+    this.subscriptionRetentionMetricService.getChartData()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        this.chartDataSuscriptionRetention = data;
+      });
+
+    this.subscriptionRetentionMetricService.loadData()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
 
 
   }
@@ -366,6 +371,7 @@ export class NotificationChartComponent implements OnInit {
 
 
 
+
   // Método para procesar los datos
   processSubscriptionData(contacts: any[], subscriptionTypes: any[]) {
     // Filtrar solo las suscripciones opcionales
@@ -435,120 +441,12 @@ export class NotificationChartComponent implements OnInit {
     });
   }
 
-  loadContactsAndSubscriptions(): void {
-    forkJoin({
-      subscriptionTypes: this.subscriptionService.getAllSubscriptions(),
-      contacts: this.contactService.getAllContacts()
-    }).subscribe({
-      next: ({ subscriptionTypes, contacts }) => {
-        // Actualizar gráfico de tasa de retención (verde)
-        const retentionMetrics = this.calculateRetentionMetrics(contacts, subscriptionTypes);
-        this.retentionChartData = {
-          labels: retentionMetrics.map(m => this.subscriptionService.getSubscriptionNameInSpanish(m.subscriptionName)),
-          datasets: [{
-            data: retentionMetrics.map(m => m.retentionRate),
-            label: 'Tasa de Retención (%)',
-            backgroundColor: 'rgba(98, 182, 143, 1)',
-            borderColor: 'rgba(98, 182, 143, 1)',
-            borderWidth: 1
-          }]
-        };
-
-        // Actualizar gráfico de análisis (azul/rojo)
-        const analysisMetrics = this.calculateSubscriptionAnalysis(contacts, subscriptionTypes);
-        this.subscriptionAnalysisData = {
-          labels: analysisMetrics.map(m => this.subscriptionService.getSubscriptionNameInSpanish(m.subscriptionName)),
-          datasets: [
-            {
-              data: analysisMetrics.map(m => m.subscribed),
-              label: 'Suscritos',
-              backgroundColor: 'rgba(130, 177, 255, 1)',
-              borderColor: 'rgba(130, 177, 255, 1)',
-              borderWidth: 1
-            },
-            {
-              data: analysisMetrics.map(m => m.unsubscribed),
-              label: 'Desuscritos',
-              backgroundColor: 'rgba(255, 145, 158, 1)',
-              borderColor: 'rgba(255, 145, 158, 1)',
-              borderWidth: 1
-            }
-          ]
-        };
-      },
-      error: (error) => {
-        console.error('Error loading contacts and subscriptions:', error);
-      }
-    });
-  }
-
-  private calculateRetentionMetrics(contacts: any[], subscriptionTypes: any[]): RetentionMetric[] {
-    // Solo para suscripciones opcionales
-    const optionalSubs = subscriptionTypes
-      .filter(sub => sub.isUnsubscribable)
-      .map(sub => sub.name);
-
-    const totalUsers = contacts.length;
-
-    return optionalSubs.map(subName => {
-      const activeUsers = contacts.filter(contact =>
-        contact.subscriptions.includes(subName)
-      ).length;
-
-      return {
-        subscriptionName: subName,
-        totalUsers: totalUsers,
-        activeUsers: activeUsers,
-        retentionRate: (activeUsers / totalUsers) * 100
-      };
-    });
-  }
 
 
-  retentionChartData: ChartData = {
-    labels: [], // Nombres de suscripciones
-    datasets: [{
-      data: [], // Porcentajes de retención
-      label: 'Tasa de Retención (%)',
-      backgroundColor: '#4CAF50', // Verde
-      borderColor: '#4CAF50',
-      borderWidth: 1
-    }]
-  };
 
-  retentionChartOptions: ChartConfiguration['options'] = {
-    indexAxis: 'y',
-    responsive: true,
-    plugins: {
-      title: {
-        display: true,
-        text: 'Tasa de Retención de Notificaciones Opcionales'
-      }
-    },
-    scales: {
-      x: {
-        min: 0,
-        max: 100,
-        title: {
-          display: true,
-          text: 'Porcentaje de Retención'
-        }
-      }
-    }
-  };
 
-  private updateRetentionChart(metrics: any[]) {
-    this.retentionChartData = {
-      labels: metrics.map(m => this.subscriptionService.getSubscriptionNameInSpanish(m.subscriptionName)),
-      datasets: [{
-        data: metrics.map(m => m.retentionRate),
-        label: 'Tasa de Retención (%)',
-        backgroundColor: '#4CAF50',
-        borderColor: '#4CAF50',
-        borderWidth: 1
-      }]
-    };
-  }
+
+
 
   private calculateRetentionKPIs(metrics: RetentionMetric[]): RetentionKPIs {
     return {
@@ -561,9 +459,9 @@ export class NotificationChartComponent implements OnInit {
 
   processRetentionData(contacts: any[], subscriptionTypes: any[]) {
     // Para los KPIs y el gráfico de tasa de retención (verde)
-    const retentionMetrics = this.calculateRetentionMetrics(contacts, subscriptionTypes);
-    this.retentionKPIs = this.calculateRetentionKPIs(retentionMetrics);
-    this.updateRetentionChart(retentionMetrics);
+    // const retentionMetrics = this.calculateRetentionMetrics(contacts, subscriptionTypes);
+    // this.retentionKPIs = this.calculateRetentionKPIs(retentionMetrics);
+    // this.updateRetentionChart(retentionMetrics);
 
     // Para el gráfico de análisis (azul/rojo)
     const analysisMetrics = this.calculateSubscriptionAnalysis(contacts, subscriptionTypes);
