@@ -22,6 +22,7 @@ import { KpiViewedRateService } from '../../../app/services/dashboard/kpi/kpi-vi
 import { KpiDailyAverageService } from '../../../app/services/dashboard/kpi/kpi-dayli-average.service';
 import { KpiPeakTimeService, PeakHourStats } from '../../../app/services/dashboard/kpi/kpi-peak-time.service';
 import { FrequentContactStats, KpiMostFrequentContactService } from '../../../app/services/dashboard/kpi/kpi-most-frequent-contact.service';
+import { ActiveDayStats, KpiMostDayliActiveService } from '../../../app/services/dashboard/kpi/kpi-most-dayli-active.service';
 
 
 @Component({
@@ -53,7 +54,8 @@ export class NotificationChartComponent implements OnInit {
     private kpiViewedRateService: KpiViewedRateService,
     private kpiDailyAverageService: KpiDailyAverageService,
     private kpiPeakTimeService: KpiPeakTimeService,
-    private kpiMostFrequentContactService: KpiMostFrequentContactService
+    private kpiMostFrequentContactService: KpiMostFrequentContactService,
+    private kpiMostDayliActiveService: KpiMostDayliActiveService
 
   ) {
 
@@ -91,6 +93,7 @@ export class NotificationChartComponent implements OnInit {
   dailyAverage: number = 0;
   peakHour: PeakHourStats;
   frequentContact: FrequentContactStats
+  mostActiveDay : ActiveDayStats;
 
 
   //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
@@ -153,7 +156,7 @@ export class NotificationChartComponent implements OnInit {
       this.dateUntil = this.formatDate(tomorrow);
 
       if (this.isBrowser) {
-        this.calculateKPIs(data);
+       
       }
     });
 
@@ -221,6 +224,12 @@ export class NotificationChartComponent implements OnInit {
         this.frequentContact = stats;
       });
 
+      this.kpiMostDayliActiveService.getMostActiveDay()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(stats => {
+        this.mostActiveDay = stats;
+      });
+
 
     this.loadData();
 
@@ -285,6 +294,11 @@ export class NotificationChartComponent implements OnInit {
       dateUntil: this.dateUntil
     });
 
+    this.kpiMostDayliActiveService.updateDateFilter({
+      dateFrom: this.dateFrom,
+      dateUntil: this.dateUntil
+    });
+
   }
 
   loadData(): void {
@@ -292,75 +306,10 @@ export class NotificationChartComponent implements OnInit {
     this.kpiDailyAverageService.loadNotifications();
     this.kpiPeakTimeService.loadNotifications();
     this.kpiMostFrequentContactService.loadNotifications();
+    this.kpiMostDayliActiveService.loadNotifications();
   }
 
   //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
-
-  private calculateKPIs(data: any[]): void {
-    const total = data.length;
-
-    const sent = data.filter(n => n.statusSend === 'SENT').length;
-    const pending = data.filter(n => n.statusSend === 'VISUALIZED').length;
-
-    const uniqueDays = new Set(data.map(n => n.dateSend.split(' ')[0])).size;
-
-
-    const hourCount = new Map<number, number>();
-    data.forEach(n => {
-      const hour = parseInt(n.dateSend.split(' ')[1].split(':')[0]);
-      hourCount.set(hour, (hourCount.get(hour) || 0) + 1);
-    });
-
-    const contactCount = new Map<string, number>();
-    data.forEach(n => {
-      contactCount.set(n.recipient, (contactCount.get(n.recipient) || 0) + 1);
-    });
-
-    const mostFrequentContact = Array.from(contactCount.entries())
-      .reduce((a, b) => a[1] > b[1] ? a : b, ['', 0]);
-
-    const peakHour = Array.from(hourCount.entries())
-      .reduce((a, b) => a[1] > b[1] ? a : b, [0, 0]);
-
-    const weekdayCount = new Map<string, number>();
-    const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-
-    data.forEach(notification => {
-      const [day, month, year] = notification.dateSend.split(' ')[0].split('/');
-      const date = new Date(year, month - 1, day);
-      const weekday = weekdays[date.getDay()];
-      weekdayCount.set(weekday, (weekdayCount.get(weekday) || 0) + 1);
-    });
-
-    let maxCount = 0;
-    let mostActiveDay = '';
-
-    weekdayCount.forEach((count, day) => {
-      if (count > maxCount) {
-        maxCount = count;
-        mostActiveDay = day;
-      }
-    });
-
-    this.kpis = {
-      pendingRate: (sent / total) * 100,
-      viewedRate: (pending / total) * 100,
-      dailyAverage: total / uniqueDays,
-      peakHour: {
-        hour: peakHour[0],
-        count: peakHour[1]
-      },
-      mostFrequentContact: {
-        email: mostFrequentContact[0],
-        count: mostFrequentContact[1]
-      },
-      mostActiveDay: {
-        day: mostActiveDay,
-        count: maxCount,
-        percentage: (maxCount / total) * 100
-      }
-    };
-  }
 
   showInfo() {
     const message = '';
