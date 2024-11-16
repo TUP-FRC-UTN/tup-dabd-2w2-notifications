@@ -12,12 +12,14 @@ export interface Notification {
     dateNotification?: string | Date;
 }
 
-export interface NotificationModelChart {
+export interface NotificationKPIViewedModel {
   id: number;
   recipient: string;
   subject: string;
   templateId: number;
   templateName: string;
   dateSend: string;
-  statusSend: string;
+  statusSend: 'SENT' | 'VISUALIZED';
 }
+
+

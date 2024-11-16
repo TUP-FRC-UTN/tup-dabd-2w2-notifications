@@ -1,27 +1,24 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../app/services/notification.service';
-import { ContactService } from '../../../app/services/contact.service';
-import { NotificationModelChart } from '../../../app/models/notifications/notification';
-import { ContactModel } from '../../../app/models/contacts/contactModel';
-import { ChartConfigurationService } from '../../../app/services/dashboard/charts/chart-configuration.service';
 import { KPIModel, RetentionKPIs, RetentionMetric } from '../../../app/models/kpi/kpiModel';
 import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { MainContainerComponent } from 'ngx-dabd-grupo01';
 import { IaService } from '../../../app/services/ia-service';
-import { ChartData, ChartConfiguration, ChartOptions } from 'chart.js';
+import { ChartData, ChartOptions } from 'chart.js';
 import { RouterModule } from '@angular/router';
-import { forkJoin, Subject, takeUntil } from 'rxjs';
+import {Subject, takeUntil } from 'rxjs';
 import { SubscriptionService } from '../../../app/services/subscription.service';
-import { SubscriptionStat } from '../../../app/models/suscriptions/subscription'
 import { ContactTypeMetricService } from '../../../app/services/dashboard/charts/contact-type-metric.service';
 import { NotificationStatusMetricService } from '../../../app/services/dashboard/charts/notification-status-metric.service';
 import { NotificationWeeklyMetricService } from '../../../app/services/dashboard/charts/notification-weekly-metric.service';
 import { SubscriptionRetentionMetricService } from '../../../app/services/dashboard/charts/suscription-retention-metric.service';
 import { SubscriptionOptionalAnalysisMetricService } from '../../../app/services/dashboard/charts/suscription-optional-analysis-metric.service';
+import { NotificationKPIViewedModel } from '../../../app/models/notifications/notification';
+import { KpiViewedRateService } from '../../../app/services/dashboard/kpi/kpi-viewed-rate.service';
 
 
 @Component({
@@ -49,7 +46,8 @@ export class NotificationChartComponent implements OnInit {
     private notificationStatusMetricService: NotificationStatusMetricService,
     private weeklyMetricService: NotificationWeeklyMetricService,
     private subscriptionRetentionMetricService: SubscriptionRetentionMetricService,
-    private subscriptionOptionalAnalysisMetricService: SubscriptionOptionalAnalysisMetricService
+    private subscriptionOptionalAnalysisMetricService: SubscriptionOptionalAnalysisMetricService,
+    private kpiViewedRateService: KpiViewedRateService
 
   ) {
 
@@ -81,6 +79,9 @@ export class NotificationChartComponent implements OnInit {
   dateFrom: string | null = null;
   dateUntil: string | null = null;
   selectedStatus: 'ALL' | 'SENT' | 'VISUALIZED' = 'ALL';
+  viewedRate: number = 0;
+  viewedCount: number = 0;
+  totalCount: number = 0;
 
 
   //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
@@ -115,7 +116,7 @@ export class NotificationChartComponent implements OnInit {
 
   kpis!: KPIModel;
 
-  notifications: NotificationModelChart[] = []
+  notifications: NotificationKPIViewedModel[] = []
 
   getAllNotifications() {
 
@@ -185,9 +186,21 @@ export class NotificationChartComponent implements OnInit {
         this.chartDataSubscriptionOptionalAnalysis = data;
       });
 
+      this.kpiViewedRateService.getViewedStats()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(stats => {
+        this.viewedRate = stats.viewedRate;
+        this.viewedCount = stats.viewed;
+        this.totalCount = stats.total;
+      });
+
+    this.loadData();
+
     //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
 
   }
+
+
 
   //START REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
 
@@ -214,6 +227,23 @@ export class NotificationChartComponent implements OnInit {
     this.dateUntil = null;
     this.selectedStatus = 'ALL';
     this.notificationStatusMetricService.resetFilters();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['dateFrom'] || changes['dateUntil']) {
+      this.updateDateFilter();
+    }
+  }
+
+  private updateDateFilter(): void {
+    this.kpiViewedRateService.updateDateFilter({
+      dateFrom: this.dateFrom,
+      dateUntil: this.dateUntil
+    });
+  }
+
+  loadData(): void {
+    this.kpiViewedRateService.loadNotificationStats();
   }
 
 //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
