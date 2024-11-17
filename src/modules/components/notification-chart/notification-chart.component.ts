@@ -93,10 +93,20 @@ export class NotificationChartComponent implements OnInit {
   viewedCount: number = 0;
   totalCount: number = 0;
   dailyAverage: number = 0;
-  peakHour: PeakHourStats;
-  frequentContact: FrequentContactStats;
-  mostActiveDay: ActiveDayStats;
-  averageRetention: 0;
+  peakHour: PeakHourStats = {
+    hour: 0,
+    count: 0
+  };
+  frequentContact: FrequentContactStats = {
+    email: '',
+    count: 0
+  };
+  mostActiveDay: ActiveDayStats = {
+    day: '',
+    count: 0,
+    percentage: 0
+  };
+  averageRetention: number = 0;
 
 
   //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
