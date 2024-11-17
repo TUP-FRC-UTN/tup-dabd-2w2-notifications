@@ -23,6 +23,7 @@ import { KpiDailyAverageService } from '../../../app/services/dashboard/kpi/kpi-
 import { KpiPeakTimeService, PeakHourStats } from '../../../app/services/dashboard/kpi/kpi-peak-time.service';
 import { FrequentContactStats, KpiMostFrequentContactService } from '../../../app/services/dashboard/kpi/kpi-most-frequent-contact.service';
 import { ActiveDayStats, KpiMostDayliActiveService } from '../../../app/services/dashboard/kpi/kpi-most-dayli-active.service';
+import { KpiAverageRetentionService } from '../../../app/services/dashboard/kpi/kpi-retention-optional-notifications.service';
 
 
 @Component({
@@ -55,7 +56,8 @@ export class NotificationChartComponent implements OnInit {
     private kpiDailyAverageService: KpiDailyAverageService,
     private kpiPeakTimeService: KpiPeakTimeService,
     private kpiMostFrequentContactService: KpiMostFrequentContactService,
-    private kpiMostDayliActiveService: KpiMostDayliActiveService
+    private kpiMostDayliActiveService: KpiMostDayliActiveService,
+    private kpiAverageRetentionService: KpiAverageRetentionService
 
   ) {
 
@@ -92,8 +94,9 @@ export class NotificationChartComponent implements OnInit {
   totalCount: number = 0;
   dailyAverage: number = 0;
   peakHour: PeakHourStats;
-  frequentContact: FrequentContactStats
-  mostActiveDay : ActiveDayStats;
+  frequentContact: FrequentContactStats;
+  mostActiveDay: ActiveDayStats;
+  averageRetention: 0;
 
 
   //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
@@ -156,7 +159,7 @@ export class NotificationChartComponent implements OnInit {
       this.dateUntil = this.formatDate(tomorrow);
 
       if (this.isBrowser) {
-       
+
       }
     });
 
@@ -224,10 +227,16 @@ export class NotificationChartComponent implements OnInit {
         this.frequentContact = stats;
       });
 
-      this.kpiMostDayliActiveService.getMostActiveDay()
+    this.kpiMostDayliActiveService.getMostActiveDay()
       .pipe(takeUntil(this.destroy$))
       .subscribe(stats => {
         this.mostActiveDay = stats;
+      });
+
+    this.kpiAverageRetentionService.getRetentionStats()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(stats => {
+        this.retentionKPIs.averageRetention = stats.averageRetention;
       });
 
 
@@ -299,6 +308,11 @@ export class NotificationChartComponent implements OnInit {
       dateUntil: this.dateUntil
     });
 
+    this.kpiAverageRetentionService.updateDateFilter({
+      dateFrom: this.dateFrom,
+      dateUntil: this.dateUntil
+    });
+
   }
 
   loadData(): void {
@@ -307,6 +321,7 @@ export class NotificationChartComponent implements OnInit {
     this.kpiPeakTimeService.loadNotifications();
     this.kpiMostFrequentContactService.loadNotifications();
     this.kpiMostDayliActiveService.loadNotifications();
+    this.kpiAverageRetentionService.loadData();
   }
 
   //END REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW REFACTOR NEW
