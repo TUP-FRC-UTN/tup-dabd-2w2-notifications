@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 import { NgbPagination, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { MainContainerComponent, ToastService, TableFiltersComponent, Filter, FilterConfigBuilder } from 'ngx-dabd-grupo01';
 import { SubscriptionService } from '../../../app/services/subscription.service';
-import { map } from 'rxjs';
+import { catchError, concatMap, map, switchMap, tap, throwError } from 'rxjs';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -83,18 +83,18 @@ export class ContactListComponent implements OnInit {
   selectedContact: ContactModel | null = null;
 
   //Estado de filtro de texto; global o filtrado
-  activeSearchTerm : ActiveSearchTerm = ActiveSearchTerm.GLOBAL;
+  activeSearchTerm: ActiveSearchTerm = ActiveSearchTerm.GLOBAL;
 
   //Envio a varios contactos
   emailService = inject(EmailService)
   templateService = inject(TemplateService)
-  selectedContacts : number[] = []
-  minimunContacts : boolean = false
-  isEmailModalOpen : boolean = false
-  emailSubject : string = ""
-  emailBody : string = ""
-  allTemplates : TemplateModel[] = []
-  selectedTemplate : number = 0
+  selectedContacts: number[] = []
+  minimunContacts: boolean = false
+  isEmailModalOpen: boolean = false
+  emailSubject: string = ""
+  emailBody: string = ""
+  allTemplates: TemplateModel[] = []
+  selectedTemplate: number = 0
   allSelected: boolean = false
 
   loadTemplates() {
@@ -104,24 +104,24 @@ export class ContactListComponent implements OnInit {
   }
   selectContact(contactId: number, event: Event) {
     const inputElement = event.target as HTMLInputElement
-    
+
     if (inputElement && inputElement.checked !== undefined) {
       const isSelected = inputElement.checked;
-  
+
       // Si el checkbox está seleccionado, agregar el contacto al array
-      if (isSelected) {        
+      if (isSelected) {
         this.selectedContacts.push(contactId);
-        
+
       } else {
         // Si el checkbox está desmarcado, eliminar el contacto del array
-        
+
         const index = this.selectedContacts.indexOf(contactId);
         if (index > -1) {
           this.selectedContacts.splice(index, 1);
         }
       }
     }
-  
+
     this.minimunContacts = this.selectedContacts.length >= 2;
   }
   openEmailModal() {
@@ -132,12 +132,12 @@ export class ContactListComponent implements OnInit {
   }
   sendEmail() {
     this.isLoading = true;
-    const data : EmailDataContact = {
+    const data: EmailDataContact = {
       subject: this.emailSubject,
       variables: [],
       templateId: this.selectedTemplate,
       contactIds: this.selectedContacts
-    }    
+    }
     this.emailService.sendEmailWithContacts(data).subscribe({
       next: () => {
         this.isEmailModalOpen = false
@@ -184,19 +184,19 @@ export class ContactListComponent implements OnInit {
 
 
 
-  filterConfig : Filter[] = new FilterConfigBuilder()
-  .textFilter('Refinar búsqueda', 'filteredSearch', 'Buscar...')
-  .selectFilter('Estado', 'status', 'Seleccione un estado', [
-    {value: 'ALL', 'label': 'Todos' },
-    {value: 'ACTIVE', label: 'Activos'},
-    {value: 'INACTIVE', label: 'Inactivos'}
-  ])
-  .selectFilter('Tipo', 'contactType', 'Seleccione un tipo de contacto', [
-    {value: 'EMAIL', label: 'Correo electrónico'},
-    {value: 'PHONE', label: 'Teléfono'},
-    {value: 'SOCIAL_MEDIA_LINK', label: 'Red social'}
-  ])
-  .build();
+  filterConfig: Filter[] = new FilterConfigBuilder()
+    .textFilter('Refinar búsqueda', 'filteredSearch', 'Buscar...')
+    .selectFilter('Estado', 'status', 'Seleccione un estado', [
+      { value: 'ALL', 'label': 'Todos' },
+      { value: 'ACTIVE', label: 'Activos' },
+      { value: 'INACTIVE', label: 'Inactivos' }
+    ])
+    .selectFilter('Tipo', 'contactType', 'Seleccione un tipo de contacto', [
+      { value: 'EMAIL', label: 'Correo electrónico' },
+      { value: 'PHONE', label: 'Teléfono' },
+      { value: 'SOCIAL_MEDIA_LINK', label: 'Red social' }
+    ])
+    .build();
 
 
 
@@ -232,22 +232,22 @@ export class ContactListComponent implements OnInit {
 
   filterChange($event: Record<string, any>) {
     this.clearFilters();
-    if($event['status']  && $event['status'].trim() !== '' ) {
-      if($event['status']==='ACTIVE'){
+    if ($event['status'] && $event['status'].trim() !== '') {
+      if ($event['status'] === 'ACTIVE') {
         this.isActiveContactFilter = true;
 
-     } else if ($event['status']==='INACTIVE' ) {
-       this.isActiveContactFilter = false;
-     } else {
-       this.isActiveContactFilter = undefined;
-     }
+      } else if ($event['status'] === 'INACTIVE') {
+        this.isActiveContactFilter = false;
+      } else {
+        this.isActiveContactFilter = undefined;
+      }
     }
 
-    if($event['contactType']  && $event['contactType'].trim() !== '' ) {
+    if ($event['contactType'] && $event['contactType'].trim() !== '') {
       this.selectedContactType = $event['contactType']
     }
 
-    if($event['filteredSearch']  && $event['filteredSearch'].trim() !== '' ) {
+    if ($event['filteredSearch'] && $event['filteredSearch'].trim() !== '') {
       this.activeSearchTerm = ActiveSearchTerm.FILTERED;
       this.filteredSearchTerm = $event['filteredSearch']
     }
@@ -260,8 +260,8 @@ export class ContactListComponent implements OnInit {
   private applyFilters() {
     this.currentPage = 1; // Resetear a la primera página al filtrar
     this.loadContacts(
-      this.isActiveContactFilter, 
-      this.activeSearchTerm === ActiveSearchTerm.FILTERED ? this.filteredSearchTerm : this.globalSearchTerm , 
+      this.isActiveContactFilter,
+      this.activeSearchTerm === ActiveSearchTerm.FILTERED ? this.filteredSearchTerm : this.globalSearchTerm,
       this.selectedContactType
     );
   }
@@ -277,7 +277,7 @@ export class ContactListComponent implements OnInit {
 
 
 
-  
+
 
 
 
@@ -301,7 +301,7 @@ export class ContactListComponent implements OnInit {
       this.loadContacts(this.isActiveContactFilter, this.globalSearchTerm, this.selectedContactType);
     }
   }
-  
+
   previousPage() {
     if (this.currentPage > 0) {
       this.currentPage--;
@@ -339,46 +339,50 @@ export class ContactListComponent implements OnInit {
     this.loadContacts();
   }
 
-  
+
 
   saveContact() {
     this.router.navigate(['/contact/new']);
   }
 
   editContact(contact: ContactModel) {
-    this.contactService.updateContact(contact).subscribe({
-      next: (response) => {
+
+
+    this.contactService.updateContact(contact).pipe(
+      tap(updateResponse => {
         const index = this.contacts.findIndex((c) => c.id === contact.id);
         if (index !== -1) {
           this.contacts[index] = { ...contact };
         }
+      }),
 
-        this.suscriptionService.updateContactSubscriptions(contact).subscribe({
-          next: (response) => {
+      concatMap(() => {
 
-          },
-          error: (error: HttpErrorResponse) => {
-
-            console.error('Error al actualizar las suscripciones del contacto intente nuevamente:', error);
-          },
-        });
+        return this.suscriptionService.updateContactSubscriptions(contact).pipe(
+          tap(response => console.log('', response)  )
+        );
+      })
+    ).subscribe({
+      next: (finalResponse) => {
 
         this.closeEditModal();
-
         this.toastService.sendSuccess(
-          'Éxito El contacto ha sido actualizado correctamente'
+          'Éxito: El contacto y sus suscripciones han sido actualizados correctamente'
         );
-
       },
       error: (error: HttpErrorResponse) => {
+
         this.toastService.sendError(
-          'Error Ha ocurrido un error al intentar actualizar el contacto intente nuevamente...'
+          'Error: Ha ocurrido un error al intentar actualizar el contacto. Intente nuevamente...'
         );
         this.closeEditModal();
-        console.error('Error al editar el contacto:', error);
       },
+      complete: () => {
+
+      }
     });
   }
+
 
   deleteContact(contact: ContactModel) {
     this.contactService.deleteContact(contact.id).subscribe({
@@ -586,7 +590,7 @@ export class ContactListComponent implements OnInit {
   openTelegramModal() {
     this.isTelegramModalOpen = true;
   }
-  
+
   closeTelegramModal() {
     this.isTelegramModalOpen = false;
   }
