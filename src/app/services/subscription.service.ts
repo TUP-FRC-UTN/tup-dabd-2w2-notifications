@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Subscription } from '../models/suscriptions/subscription';
 import { ContactModel } from '../models/contacts/contactModel';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
 interface ApiSubscriptionUpdate {
@@ -19,6 +19,9 @@ interface ApiContactResponse {
   contact_type: string;
   active: boolean;
 }
+
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -45,39 +48,50 @@ export class SubscriptionService {
   }
 
 
-
-
   updateContactSubscriptions(contact: ContactModel): Observable<ContactModel> {
-
     return this.getAllSubscriptions().pipe(
       switchMap(availableSubscriptions => {
+        // Primero obtenemos el estado actual del contacto
+        return this.getContactSubscriptions(contact.id).pipe(
+          switchMap(currentContact => {
+            // Encontramos las suscripciones que necesitan ser desactivadas
+            // (las que están en currentContact.subscriptions pero no en contact.subscriptions)
+            const subscriptionsToUpdate = availableSubscriptions.filter(subscription =>
+              currentContact.subscriptions.includes(subscription.name) &&
+              !contact.subscriptions.includes(subscription.name)
+            );
 
-        const updateObservables = contact.subscriptions.map(subscriptionName => {
-          const subscription = availableSubscriptions.find(s => s.name === subscriptionName);
+            if (subscriptionsToUpdate.length === 0) {
+              return of(contact);
+            }
 
-          if (!subscription) {
-            throw new Error(`Subscription ${subscriptionName} not found`);
-          }
+            const updateObservables = subscriptionsToUpdate.map(subscription => {
+              const updateData: ApiSubscriptionUpdate = {
+                contactId: contact.id,
+                subscriptionId: subscription.id,
+                subscriptionValue: false
+              };
 
+              console.log('Actualizando suscripción:', updateData);
+              return this.http.put<any>(`${this.apiUrl}/contacts/subscriptions`, updateData);
+            });
 
-          const updateData: ApiSubscriptionUpdate = {
-            contactId: contact.id,
-            subscriptionId: subscription.id,
-            subscriptionValue: true
-          };
-
-
-          return this.http.put<any>(`${this.apiUrl}/subscriptions`, updateData);
-        });
-
-
-        return forkJoin(updateObservables).pipe(
-          map(() => contact)
+            return forkJoin(updateObservables).pipe(
+              map(() => contact)
+            );
+          })
         );
       })
     );
   }
 
+
+
+  private getContactSubscriptions(contactId: number): Observable<ApiContactResponse> {
+    return this.http.get<ApiContactResponse>(
+      `${this.apiUrl}/contacts/${contactId}`
+    );
+  }
 
 
   getSubscriptionNameInSpanish(englishName: string): string {
