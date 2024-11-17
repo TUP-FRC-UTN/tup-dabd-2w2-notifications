@@ -28,15 +28,15 @@ export class KpiAverageRetentionService {
   private contactService = inject(ContactService);
 
   private readonly OPTIONAL_SUBSCRIPTIONS = [
-    'GENERAL',
-    'EMPLOYEE_PAYMENT',
-    'EXPENSES_EXPIRATION',
-    'GENERAL_BILL',
-    'PAYMENT',
-    'ASSOCIATED_USER_CREATED',
-    'WORKER_LATE_DEPARTURE',
-    'INVENTORY',
-    'GENERAL_EXPENSE'
+    'General',
+    'Pago de Empleados',
+    'Vencimiento de Gastos',
+    'Factura General',
+    'Pago',
+    'Usuario Asociado Creado',
+    'Salida Tardía de Trabajador',
+    'Inventario',
+    'Gasto General'
   ];
 
   private currentFilter$ = new BehaviorSubject<DateFilter>({
